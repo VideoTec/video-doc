@@ -1,0 +1,49 @@
+文档
+ * @param pkt The packet containing the data to be written.
+ *            <br>
+ *            If the packet is reference-counted, this function will take
+ *            ownership of this reference and unreference it later when it sees
+ *            fit.
+ *            The caller must not access the data through this reference after
+ *            this function returns. If the packet is not reference-counted,
+ *            libavformat will make a copy.
+ *            <br>
+ *            This parameter can be NULL (at any time, not just at the end), to
+ *            flush the interleaving queues.
+ *            <br>
+ *            Packet's @ref AVPacket.stream_index "stream_index" field must be
+ *            set to the index of the corresponding stream in @ref
+ *            AVFormatContext.streams "s->streams". It is very strongly
+ *            recommended that timing information (@ref AVPacket.pts "pts", @ref
+ *            AVPacket.dts "dts", @ref AVPacket.duration "duration") is set to
+ *            correct values.
+ 
+1. If the packet is reference-counted
+2. If the packet is not reference-counted
+3. 传递空值用于：flush the interleaving queues
+4. AVPacket.stream_index 必须设置
+5. AVPacket.pts 必须设置
+
+14:22 2015/7/9
+pkt.pts 必须设置正确，否则输出文件不问题。声音和视频一样。
+avcodec_encode_audio2, avcodec_encode_video2 会依据 frame->pts 为输出的Pkt计算合适的时间戳
+今天遇到一个问题，分成三种情况
+1. 传给 avcodec_encode_audio2 frame->pts 是 AV_NOPTS_VALUE 输出的文件为空
+2. 传给 avcodec_encode_audio2 frame->pts 是 0 输出的文件可以播放，但格式有问题
+3. 传给 avcodec_encode_audio2 frame->pts 是 递增1024， 输出的文件正常
+
+20:54 2015/7/8
+Libavformat will always take care of freeing the packet, even if this function fails.
+
+22:19 2015/4/23
+遇到的问题：H:\WinApp\libav-test\msource-change-history.txt 18:51 2015/4/23
+总结 av_interleaved_write_frame 的 pkt 参数的 pts and dts 参数的作用？
+
+文档里的说法是：三个值最好设置成正确的值
+It is very strongly recommended that timing information is set to correct values
+(@ref AVPacket.pts "pts", @ref AVPacket.dts "dts", @ref AVPacket.duration "duration")
+
+2015.4.21 av_interleaved_write_frame 会释放 packet? 
+         还是 局部变量 的 reference-counted pkt，退出作用域时会自动释放空间？
+		 av_interleaved_write_frame 最终会调用 av_packet_unref 释放为 avpkt 分配的内存。
+		 22:19 2015/4/23 只释放 引用计数的 缓存。

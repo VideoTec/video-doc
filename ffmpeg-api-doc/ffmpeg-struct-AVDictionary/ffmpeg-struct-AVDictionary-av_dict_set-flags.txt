@@ -1,0 +1,17 @@
+ * @param key entry key to add to *pm (will be av_strduped depending on flags)
+ * @param value entry value to add to *pm (will be av_strduped depending on flags).
+ *        Passing a NULL value will cause an existing entry to be deleted.
+ 
+int av_dict_set(AVDictionary **pm, const char *key, const char *value, int flags);
+
+E:\libav\libavutil\dict.h
+
+#define AV_DICT_MATCH_CASE      1
+#define AV_DICT_IGNORE_SUFFIX   2
+#define AV_DICT_DONT_STRDUP_KEY 4   /**< Take ownership of a key that's been
+                                         allocated with av_malloc() and children. */
+#define AV_DICT_DONT_STRDUP_VAL 8   /**< Take ownership of a value that's been
+                                         allocated with av_malloc() and chilren. */
+#define AV_DICT_DONT_OVERWRITE 16   ///< Don't overwrite existing entries.
+#define AV_DICT_APPEND         32   /**< If the entry already exists, append to it.  Note that no
+                                      delimiter is added, the strings are simply concatenated. */

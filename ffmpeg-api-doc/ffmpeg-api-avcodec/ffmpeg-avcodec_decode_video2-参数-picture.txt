@@ -1,0 +1,43 @@
+文档
+ * @param[out] picture The AVFrame in which the decoded video frame will be stored.
+ *             Use av_frame_alloc() to get an AVFrame. The codec will
+ *             allocate memory for the actual bitmap by calling the
+ *             AVCodecContext.get_buffer2() callback.
+ *             When AVCodecContext.refcounted_frames is set to 1, the frame is
+ *             reference counted and the returned reference belongs to the
+ *             caller. The caller must release the frame using av_frame_unref()
+ *             when the frame is no longer needed. The caller may safely write
+ *             to the frame if av_frame_is_writable() returns 1.
+ *             When AVCodecContext.refcounted_frames is set to 0, the returned
+ *             reference belongs to the decoder and is valid only until the
+ *             next call to this function or until closing or flushing the
+ *             decoder. The caller may not write to it.
+ 
+ ------------------------------------------------------------------
+ When AVCodecContext.refcounted_frames is set to 1
+ ------------------------------------------------------------------
+ AVFrame 的引用归 用户管理
+ The caller must release the frame using av_frame_unref()
+ when the frame is no longer needed.
+ The caller may safely write to the frame 
+ if av_frame_is_writable() returns 1
+ 
+ ------------------------------------------------------------------
+ When AVCodecContext.refcounted_frames is set to 0 【默认为 0】
+ ------------------------------------------------------------------
+ AVFrame 的引用归 解码器管理
+ AVFrame 的有效期 一直到下次调用这个编码函数时 或者 closing or flushing解码器时。
+ 
+ 
+ ------------------------------------------------------------------
+ 需要初始化吗？不需要 av_frame_alloc av_frame_unref 会初始化必须的值
+ ------------------------------------------------------------------
+ 
+ 关于初始化 AVFrame - get_frame_defaults(frame); 会初始必要的字段 
+ 调用 get_frame_defaults 的接口有：
+ 1. av_frame_alloc get_frame_defaults
+ 2. av_frame_free 调用 av_frame_unref 调用 get_frame_defaults
+ 
+ ------------------------------------------------------------------
+ 使用完后，需要释放？需要调用 av_frame_unref
+ ------------------------------------------------------------------

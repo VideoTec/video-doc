@@ -1,0 +1,39 @@
+头文件：avutil/buffer_internal.h
+
+---------------------------------------
+在 buffer.h 里定义了
+---------------------------------------
+/**
+ * A reference counted buffer type. It is opaque and is meant to be used through
+ * references (AVBufferRef).
+ */
+typedef struct AVBuffer AVBuffer;
+
+---------------------------------------
+在 buffer_internal.h 里定义了
+---------------------------------------
+
+struct AVBuffer {
+    uint8_t *data; /**< data described by this buffer */
+    int      size; /**< size of data in bytes */
+
+    /**
+     *  number of existing AVBufferRef instances referring to this buffer
+     */
+    volatile int refcount;
+
+    /**
+     * a callback for freeing the data
+     */
+    void (*free)(void *opaque, uint8_t *data);
+
+    /**
+     * an opaque pointer, to be used by the freeing callback
+     */
+    void *opaque;
+
+    /**
+     * A combination of BUFFER_FLAG_*
+     */
+    int flags;
+};

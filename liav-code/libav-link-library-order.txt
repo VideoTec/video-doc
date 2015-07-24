@@ -1,0 +1,2 @@
+指定链接库的顺序:
+-lavformat -lavcodec -lavfilter -lswresample -lswscale -lavutil

@@ -1,0 +1,23 @@
+把四字符 tag 转成整数
+
+#define MKTAG(a,b,c,d) ((a) | ((b) << 8) | ((c) << 16) | ((unsigned)(d) << 24))
+#define MKBETAG(a,b,c,d) ((d) | ((c) << 8) | ((b) << 16) | ((unsigned)(a) << 24))
+
+示例见 
+E:\libav\libavformat\mov.c
+
+/* those functions parse an atom */
+/* links atom IDs to parse functions */
+typedef struct MOVParseTableEntry {
+    uint32_t type;
+    int (*parse)(MOVContext *ctx, AVIOContext *pb, MOVAtom atom);
+} MOVParseTableEntry;
+
+static const MOVParseTableEntry mov_default_parse_table[] = {
+{ MKTAG('a','v','s','s'), mov_read_extradata },
+{ MKTAG('c','h','p','l'), mov_read_chpl },
+{ MKTAG('c','o','6','4'), mov_read_stco },
+{ MKTAG('c','t','t','s'), mov_read_ctts }, /* composition time to sample */
+{ MKTAG('d','i','n','f'), mov_read_default },
+{ MKTAG('d','r','e','f'), mov_read_dref },
+{ MKTAG('e','d','t','s'), mov_read_default },

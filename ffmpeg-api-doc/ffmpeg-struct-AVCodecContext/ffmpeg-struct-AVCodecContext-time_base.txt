@@ -1,0 +1,69 @@
+AVCodecContext 时间单元
+
+    /**
+     * This is the fundamental[美][ˌfʌndəˈmɛntl]基本的 unit of time (in seconds) in terms
+     * of which frame timestamps are represented. For fixed-fps content,
+     * timebase should be 1/framerate and timestamp increments should be
+     * identically 1.
+     * - encoding: MUST be set by user. 必须设置，怎么设置？
+     * - decoding: Set by libavcodec.
+     */
+    AVRational time_base;
+
+/**
+ * rational number numerator/denominator
+ */
+typedef struct AVRational{
+    int num; ///< numerator
+    int den; ///< denominator
+} AVRational;
+
+
+-----------------------------
+encoding: MUST be set by user. 必须设置，怎么设置？
+-----------------------------
+avconv.c 
+/* for each output stream, we compute the right encoding parameters */
+            if (!copy_tb) {
+                enc_ctx->time_base      = dec_ctx->time_base;
+                enc_ctx->time_base.num *= dec_ctx->ticks_per_frame;
+                av_reduce(&enc_ctx->time_base.num, &enc_ctx->time_base.den,
+                          enc_ctx->time_base.num, enc_ctx->time_base.den, INT_MAX);
+            } else
+                enc_ctx->time_base = ist->st->time_base;
+
+-------------------------------------
+这个 time_base 有什么用？ 见 avconv.c
+-------------------------------------
+
+用于计算 编码时间戳？
+av_packet_rescale_ts(&pkt, enc->time_base, ost->st->time_base);
+
+static void do_audio_out(AVFormatContext *s, OutputStream *ost,
+                         AVFrame *frame)
+{
+    AVCodecContext *enc = ost->enc_ctx;
+    AVPacket pkt;
+    int got_packet = 0;
+
+    av_init_packet(&pkt);
+    pkt.data = NULL;
+    pkt.size = 0;
+
+    if (frame->pts == AV_NOPTS_VALUE || audio_sync_method < 0)
+        frame->pts = ost->sync_opts;
+    ost->sync_opts = frame->pts + frame->nb_samples;
+
+    ost->samples_encoded += frame->nb_samples;
+    ost->frames_encoded++;
+
+    if (avcodec_encode_audio2(enc, &pkt, frame, &got_packet) < 0) {
+        av_log(NULL, AV_LOG_FATAL, "Audio encoding failed\n");
+        exit_program(1);
+    }
+
+    if (got_packet) {
+        av_packet_rescale_ts(&pkt, enc->time_base, ost->st->time_base);
+        write_frame(s, &pkt, ost);
+    }
+}

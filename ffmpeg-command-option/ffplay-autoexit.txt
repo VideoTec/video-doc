@@ -1,0 +1,21 @@
+avplay doc
+‘-noautoexit’
+Do not exit after playback is finished.
+
+‘-exitonkeydown’
+Exit if any key is pressed.
+
+‘-exitonmousedown’
+Exit if any mouse button is pressed.
+
+
+ffplay doc
+
+-autoexit
+Exit when video is done playing.
+
+-exitonkeydown
+Exit if any key is pressed.
+
+-exitonmousedown
+Exit if any mouse button is pressed.

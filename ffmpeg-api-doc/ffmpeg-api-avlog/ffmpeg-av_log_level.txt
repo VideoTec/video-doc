@@ -1,0 +1,70 @@
+libavutil/log.c
+
+static int av_log_level = AV_LOG_INFO;
+
+int av_log_get_level(void)
+{
+    return av_log_level;
+}
+
+void av_log_set_level(int level)
+{
+    av_log_level = level;
+}
+
+libavutil/log.h 定义了所有 log level 
+#define AV_LOG_QUIET
+#define AV_LOG_PANIC     0
+#define AV_LOG_FATAL     8
+#define AV_LOG_ERROR    16
+#define AV_LOG_WARNING  24
+#define AV_LOG_INFO     32
+#define AV_LOG_VERBOSE  40
+#define AV_LOG_DEBUG    48
+
+log level 的详细解释
+/**
+ * Print no output.
+ */
+#define AV_LOG_QUIET    -8
+
+/**
+ * Something went really wrong and we will crash now.
+ */
+#define AV_LOG_PANIC     0
+
+/**
+ * Something went wrong and recovery is not possible.
+ * For example, no header was found for a format which depends
+ * on headers or an illegal combination of parameters is used.
+ */
+#define AV_LOG_FATAL     8
+
+/**
+ * Something went wrong and cannot losslessly be recovered.
+ * However, not all future data is affected.
+ */
+#define AV_LOG_ERROR    16
+
+/**
+ * Something somehow does not look correct. This may or may not
+ * lead to problems. An example would be the use of '-vstrict -2'.
+ */
+#define AV_LOG_WARNING  24
+
+/**
+ * Standard information.
+ */
+#define AV_LOG_INFO     32
+
+/**
+ * Detailed information.
+ */
+#define AV_LOG_VERBOSE  40
+
+/**
+ * Stuff which is only useful for libav* developers.
+ */
+#define AV_LOG_DEBUG    48
+
+#define AV_LOG_MAX_OFFSET (AV_LOG_DEBUG - AV_LOG_QUIET)

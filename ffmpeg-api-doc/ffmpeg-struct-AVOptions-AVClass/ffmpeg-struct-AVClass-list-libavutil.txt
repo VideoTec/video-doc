@@ -1,0 +1,37 @@
+
+E:\ffmpeg-src\libavutil\opt.c
+static const AVClass test_class = {
+    "TestContext",
+    test_get_name,
+    test_options
+};
+
+E:\ffmpeg-src\libavutil\opencl.c
+static const AVClass openclutils_class = {
+    .class_name                = "OPENCLUTILS",
+    .option                    = opencl_options,
+    .item_name                 = av_default_item_name,
+    .version                   = LIBAVUTIL_VERSION_INT,
+    .log_level_offset_offset   = offsetof(OpenclContext, log_offset),
+    .parent_log_context_offset = offsetof(OpenclContext, log_ctx),
+};
+
+E:\ffmpeg-src\libavutil\imgutils.c
+static const AVClass imgutils_class = { "IMGUTILS", av_default_item_name, NULL, LIBAVUTIL_VERSION_INT, offsetof(ImgUtils, log_offset), offsetof(ImgUtils, log_ctx) };
+
+E:\ffmpeg-src\libavutil\eval.c
+static const AVClass eval_class = { "Eval", av_default_item_name, NULL, LIBAVUTIL_VERSION_INT, offsetof(Parser,log_offset), offsetof(Parser,log_ctx) };
+
+E:\ffmpeg-src\libavutil\cpu.c 两个 AVClass 结构体
+    static const AVClass class = {
+        .class_name = "cpuflags",
+        .item_name  = av_default_item_name,
+        .option     = cpuflags_opts,
+        .version    = LIBAVUTIL_VERSION_INT,
+    };
+    static const AVClass class = {
+        .class_name = "cpuflags",
+        .item_name  = av_default_item_name,
+        .option     = cpuflags_opts,
+        .version    = LIBAVUTIL_VERSION_INT,
+    };

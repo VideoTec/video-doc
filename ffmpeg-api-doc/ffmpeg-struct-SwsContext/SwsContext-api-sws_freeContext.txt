@@ -1,0 +1,72 @@
+头文件：libswscale/swscale.h
+源文件：libswscale/utils.c
+
+/**
+ * Free the swscaler context swsContext.
+ * If swsContext is NULL, then does nothing.
+ */
+void sws_freeContext(struct SwsContext *swsContext);
+
+void sws_freeContext(SwsContext *c)
+{
+    int i;
+    if (!c)
+        return;
+
+    if (c->lumPixBuf) {
+        for (i = 0; i < c->vLumBufSize; i++)
+            av_freep(&c->lumPixBuf[i]);
+        av_freep(&c->lumPixBuf);
+    }
+
+    if (c->chrUPixBuf) {
+        for (i = 0; i < c->vChrBufSize; i++)
+            av_freep(&c->chrUPixBuf[i]);
+        av_freep(&c->chrUPixBuf);
+        av_freep(&c->chrVPixBuf);
+    }
+
+    if (CONFIG_SWSCALE_ALPHA && c->alpPixBuf) {
+        for (i = 0; i < c->vLumBufSize; i++)
+            av_freep(&c->alpPixBuf[i]);
+        av_freep(&c->alpPixBuf);
+    }
+
+    av_freep(&c->vLumFilter);
+    av_freep(&c->vChrFilter);
+    av_freep(&c->hLumFilter);
+    av_freep(&c->hChrFilter);
+#if HAVE_ALTIVEC
+    av_freep(&c->vYCoeffsBank);
+    av_freep(&c->vCCoeffsBank);
+#endif
+
+    av_freep(&c->vLumFilterPos);
+    av_freep(&c->vChrFilterPos);
+    av_freep(&c->hLumFilterPos);
+    av_freep(&c->hChrFilterPos);
+
+#if HAVE_MMX_INLINE
+#if USE_MMAP
+    if (c->lumMmxextFilterCode)
+        munmap(c->lumMmxextFilterCode, c->lumMmxextFilterCodeSize);
+    if (c->chrMmxextFilterCode)
+        munmap(c->chrMmxextFilterCode, c->chrMmxextFilterCodeSize);
+#elif HAVE_VIRTUALALLOC
+    if (c->lumMmxextFilterCode)
+        VirtualFree(c->lumMmxextFilterCode, 0, MEM_RELEASE);
+    if (c->chrMmxextFilterCode)
+        VirtualFree(c->chrMmxextFilterCode, 0, MEM_RELEASE);
+#else
+    av_free(c->lumMmxextFilterCode);
+    av_free(c->chrMmxextFilterCode);
+#endif
+    c->lumMmxextFilterCode = NULL;
+    c->chrMmxextFilterCode = NULL;
+#endif /* HAVE_MMX_INLINE */
+
+    av_freep(&c->yuvTable);
+    av_free(c->formatConvBuffer);
+
+    av_free(c);
+}

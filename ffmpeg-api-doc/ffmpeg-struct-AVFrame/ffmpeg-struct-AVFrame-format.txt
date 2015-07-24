@@ -1,0 +1,9 @@
+用于 指定 声音或者图片 的格式
+
+
+    /**
+     * format of the frame, -1 if unknown or unset
+     * Values correspond to enum AVPixelFormat for video frames,
+     * enum AVSampleFormat for audio)
+     */
+    int format;

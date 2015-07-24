@@ -1,0 +1,55 @@
+libavformat ¿â£º
+TESTPROGS = seek                                                        \
+            srtp                                                        \
+            url                                                         \
+
+TESTPROGS-$(CONFIG_NETWORK)              += noproxy
+
+TOOLS     = aviocat                                                     \
+            ismindex                                                    \
+            pktdumper                                                   \
+            probetest                                                   \
+
+libavcodec
+TESTPROGS-$(CONFIG_FFT)                   += fft fft-fixed
+TESTPROGS-$(CONFIG_IDCTDSP)               += dct
+TESTPROGS-$(CONFIG_IIRFILTER)             += iirfilter
+TESTPROGS-$(CONFIG_GOLOMB)                += golomb
+TESTPROGS-$(CONFIG_RANGECODER)            += rangecoder
+
+libavutil
+TESTPROGS = adler32                                                     \
+            aes                                                         \
+            atomic                                                      \
+            avstring                                                    \
+            base64                                                      \
+            blowfish                                                    \
+            cpu                                                         \
+            crc                                                         \
+            des                                                         \
+            eval                                                        \
+            fifo                                                        \
+            float_dsp                                                   \
+            hmac                                                        \
+            lfg                                                         \
+            lls                                                         \
+            md5                                                         \
+            opt                                                         \
+            parseutils                                                  \
+            sha                                                         \
+            tree                                                        \
+            xtea                                                        \
+
+libavresample
+TESTPROGS = avresample
+
+libswscale
+TESTPROGS = colorspace                                                  \
+            swscale                                                     \
+
+libavfilter
+TOOLS     = graph2dot
+TESTPROGS = filtfmts
+
+libavdevice
+TESTPROGS = timefilter

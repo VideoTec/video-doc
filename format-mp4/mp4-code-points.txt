@@ -1,0 +1,15 @@
+http://www.mp4ra.org/
+
+mp4 code-points 列表
+http://www.mp4ra.org/atoms.html
+
+This site is the registration authority for code-points in "MP4 Family" files. 
+Within the documentation on this site are code-points from specifications both using and related to the ISO specifications for which this is the formal registry.
+
+The registered code-points include four-character codes (4CCs) used in various ways within these file formats, and 
+ObjectTypeIndication values used in MPEG-4 systems. 
+The four-character codes are divided into various categories, for convenience. 
+The largest category is the box (atom) types. 
+The only box (atom) types which are not normally registered are boxes that are within the sample entry (sample description) for, and specific to, 
+a codec or family of codecs, or 
+that are used in a specific coding system (e.g. boxes used in a specific hint track).

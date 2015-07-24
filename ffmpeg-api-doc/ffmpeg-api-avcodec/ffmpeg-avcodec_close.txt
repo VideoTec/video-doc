@@ -1,0 +1,181 @@
+libavcodec\avcodec.h
+libavcodec\utils.c
+
+/**
+ * Close a given AVCodecContext and free all the data associated with it
+ * (but not the AVCodecContext itself).
+ *
+ * Calling this function on an AVCodecContext that hasn't been opened will free
+ * the codec-specific data allocated in avcodec_alloc_context3() /
+ * avcodec_get_context_defaults3() with a non-NULL codec. Subsequent calls will
+ * do nothing.
+ */
+int avcodec_close(AVCodecContext *avctx);
+
+--------------------------------
+源码：
+--------------------------------
+
+av_cold int avcodec_close(AVCodecContext *avctx)
+{
+    if (avcodec_is_open(avctx)) {
+        FramePool *pool = avctx->internal->pool;
+        int i;
+        if (HAVE_THREADS && avctx->internal->thread_ctx)
+            ff_thread_free(avctx);
+        if (avctx->codec && avctx->codec->close)
+            avctx->codec->close(avctx);
+        avctx->coded_frame = NULL;
+        av_frame_free(&avctx->internal->to_free);
+        for (i = 0; i < FF_ARRAY_ELEMS(pool->pools); i++)
+            av_buffer_pool_uninit(&pool->pools[i]);
+        av_freep(&avctx->internal->pool);
+
+        if (avctx->hwaccel && avctx->hwaccel->uninit)
+            avctx->hwaccel->uninit(avctx);
+        av_freep(&avctx->internal->hwaccel_priv_data);
+
+        av_freep(&avctx->internal);
+    }
+
+    if (avctx->priv_data && avctx->codec && avctx->codec->priv_class)
+        av_opt_free(avctx->priv_data);
+    av_opt_free(avctx);
+    av_freep(&avctx->priv_data);
+    if (av_codec_is_encoder(avctx->codec))
+        av_freep(&avctx->extradata);
+    avctx->codec = NULL;
+    avctx->active_thread_type = 0;
+
+    return 0;
+}
+
+
+--------------------------------
+调用 示例
+--------------------------------
+libavformat/utils.c
+int avformat_find_stream_info(AVFormatContext *ic, AVDictionary **options)
+{
+    // close codecs which were opened in try_decode_frame()
+    for (i = 0; i < ic->nb_streams; i++) {
+        st = ic->streams[i];
+        avcodec_close(st->codec);
+    }
+
+--------------------------------
+调用 示例
+--------------------------------
+libavcodec/options.c
+void avcodec_free_context(AVCodecContext **pavctx)
+{
+    AVCodecContext *avctx = *pavctx;
+
+    if (!avctx)
+        return;
+
+    avcodec_close(avctx);
+
+    av_freep(&avctx->extradata);
+    av_freep(&avctx->subtitle_header);
+
+    av_freep(pavctx);
+}
+
+--------------------------------
+调用 示例
+--------------------------------
+E:\libav\doc\examples\transcode_aac.c
+cleanup:
+    if (fifo)
+        av_audio_fifo_free(fifo);
+    if (resample_context) {
+        avresample_close(resample_context);
+        avresample_free(&resample_context);
+    }
+    if (output_codec_context)
+        avcodec_close(output_codec_context);
+    if (output_format_context) {
+        avio_close(output_format_context->pb);
+        avformat_free_context(output_format_context);
+    }
+    if (input_codec_context)
+        avcodec_close(input_codec_context);
+    if (input_format_context)
+        avformat_close_input(&input_format_context);
+
+    return ret;
+}
+
+--------------------------------
+调用 示例
+--------------------------------
+avconv.c
+    /* close each decoder */
+    for (i = 0; i < nb_input_streams; i++) {
+        ist = input_streams[i];
+        if (ist->decoding_needed) {
+            avcodec_close(ist->dec_ctx);
+            if (ist->hwaccel_uninit)
+                ist->hwaccel_uninit(ist->dec_ctx);
+        }
+    }
+
+--------------------------------
+调用 示例
+--------------------------------
+avplay.c
+static void stream_component_close(VideoState *is, int stream_index)
+{
+    ic->streams[stream_index]->discard = AVDISCARD_ALL;
+    avcodec_close(avctx)
+
+--------------------------------
+调用 示例
+--------------------------------
+avprobe.c
+static void close_input_file(AVFormatContext **ctx_ptr)
+{
+    int i;
+    AVFormatContext *fmt_ctx = *ctx_ptr;
+
+    /* close decoder for each stream */
+    for (i = 0; i < fmt_ctx->nb_streams; i++) {
+        AVStream *stream = fmt_ctx->streams[i];
+
+        avcodec_close(stream->codec);
+    }
+    avformat_close_input(ctx_ptr);
+}
+
+--------------------------------
+调用 示例
+--------------------------------
+E:\libav\doc\examples\output.c
+
+static void close_stream(AVFormatContext *oc, OutputStream *ost)
+{
+    avcodec_close(ost->st->codec);
+    av_frame_free(&ost->frame);
+    av_frame_free(&ost->tmp_frame);
+    sws_freeContext(ost->sws_ctx);
+    avresample_free(&ost->avr);
+}
+    /* Write the trailer, if any. The trailer must be written before you
+     * close the CodecContexts open when you wrote the header; otherwise
+     * av_write_trailer() may try to use memory that was freed on
+     * av_codec_close(). */
+    av_write_trailer(oc);
+
+    /* Close each codec. */
+    if (have_video)
+        close_stream(oc, &video_st);
+    if (have_audio)
+        close_stream(oc, &audio_st);
+
+    if (!(fmt->flags & AVFMT_NOFILE))
+        /* Close the output file. */
+        avio_close(oc->pb);
+
+    /* free the stream */
+    avformat_free_context(oc);

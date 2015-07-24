@@ -1,0 +1,70 @@
+头文件：avutil/buffer.h
+源文件：avutil/buffer.c
+
+/**
+ * Reallocate a given buffer.
+ *
+ * @param buf  a buffer reference to reallocate. On success, buf will be
+ *             unreferenced and a new reference with the required size will be
+ *             written in its place. On failure buf will be left untouched. *buf
+ *             may be NULL, then a new buffer is allocated.
+ * @param size required new buffer size.
+ * @return 0 on success, a negative AVERROR on failure.
+ *
+ * @note the buffer is actually reallocated with av_realloc() only if it was
+ * initially allocated through av_buffer_realloc(NULL) and there is only one
+ * reference to it (i.e. the one passed to this function). In all other cases
+ * a new buffer is allocated and the data is copied.
+ */
+int av_buffer_realloc(AVBufferRef **buf, int size);
+
+int av_buffer_realloc(AVBufferRef **pbuf, int size)
+{
+    AVBufferRef *buf = *pbuf;
+    uint8_t *tmp;
+
+    if (!buf) {
+        /* allocate a new buffer with av_realloc(), so it will be reallocatable
+         * later */
+        uint8_t *data = av_realloc(NULL, size);
+        if (!data)
+            return AVERROR(ENOMEM);
+
+        buf = av_buffer_create(data, size, av_buffer_default_free, NULL, 0);
+        if (!buf) {
+            av_freep(&data);
+            return AVERROR(ENOMEM);
+        }
+
+        buf->buffer->flags |= BUFFER_FLAG_REALLOCATABLE;
+        *pbuf = buf;
+
+        return 0;
+    } else if (buf->size == size)
+        return 0;
+
+    if (!(buf->buffer->flags & BUFFER_FLAG_REALLOCATABLE) ||
+        !av_buffer_is_writable(buf)) {
+        /* cannot realloc, allocate a new reallocable buffer and copy data */
+        AVBufferRef *new = NULL;
+
+        av_buffer_realloc(&new, size);
+        if (!new)
+            return AVERROR(ENOMEM);
+
+        memcpy(new->data, buf->data, FFMIN(size, buf->size));
+
+        av_buffer_unref(pbuf);
+        *pbuf = new;
+        return 0;
+    }
+
+    tmp = av_realloc(buf->buffer->data, size);
+    if (!tmp)
+        return AVERROR(ENOMEM);
+
+    buf->buffer->data = buf->data = tmp;
+    buf->buffer->size = buf->size = size;
+    return 0;
+}
+

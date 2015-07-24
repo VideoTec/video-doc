@@ -1,0 +1,29 @@
+http://www.raywenderlich.com/69365/audio-tutorial-ios-file-data-formats-2014-edition
+There are several variants of linear PCM depending on how the data is stored. 
+The data can be stored in big or little endian formats, as floats or integers, and in varying bit-widths.
+
+The most important thing to know here is the preferred variant of linear PCM on the iPhone is little-endian integer 16-bit, or LEI16 for short. 
+Note that this differs from the preferred variant on the Mac OSX, which is native-endian floating point 32-bit. 
+Because audio files are often created on the Mac, 
+it’s a good idea to examine the files and convert them to the preferred format for the iPhone.
+
+http://www.cnblogs.com/ios8/p/iphone-audio.html
+Linear PCM是iPhone上最喜欢的无压缩数据格式。
+根据音频数据如何存储，Linear PCM有几个变种。例如，数据可以存储成大端格式，小端格式；数据可以存储成浮点型，整型，和各种位宽。
+
+
+iPhone上最喜欢的linear PCM变种是小端，整型，16-bit或者LEI16。
+MAC OSX上最喜欢的linear PCM变种是native-endian floating point 32-bit
+
+
+因为音频文件经常在MAC上创建，所以在iPhone上使用时最好先检查一下，最好转换成iPhone喜欢的格式后再用。
+
+参考： twos
+static const AVCodecTag ff_codec_aiff_tags[] = {
+     { CODEC_ID_MACE6,        MKTAG('M','A','C','6') },
+     { CODEC_ID_GSM,          MKTAG('G','S','M',' ') },
+     { CODEC_ID_ADPCM_G726,   MKTAG('G','7','2','6') },
++    { CODEC_ID_PCM_S16BE,    MKTAG('t','w','o','s') },
+     { CODEC_ID_PCM_S16LE,    MKTAG('s','o','w','t') },
+     { CODEC_ID_ADPCM_IMA_QT, MKTAG('i','m','a','4') },
+     { CODEC_ID_QDM2,         MKTAG('Q','D','M','2') },

@@ -1,0 +1,45 @@
+av_strerror 源码
+
+int av_strerror(int errnum, char *errbuf, size_t errbuf_size)
+{
+    int ret = 0, i;
+    const struct error_entry *entry = NULL;
+
+    for (i = 0; i < FF_ARRAY_ELEMS(error_entries); i++) {
+        if (errnum == error_entries[i].num) {
+            entry = &error_entries[i];
+            break;
+        }
+    }
+    if (entry) {
+        av_strlcpy(errbuf, entry->str, errbuf_size);
+    } else {
+#if HAVE_STRERROR_R
+        ret = AVERROR(strerror_r(AVUNERROR(errnum), errbuf, errbuf_size));
+#else
+        ret = -1;
+#endif
+        if (ret < 0)
+            snprintf(errbuf, errbuf_size, "Error number %d occurred", errnum);
+    }
+
+    return ret;
+}
+
+----------------------------------------
+HAVE_STRERROR_R
+----------------------------------------
+windows系统中没有这个API？
+
+标准里面有 strerror
+
+没有 strerror_r
+
+strerror_r[80]	POSIX 1, GNU	a variant of strerror that is thread-safe. GNU version is incompatible with POSIX one.
+
+----------------------------------------
+strerror_r 文档，系统 API
+----------------------------------------
+strerror, strerror_r - return string describing error number
+在linux编程中，strerror()是个好东东，因为一个孤零零的errno看不出个所以然，
+然而strerror()返回的错误描述已经给我们解决问题提供了80%的成功率。但从安全性的角度来讲，strerror_r是更好的选择

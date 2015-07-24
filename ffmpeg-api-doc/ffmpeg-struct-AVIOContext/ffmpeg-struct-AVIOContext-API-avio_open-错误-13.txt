@@ -1,0 +1,7 @@
+  ret = avio_open(&fmctx->pb, filename, AVIO_FLAG_WRITE);
+  CHECK_FAIL(ret, ret, "create target: open output file error")
+
+Android 打开文件失败，返回： -13
+原因：app，没有写sdcard权限。
+在 AndroidManifest.xml <application> 之前添加：
+<uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />

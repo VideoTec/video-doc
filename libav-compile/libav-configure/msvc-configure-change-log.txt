@@ -1,0 +1,241 @@
+call "C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin\vcvars32.bat" 
+放在msys.bat文件头。
+
+libav/makefile 定义了许多目标,例如下面的目标：
+make libavutil/libavutil.a
+make libavutil/cpu-test.exe
+make install-libavutil-static
+make install-libavutil-headers
+make tools/aviocat.exe
+
+第九版
+去掉 --disable-avdevice --disable-network --disable-everything
+相对应的去掉 --enable 选项
+./configure --toolchain=msvc --disable-debug --enable-runtime-cpudetect
+
+第八版：
+修改config.mak来编译debug版本
+ -O2 变成 -Od
+ -Z7 变成 -ZI
+ 添加 /MTd
+
+第七版：
+1. 不区别debug/release（建立vc工程来编译debug版本，不用这么复杂，修改config.mak来编译debug版本）
+2. 去掉：--disable-programs 
+3. 去掉：--disable-avfilter （avconv需要）
+./configure --toolchain=msvc --disable-debug --enable-runtime-cpudetect --disable-avdevice --disable-network --disable-everything --enable-protocol=file --enable-demuxer=mov --enable-muxer=mp4 --enable-decoder=aac,flv,h261,h263,h263i,h264,mjpeg,mpeg1video,mpeg2video,mpeg4,msmpeg4v1,msmpeg4v2,msmpeg4v3,rv10,rv20,svq3,wmv2,jpegls --enable-encoder=aac,flv,h261,h263,h263i,h264,mjpeg,mpeg1video,mpeg2video,mpeg4,msmpeg4v1,msmpeg4v2,msmpeg4v3,rv10,rv20,svq3,wmv2,jpegls
+
+只编译出avprobe，没有生成avconv，为什么？
+查看config的log记录：I:\libav\config.log
+avconv=yes
+avconv_deps='avcodec avfilter avformat avresample swscale'
+avconv_select='aformat_filter anull_filter asyncts_filter atrim_filter format_filter
+               fps_filter null_filter resample_filter scale_filter
+               setpts_filter trim_filter'
+
+LD      avconv.exe
+avconv_dxva2.o : error LNK2019: 无法解析的外部符号 __imp__GetShellWindow@0，该符号在函数 _dxva2_alloc 中被引用
+avconv.exe : fatal error LNK1120: 1 个无法解析的外部命令
+链接命令行：
+link -libpath:libavcodec -libpath:libavdevice -libpath:libavfilter -libpath:libavformat -libpath:libavresample -libpath:libavutil -libpath:libswscale -nologo   -out:avconv.exe cmdutils.o avconv_opt.o avconv_filter.o avconv.o  avconv_dxva2.o libavfilter.a libavformat.a libavcodec.a libavresample.a libswscale.a libavutil.a psapi.lib advapi32.lib shell32.lib  ole32.lib
+错误原因：
+需要链接：GetShellWindo：User32.lib
+
+
+make -f R/D
+
+第六版，增加encoder and decoder 
+(注意decoders and encoders可写成一串，用逗号分开)
+(注意：有些encoder/decoder一体的[REGISTER_ENCDEC],只需要写一个就行，[这条不成立])
+
+release 版本
+./configure --toolchain=msvc --config-mak=release.mak --libdir='${prefix}/lib/release' --disable-debug --enable-runtime-cpudetect --disable-programs --disable-avfilter --disable-avdevice --disable-network --disable-everything --enable-protocol=file --enable-demuxer=mov --enable-muxer=mp4 --enable-decoder=aac,flv,h261,h263,h263i,h264,mjpeg,mpeg1video,mpeg2video,mpeg4,msmpeg4v1,msmpeg4v2,msmpeg4v3,rv10,rv20,svq3,wmv2,jpegls --enable-encoder=aac,flv,h261,h263,h263i,h264,mjpeg,mpeg1video,mpeg2video,mpeg4,msmpeg4v1,msmpeg4v2,msmpeg4v3,rv10,rv20,svq3,wmv2,jpegls
+
+debug 版本
+./configure --toolchain=msvc --config-mak=debug.mak --libdir='${prefix}/lib/debug' --optflags=-Od --enable-runtime-cpudetect --disable-programs --disable-avfilter --disable-avdevice --disable-network --disable-everything --enable-protocol=file --enable-demuxer=mov --enable-muxer=mp4 --enable-decoder=aac,flv,h261,h263,h263i,h264,mjpeg,mpeg1video,mpeg2video,mpeg4,msmpeg4v1,msmpeg4v2,msmpeg4v3,rv10,rv20,svq3,wmv2,jpegls --enable-encoder=aac,flv,h261,h263,h263i,h264,mjpeg,mpeg1video,mpeg2video,mpeg4,msmpeg4v1,msmpeg4v2,msmpeg4v3,rv10,rv20,svq3,wmv2,jpegls
+
+
+第五版
+release 版本
+./configure --toolchain=msvc --config-mak=release.mak --libdir='${prefix}/lib/release' --disable-debug --enable-runtime-cpudetect --disable-programs --disable-avfilter --disable-avdevice --disable-network --disable-everything --enable-protocol=file --enable-demuxer=mov --enable-muxer=mp4 --enable-decoder=mpeg4 --enable-decoder=h264 --enable-encoder=mpeg4 --enable-encoder=aac --enable-decoder=aac
+
+debug 版本
+./configure --toolchain=msvc --config-mak=debug.mak --libdir='${prefix}/lib/debug' --optflags=-Od --enable-runtime-cpudetect --disable-programs --disable-avfilter --disable-avdevice --disable-network --disable-everything --enable-protocol=file --enable-demuxer=mov --enable-muxer=mp4 --enable-decoder=mpeg4 --enable-decoder=h264 --enable-encoder=mpeg4 --enable-encoder=aac --enable-decoder=aac
+
+第四版
+release 版本  (--libdir='${prefix}/lib/release' 指定输出库文件路径：注意其中的单引号)
+./configure-msvc --toolchain=msvc --libdir='${prefix}/lib/release' --disable-debug --enable-runtime-cpudetect --disable-programs --disable-avfilter --disable-avdevice --disable-network --disable-everything --enable-protocol=file --enable-demuxer=mov --enable-muxer=mp4 --enable-decoder=mpeg4 --enable-decoder=h264 --enable-encoder=mpeg4 --enable-encoder=aac --enable-decoder=aac
+
+debug 版本
+./configure-msvc --toolchain=msvc --libdir='${prefix}/lib/debug' --optflags=-Od --enable-runtime-cpudetect --disable-programs --disable-avfilter --disable-avdevice --disable-network --disable-everything --enable-protocol=file --enable-demuxer=mov --enable-muxer=mp4 --enable-decoder=mpeg4 --enable-decoder=h264 --enable-encoder=mpeg4 --enable-encoder=aac --enable-decoder=aac
+ 
+第三版
+./configure --toolchain=msvc --enable-runtime-cpudetect --disable-programs --disable-avfilter --disable-avdevice --disable-network --disable-everything --enable-protocol=file --enable-demuxer=mov --enable-muxer=mp4 --enable-decoder=mpeg4 --enable-decoder=h264 --enable-encoder=mpeg4 --enable-encoder=aac --enable-decoder=aac 
+
+第二版
+./configure --toolchain=msvc --disable-avfilter --disable-avdevice --disable-network --disable-everything --enable-protocol=file --enable-demuxer=mov --enable-muxer=mp4 --enable-decoder=mpeg4 --enable-decoder=h264 --enable-encoder=mpeg4 --enable-encoder=aac --enable-decoder=aac 
+
+第一版：
+./configure --toolchain=msvc
+
+
+------------------------------------------------------------------------------
+下面是关于 release/debug 版本编译
+------------------------------------------------------------------------------
+
+修改, CFLAGS, 编译选项
+ -O2 变成 -Od
+ -Z7 变成 -ZI
+ 添加 /MTd
+
+
+自定义
+configure-msvc
+1) 静态库的后缀名称。
+[不要用这个] --build-suffix=SUFFIX    library name suffix []  注意这里的后缀的意思：libavcodec[suffix].a
+
+[这个是什么意思？]_ld_lib='lib%.a' -> _ld_lib='lib%.lib'
+
+# build settings
+SHFLAGS='-shared -Wl,-soname,$$(@F)'
+LIBPREF="lib"
+LIBSUF=".a"
+FULLNAME='$(NAME)$(BUILDSUF)'
+LIBNAME='$(LIBPREF)$(FULLNAME)$(LIBSUF)'
+SLIBPREF="lib"
+SLIBSUF=".so"
+SLIBNAME='$(SLIBPREF)$(FULLNAME)$(SLIBSUF)'
+SLIBNAME_WITH_VERSION='$(SLIBNAME).$(LIBVERSION)'
+SLIBNAME_WITH_MAJOR='$(SLIBNAME).$(LIBMAJOR)'
+LIB_INSTALL_EXTRA_CMD='$$(RANLIB) "$(LIBDIR)/$(LIBNAME)"'
+SLIB_INSTALL_NAME='$(SLIBNAME_WITH_VERSION)'
+SLIB_INSTALL_LINKS='$(SLIBNAME_WITH_MAJOR) $(SLIBNAME)'
+
+动态库的后缀：（dll, def, lib）
+    win32|win64)
+        disable symver
+        if enabled shared; then
+            # Link to the import library instead of the normal static library
+            # for shared libs.
+            LD_LIB='%.lib'
+            # Cannot build both shared and static libs with MSVC or icl.
+            disable static
+        fi
+        shlibdir_default="$bindir_default"
+        LIBSUF=".lib"                          添加这一行，定义静态库，后缀
+        LIBPREF=""                             添加这一行，定义静态库，前缀
+        SLIBPREF=""
+        SLIBSUF=".dll"
+        SLIBNAME_WITH_VERSION='$(SLIBPREF)$(FULLNAME)-$(LIBVERSION)$(SLIBSUF)'
+        SLIBNAME_WITH_MAJOR='$(SLIBPREF)$(FULLNAME)-$(LIBMAJOR)$(SLIBSUF)'
+        SLIB_CREATE_DEF_CMD='$(SRC_PATH)/compat/windows/makedef $(SUBDIR)lib$(NAME).ver $(OBJS) > $$(@:$(SLIBSUF)=.def)'
+        SLIB_INSTALL_NAME='$(SLIBNAME_WITH_MAJOR)'
+        SLIB_INSTALL_LINKS=
+        SLIB_INSTALL_EXTRA_SHLIB='$(SLIBNAME:$(SLIBSUF)=.lib)'
+        SLIB_INSTALL_EXTRA_LIB='$(SLIBNAME_WITH_MAJOR:$(SLIBSUF)=.def)'
+        SHFLAGS='-dll -def:$$(@:$(SLIBSUF)=.def) -implib:$(SUBDIR)$(SLIBNAME:$(SLIBSUF)=.lib)'
+        objformat="win32"
+        ranlib=:
+        enable dos_paths
+        ;;
+
+2) Debug/Release 编译选项。
+   Debug 需要的CFlags : -Od(--optflags=-Od) -ZI -MTd
+         需要的LFlags : -debug(默认添加)
+
+   Release 需要的CFlags : -O2(默认添加) -Zi(disabled debug 来追加-Zi) 去掉（-MTd, -ZI）(--disable-debug)
+           需要的LFlags : 去掉 -debug (--disable-debug)
+
+  --optflags=OPTFLAGS      override optimization-related compiler flags 这个可以设置编译器优化参数（Od）
+
+
+研究下面这段代码
+elif enabled_any msvc icl; then
+    enabled x86_32 && disable aligned_stack
+    enabled_all x86_32 debug && add_cflags -Oy- 
+    disabled debug && add_cflags -Zi               //添加这一行，用于编译Relase版本
+    enabled debug && add_ldflags -debug
+    enable pragma_deprecated
+    if enabled icl; then
+        # -Qansi-alias is basically -fstrict-aliasing, but does not work
+        # (correctly) on icl 13.x.
+        check_cpp_condition "windows.h" "__ICL < 1300 || __ICL >= 1400" &&
+            add_cflags -Qansi-alias
+        # icl will pass the inline asm tests but inline asm is currently
+        # not supported (build will fail)
+        disable inline_asm
+    fi
+
+研究下面这段代码
+    elif $_cc 2>&1 | grep -q Microsoft; then
+        _type=msvc
+        _ident=$($cc 2>&1 | head -n1)
+        _DEPCMD='$(DEP$(1)) $(DEP$(1)FLAGS) $($(1)DEP_FLAGS) $< 2>&1 | awk '\''/including/ { sub(/^.*file: */, ""); gsub(/\\/, "/"); if (!match($$0, / /)) print "$@:", $$0 }'\'' > $(@:.o=.d)'
+        _DEPFLAGS='$(CPPFLAGS) $(CFLAGS) -showIncludes -Zs'
+        _cflags_speed="-O2"
+        _cflags_size="-O1"
+        if $_cc 2>&1 | grep -q Linker; then
+            _ld_o='-out:$@'
+        else
+            _ld_o='-Fe$@'
+        fi
+        _cc_o='-Fo$@'
+        _cc_e='-P -Fi$@'
+        _flags_filter=msvc_flags
+        _ld_lib='lib%.lib'                这里修改成.a -> .lib???
+        _ld_path='-libpath:'
+        _flags='-nologo'
+        _cflags='-D_USE_MATH_DEFINES -D_CRT_SECURE_NO_WARNINGS -Dinline=__inline -FIstdlib.h -Dstrtoll=_strtoi64'
+        if [ $pfx = hostcc ]; then
+            append _cflags -Dsnprintf=_snprintf
+        fi
+
+注意：_cflags_speed 用在下面代码中：
+if [ -z "$optflags" ]; then
+    if enabled small; then
+        optflags=$cflags_size
+    elif enabled optimizations; then
+        optflags=$cflags_speed
+    else
+        optflags=$cflags_noopt
+    fi
+fi
+
+研究下面这段代码
+msvc_common_flags(){
+    for flag; do
+        case $flag in
+            # In addition to specifying certain flags under the compiler
+            # specific filters, they must be specified here as well or else the
+            # generic catch all at the bottom will print the original flag.
+            -Wall)                ;;
+            -std=c99)             ;;
+            # Common flags
+            -fomit-frame-pointer) ;;
+            -g)                   echo -Z7 ;;           这里修改成-ZI 这里添加 -MTd
+            -fno-math-errno)      ;;
+            -fno-common)          ;;
+            -fno-signed-zeros)    ;;
+            -fPIC)                ;;
+            -mthumb)              ;;
+            -march=*)             ;;
+            -lz)                  echo zlib.lib ;;
+            -lavifil32)           echo vfw32.lib ;;
+            -lavicap32)           echo vfw32.lib user32.lib ;;
+            -l*)                  echo ${flag#-l}.lib ;;
+            *)                    echo $flag ;;
+        esac
+    done
+}
+
+msvc_flags(){
+    msvc_common_flags "$@"
+    for flag; do
+        case $flag in
+            -Wall)                echo -W4 -wd4244 -wd4127 -wd4018 -wd4389     \
+                                       -wd4146 -wd4057 -wd4204 -wd4706 -wd4305 \
+                                       -wd4152 -wd4324 -we4013 -wd4100 -wd4214 \
+                                       -wd4273 ;;
+        esac
+    done
+}

@@ -1,0 +1,146 @@
+关于一组图片文件，文件名的分析
+E:\libav\libavformat\utils.c
+
+/**
+ * Return in 'buf' the path with '%d' replaced by a number.
+ *
+ * Also handles the '%0nd' format where 'n' is the total number
+ * of digits and '%%'.
+ *
+ * @param buf destination buffer
+ * @param buf_size destination buffer size
+ * @param path numbered sequence string
+ * @param number frame number
+ * @return 0 if OK, -1 on format error
+ */
+int av_get_frame_filename(char *buf, int buf_size,
+                          const char *path, int number);
+
+源码：
+int av_get_frame_filename(char *buf, int buf_size, const char *path, int number)
+{
+    const char *p;
+    char *q, buf1[20], c;
+    int nd, len, percentd_found;
+
+    q = buf;
+    p = path;
+    percentd_found = 0;
+    for (;;) {
+        c = *p++;
+        if (c == '\0')
+            break;
+        if (c == '%') {
+            do {
+                nd = 0;
+                while (av_isdigit(*p))
+                    nd = nd * 10 + *p++ - '0';
+                c = *p++;
+            } while (av_isdigit(c));
+
+            switch (c) {
+            case '%':
+                goto addchar;
+            case 'd':
+                if (percentd_found)
+                    goto fail;
+                percentd_found = 1;
+                snprintf(buf1, sizeof(buf1), "%0*d", nd, number);
+                len = strlen(buf1);
+                if ((q - buf + len) > buf_size - 1)
+                    goto fail;
+                memcpy(q, buf1, len);
+                q += len;
+                break;
+            default:
+                goto fail;
+            }
+        } else {
+addchar:
+            if ((q - buf) < buf_size - 1)
+                *q++ = c;
+        }
+    }
+    if (!percentd_found)
+        goto fail;
+    *q = '\0';
+    return 0;
+fail:
+    *q = '\0';
+    return -1;
+}
+
+应用示例
+E:\libav\libavformat\img2dec.c
+
+static int img_read_packet(AVFormatContext *s1, AVPacket *pkt)
+{
+    VideoDemuxData *s = s1->priv_data;
+    char filename[1024];
+    int i, res;
+    int size[3]           = { 0 }, ret[3] = { 0 };
+    AVIOContext *f[3]     = { NULL };
+    AVCodecContext *codec = s1->streams[0]->codec;
+
+    if (!s->is_pipe) {
+        /* loop over input */
+        if (s->loop && s->img_number > s->img_last) {
+            s->img_number = s->img_first;
+        }
+        if (s->img_number > s->img_last)
+            return AVERROR_EOF;
+        if (av_get_frame_filename(filename, sizeof(filename),
+                                  s->path,
+                                  s->img_number) < 0 && s->img_number > 1)
+            return AVERROR(EIO);
+        for (i = 0; i < 3; i++) {
+            if (avio_open2(&f[i], filename, AVIO_FLAG_READ,
+                           &s1->interrupt_callback, NULL) < 0) {
+                if (i >= 1)
+                    break;
+                av_log(s1, AV_LOG_ERROR, "Could not open file : %s\n",
+                       filename);
+                return AVERROR(EIO);
+            }
+            size[i] = avio_size(f[i]);
+
+            if (codec->codec_id != AV_CODEC_ID_RAWVIDEO)
+                break;
+            filename[strlen(filename) - 1] = 'U' + i;
+        }
+
+        if (codec->codec_id == AV_CODEC_ID_RAWVIDEO && !codec->width)
+            infer_size(&codec->width, &codec->height, size[0]);
+    } else {
+        f[0] = s1->pb;
+        if (f[0]->eof_reached)
+            return AVERROR(EIO);
+        size[0] = 4096;
+    }
+
+    res = av_new_packet(pkt, size[0] + size[1] + size[2]);
+    if (res < 0)
+        return res;
+    pkt->stream_index = 0;
+    pkt->flags       |= AV_PKT_FLAG_KEY;
+
+    pkt->size = 0;
+    for (i = 0; i < 3; i++) {
+        if (f[i]) {
+            ret[i] = avio_read(f[i], pkt->data + pkt->size, size[i]);
+            if (!s->is_pipe)
+                avio_close(f[i]);
+            if (ret[i] > 0)
+                pkt->size += ret[i];
+        }
+    }
+
+    if (ret[0] <= 0 || ret[1] < 0 || ret[2] < 0) {
+        av_free_packet(pkt);
+        return AVERROR(EIO); /* signal EOF */
+    } else {
+        s->img_count++;
+        s->img_number++;
+        return 0;
+    }
+}

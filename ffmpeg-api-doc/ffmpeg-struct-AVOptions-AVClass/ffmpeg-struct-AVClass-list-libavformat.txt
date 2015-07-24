@@ -1,0 +1,663 @@
+
+--------------------------------------------------------
+libavformat
+--------------------------------------------------------
+E:\ffmpeg-src\libavformat\webvttdec.c
+static const AVClass webvtt_demuxer_class = {
+    .class_name  = "WebVTT demuxer",
+    .item_name   = av_default_item_name,
+    .option      = options,
+    .version     = LIBAVUTIL_VERSION_INT,
+};
+
+E:\ffmpeg-src\libavformat\webmdashenc.c
+static const AVClass webm_dash_class = {
+    .class_name = "WebM DASH Manifest muxer",
+    .item_name  = av_default_item_name,
+    .option     = options,
+    .version    = LIBAVUTIL_VERSION_INT,
+};
+
+E:\ffmpeg-src\libavformat\webpenc.c
+static const AVClass webp_muxer_class = {
+    .class_name = "WebP muxer",
+    .item_name  = av_default_item_name,
+    .version    = LIBAVUTIL_VERSION_INT,
+    .option     = options,
+};
+
+E:\ffmpeg-src\libavformat\wavenc.c
+static const AVClass wav_muxer_class = {
+    .class_name = "WAV muxer",
+    .item_name  = av_default_item_name,
+    .option     = options,
+    .version    = LIBAVUTIL_VERSION_INT,
+};
+
+E:\ffmpeg-src\libavformat\wavdec.c
+static const AVClass wav_demuxer_class = {
+    .class_name = "WAV demuxer",
+    .item_name  = av_default_item_name,
+    .option     = demux_options,
+    .version    = LIBAVUTIL_VERSION_INT,
+};
+
+E:\ffmpeg-src\libavformat\unix.c
+static const AVClass unix_class = {
+    .class_name = "unix",
+    .item_name  = av_default_item_name,
+    .option     = unix_options,
+    .version    = LIBAVUTIL_VERSION_INT,
+};
+
+E:\ffmpeg-src\libavformat\tty.c
+static const AVClass tty_demuxer_class = {
+    .class_name     = "TTY demuxer",
+    .item_name      = av_default_item_name,
+    .option         = options,
+    .version        = LIBAVUTIL_VERSION_INT,
+};
+
+E:\ffmpeg-src\libavformat\udp.c
+static const AVClass udp_context_class = {
+    .class_name     = "udp",
+    .item_name      = av_default_item_name,
+    .option         = options,
+    .version        = LIBAVUTIL_VERSION_INT,
+};
+
+static const AVClass udplite_context_class = {
+    .class_name     = "udplite",
+    .item_name      = av_default_item_name,
+    .option         = options,
+    .version        = LIBAVUTIL_VERSION_INT,
+};
+
+E:\ffmpeg-src\libavformat\tls.c
+static const AVClass tls_class = {
+    .class_name = "tls",
+    .item_name  = av_default_item_name,
+    .option     = options,
+    .version    = LIBAVUTIL_VERSION_INT,
+};
+
+E:\ffmpeg-src\libavformat\tedcaptionsdec.c
+static const AVClass tedcaptions_demuxer_class = {
+    .class_name = "tedcaptions_demuxer",
+    .item_name  = av_default_item_name,
+    .option     = tedcaptions_options,
+    .version    = LIBAVUTIL_VERSION_INT,
+};
+
+E:\ffmpeg-src\libavformat\tee.c
+static const AVClass tee_muxer_class = {
+    .class_name = "Tee muxer",
+    .item_name  = av_default_item_name,
+    .version    = LIBAVUTIL_VERSION_INT,
+};
+
+static const AVClass tcp_class = {
+    .class_name = "tcp",
+    .item_name  = av_default_item_name,
+    .option     = options,
+    .version    = LIBAVUTIL_VERSION_INT,
+};
+
+static const AVClass srtp_context_class = {
+    .class_name     = "srtp",
+    .item_name      = av_default_item_name,
+    .option         = options,
+    .version        = LIBAVUTIL_VERSION_INT,
+};
+
+static const AVClass subfile_class = {
+    .class_name = "subfile",
+    .item_name  = av_default_item_name,
+    .option     = subfile_options,
+    .version    = LIBAVUTIL_VERSION_INT,
+};
+
+static const AVClass spdif_class = {
+    .class_name     = "spdif",
+    .item_name      = av_default_item_name,
+    .option         = options,
+    .version        = LIBAVUTIL_VERSION_INT,
+};
+
+static const AVClass seg_class = {
+    .class_name = "segment muxer",
+    .item_name  = av_default_item_name,
+    .option     = options,
+    .version    = LIBAVUTIL_VERSION_INT,
+};
+static const AVClass sseg_class = {
+    .class_name = "stream_segment muxer",
+    .item_name  = av_default_item_name,
+    .option     = options,
+    .version    = LIBAVUTIL_VERSION_INT,
+};
+static const AVClass ism_class = {
+    .class_name = "smooth streaming muxer",
+    .item_name  = av_default_item_name,
+    .option     = options,
+    .version    = LIBAVUTIL_VERSION_INT,
+};
+
+static const AVClass sbg_demuxer_class = {
+    .class_name = "sbg_demuxer",
+    .item_name  = av_default_item_name,
+    .option     = sbg_options,
+    .version    = LIBAVUTIL_VERSION_INT,
+};
+
+static const AVClass sdp_demuxer_class = {
+    .class_name     = "SDP demuxer",
+    .item_name      = av_default_item_name,
+    .option         = sdp_options,
+    .version        = LIBAVUTIL_VERSION_INT,
+};
+static const AVClass rtp_demuxer_class = {
+    .class_name     = "RTP demuxer",
+    .item_name      = av_default_item_name,
+    .option         = rtp_options,
+    .version        = LIBAVUTIL_VERSION_INT,
+};
+static const AVClass sdp_demuxer_class = {
+    .class_name     = "SDP demuxer",
+    .item_name      = av_default_item_name,
+    .option         = sdp_options,
+    .version        = LIBAVUTIL_VERSION_INT,
+};
+static const AVClass rtp_demuxer_class = {
+    .class_name     = "RTP demuxer",
+    .item_name      = av_default_item_name,
+    .option         = rtp_options,
+    .version        = LIBAVUTIL_VERSION_INT,
+};
+static const AVClass rtsp_muxer_class = {
+    .class_name = "RTSP muxer",
+    .item_name  = av_default_item_name,
+    .option     = ff_rtsp_options,
+    .version    = LIBAVUTIL_VERSION_INT,
+};
+static const AVClass rtp_muxer_class = {
+    .class_name = "RTP muxer",
+    .item_name  = av_default_item_name,
+    .option     = options,
+    .version    = LIBAVUTIL_VERSION_INT,
+};
+static const AVClass rtsp_demuxer_class = {
+    .class_name     = "RTSP demuxer",
+    .item_name      = av_default_item_name,
+    .option         = ff_rtsp_options,
+    .version        = LIBAVUTIL_VERSION_INT,
+};
+static const AVClass rawvideo_demuxer_class = {
+    .class_name = "rawvideo demuxer",
+    .item_name  = av_default_item_name,
+    .option     = rawvideo_options,
+    .version    = LIBAVUTIL_VERSION_INT,
+};
+static const AVClass ffrtmpcrypt_class = {
+    .class_name = "ffrtmpcrypt",
+    .item_name  = av_default_item_name,
+    .option     = ffrtmpcrypt_options,
+    .version    = LIBAVUTIL_VERSION_INT,
+};
+
+#define PCMDEF(name_, long_name_, ext, codec)               \
+static const AVClass name_ ## _demuxer_class = {            \
+    .class_name = #name_ " demuxer",                        \
+    .item_name  = av_default_item_name,                     \
+    .option     = pcm_options,                              \
+    .version    = LIBAVUTIL_VERSION_INT,                    \
+};  
+static const AVClass sln_demuxer_class = {
+    .class_name = "sln demuxer",
+    .item_name  = av_default_item_name,
+    .option     = sln_options,
+    .version    = LIBAVUTIL_VERSION_INT,
+};
+
+static const AVClass ffrtmphttp_class = {
+    .class_name = "ffrtmphttp",
+    .item_name  = av_default_item_name,
+    .option     = ffrtmphttp_options,
+    .version    = LIBAVUTIL_VERSION_INT,
+};
+
+#define RTMP_PROTOCOL(flavor)                    \
+static const AVClass flavor##_class = {          \
+    .class_name = #flavor,                       \
+    .item_name  = av_default_item_name,          \
+    .option     = rtmp_options,                  \
+    .version    = LIBAVUTIL_VERSION_INT,         \
+}; 
+
+#define FF_RAWVIDEO_DEMUXER_CLASS(name)\
+static const AVClass name ## _demuxer_class = {\
+    .class_name = #name " demuxer",\
+    .item_name  = av_default_item_name,\
+    .option     = ff_rawvideo_options,\
+    .version    = LIBAVUTIL_VERSION_INT,\
+};
+#define FF_RAWSUB_DEMUXER_CLASS(name)\
+static const AVClass name ## _demuxer_class = {\
+    .class_name = #name " demuxer",\
+    .item_name  = av_default_item_name,\
+    .option     = NULL,\
+    .version    = LIBAVUTIL_VERSION_INT,\
+};
+static const AVClass mpjpeg_muxer_class = {
+    .class_name = "mpjpeg_muxer",
+    .item_name  = av_default_item_name,
+    .option     = options,
+    .version    = LIBAVUTIL_VERSION_INT,
+};
+static const AVClass mpegts_class = {
+    .class_name = "mpegts demuxer",
+    .item_name  = av_default_item_name,
+    .option     = options,
+    .version    = LIBAVUTIL_VERSION_INT,
+};
+static const AVClass mpegtsraw_class = {
+    .class_name = "mpegtsraw demuxer",
+    .item_name  = av_default_item_name,
+    .option     = raw_options,
+    .version    = LIBAVUTIL_VERSION_INT,
+};
+static const AVClass mov_class = {
+    .class_name = "mov,mp4,m4a,3gp,3g2,mj2",
+    .item_name  = av_default_item_name,
+    .option     = mov_options,
+    .version    = LIBAVUTIL_VERSION_INT,
+};
+
+#define MPEGENC_CLASS(flavor)                   \
+static const AVClass flavor ## _class = {       \
+    .class_name = #flavor " muxer",             \
+    .item_name  = av_default_item_name,         \
+    .version    = LIBAVUTIL_VERSION_INT,        \
+    .option     = options,                      \
+};
+
+#define MOV_CLASS(flavor)\
+static const AVClass flavor ## _muxer_class = {\
+    .class_name = #flavor " muxer",\
+    .item_name  = av_default_item_name,\
+    .option     = options,\
+    .version    = LIBAVUTIL_VERSION_INT,\
+};
+
+static const AVClass microdvd_class = {
+    .class_name = "microdvddec",
+    .item_name  = av_default_item_name,
+    .option     = microdvd_options,
+    .version    = LIBAVUTIL_VERSION_INT,
+};
+
+static const AVClass mxf_d10_muxer_class = {
+    .class_name     = "MXF-D10 muxer",
+    .item_name      = av_default_item_name,
+    .option         = d10_options,
+    .version        = LIBAVUTIL_VERSION_INT,
+};
+static const AVClass mpegts_muxer_class = {
+    .class_name = "MPEGTS muxer",
+    .item_name  = av_default_item_name,
+    .option     = options,
+    .version    = LIBAVUTIL_VERSION_INT,
+};
+#define OGG_CLASS(flavor, name)\
+static const AVClass flavor ## _muxer_class = {\
+    .class_name = #name " muxer",\
+    .item_name  = av_default_item_name,\
+    .option     = options,\
+    .version    = LIBAVUTIL_VERSION_INT,\
+};
+
+static const AVClass mp3_muxer_class = {
+    .class_name     = "MP3 muxer",
+    .item_name      = av_default_item_name,
+    .option         = options,
+    .version        = LIBAVUTIL_VERSION_INT,
+};
+
+static const AVClass demuxer_class = {
+    .class_name = "mp3",
+    .item_name  = av_default_item_name,
+    .option     = options,
+    .version    = LIBAVUTIL_VERSION_INT,
+    .category   = AV_CLASS_CATEGORY_DEMUXER,
+};
+
+static const AVClass matroska_class = {
+    .class_name = "matroska muxer",
+    .item_name  = av_default_item_name,
+    .option     = options,
+    .version    = LIBAVUTIL_VERSION_INT,
+};
+static const AVClass webm_class = {
+    .class_name = "webm muxer",
+    .item_name  = av_default_item_name,
+    .option     = options,
+    .version    = LIBAVUTIL_VERSION_INT,
+};
+static const AVClass mka_class = {
+    .class_name = "matroska audio muxer",
+    .item_name  = av_default_item_name,
+    .option     = options,
+    .version    = LIBAVUTIL_VERSION_INT,
+};
+
+static const AVClass class = {
+    .class_name = "nutenc",
+    .item_name  = av_default_item_name,
+    .option     = options,
+    .version    = LIBAVUTIL_VERSION_INT,
+};
+
+static const AVClass md5enc_class = {
+    .class_name = "hash encoder class",
+    .item_name  = av_default_item_name,
+    .option     = hash_options,
+    .version    = LIBAVUTIL_VERSION_INT,
+};
+static const AVClass framemd5_class = {
+    .class_name = "frame hash encoder class",
+    .item_name  = av_default_item_name,
+    .option     = hash_options,
+    .version    = LIBAVUTIL_VERSION_INT,
+};
+
+static const AVClass image2_alias_pix_class = {
+    .class_name = "alias_pix demuxer",
+    .item_name  = av_default_item_name,
+    .option     = ff_img_options,
+    .version    = LIBAVUTIL_VERSION_INT,
+};
+
+static const AVClass img2mux_class = {
+    .class_name = "image2 muxer",
+    .item_name  = av_default_item_name,
+    .option     = muxoptions,
+    .version    = LIBAVUTIL_VERSION_INT,
+};
+
+static const AVClass img2_class = {
+    .class_name = "image2 demuxer",
+    .item_name  = av_default_item_name,
+    .option     = ff_img_options,
+    .version    = LIBAVUTIL_VERSION_INT,
+};
+static const AVClass img2pipe_class = {
+    .class_name = "image2pipe demuxer",
+    .item_name  = av_default_item_name,
+    .option     = ff_img_options,
+    .version    = LIBAVUTIL_VERSION_INT,
+};
+AVInputFormat ff_image2pipe_demuxer = {
+    .name           = "image2pipe",
+    .long_name      = NULL_IF_CONFIG_SMALL("piped image2 sequence"),
+    .priv_data_size = sizeof(VideoDemuxData),
+    .read_header    = ff_img_read_header,
+    .read_packet    = ff_img_read_packet,
+    .priv_class     = &img2pipe_class,
+};
+#define IMAGEAUTO_DEMUXER(imgname, codecid)\
+static const AVClass imgname ## _class = {\
+    .class_name = AV_STRINGIFY(imgname) " demuxer",\
+    .item_name  = av_default_item_name,\
+    .option     = ff_img_options,\
+    .version    = LIBAVUTIL_VERSION_INT,\
+};\
+static const AVClass image2_brender_pix_class = {
+    .class_name = "brender_pix demuxer",
+    .item_name  = av_default_item_name,
+    .option     = ff_img_options,
+    .version    = LIBAVUTIL_VERSION_INT,
+};
+static const AVClass class_gme = {
+    .class_name = "Game Music Emu demuxer",
+    .item_name  = av_default_item_name,
+    .option     = options,
+    .version    = LIBAVUTIL_VERSION_INT,
+};
+
+static const AVClass libssh_context_class = {
+    .class_name     = "libssh",
+    .item_name      = av_default_item_name,
+    .option         = options,
+    .version        = LIBAVUTIL_VERSION_INT,
+};
+
+static const AVClass libquvi_context_class = {
+    .class_name     = "libquvi",
+    .item_name      = av_default_item_name,
+    .option         = libquvi_options,
+    .version        = LIBAVUTIL_VERSION_INT,
+};
+
+static const AVClass modplug_class = {
+    .class_name = "ModPlug demuxer",
+    .item_name  = av_default_item_name,
+    .option     = options,
+    .version    = LIBAVUTIL_VERSION_INT,
+};
+
+#define RTMP_CLASS(flavor)\
+static const AVClass lib ## flavor ## _class = {\
+    .class_name = "lib" #flavor " protocol",\
+    .item_name  = av_default_item_name,\
+    .option     = options,\
+    .version    = LIBAVUTIL_VERSION_INT,\
+};
+
+static const AVClass libsmbclient_context_class = {
+    .class_name     = "libsmbc",
+    .item_name      = av_default_item_name,
+    .option         = options,
+    .version        = LIBAVUTIL_VERSION_INT,
+};
+
+static const AVClass latm_muxer_class = {
+    .class_name = "LATM/LOAS muxer",
+    .item_name  = av_default_item_name,
+    .option     = options,
+    .version    = LIBAVUTIL_VERSION_INT,
+};
+
+#define HTTP_CLASS(flavor)                          \
+static const AVClass flavor ## _context_class = {   \
+    .class_name = # flavor,                         \
+    .item_name  = av_default_item_name,             \
+    .option     = options,                          \
+    .version    = LIBAVUTIL_VERSION_INT,            \
+}
+static const AVClass adts_muxer_class = {
+    .class_name     = "ADTS muxer",
+    .item_name      = av_default_item_name,
+    .option         = options,
+    .version        = LIBAVUTIL_VERSION_INT,
+};
+static const AVClass aiff_muxer_class = {
+    .class_name     = "AIFF muxer",
+    .item_name      = av_default_item_name,
+    .option         = options,
+    .version        = LIBAVUTIL_VERSION_INT,
+};
+static const AVClass aqt_class = {
+    .class_name = "aqtdec",
+    .item_name  = av_default_item_name,
+    .option     = aqt_options,
+    .version    = LIBAVUTIL_VERSION_INT,
+};
+static const AVClass demuxer_class = {
+    .class_name = "APNG demuxer",
+    .item_name  = av_default_item_name,
+    .option     = options,
+    .version    = LIBAVUTIL_VERSION_INT,
+    .category   = AV_CLASS_CATEGORY_DEMUXER,
+};
+static const AVClass asf_class = {
+    .class_name = "asf demuxer",
+    .item_name  = av_default_item_name,
+    .option     = options,
+    .version    = LIBAVUTIL_VERSION_INT,
+};
+static const AVClass ass_class = {
+    .class_name = "ass muxer",
+    .item_name  = av_default_item_name,
+    .option     = options,
+    .version    = LIBAVUTIL_VERSION_INT,
+};
+static const AVClass ast_muxer_class = {
+    .class_name = "AST muxer",
+    .item_name  = av_default_item_name,
+    .option     = options,
+    .version    = LIBAVUTIL_VERSION_INT,
+};
+static const AVClass demuxer_class = {
+    .class_name = "avi",
+    .item_name  = av_default_item_name,
+    .option     = options,
+    .version    = LIBAVUTIL_VERSION_INT,
+    .category   = AV_CLASS_CATEGORY_DEMUXER,
+};
+const AVClass ffurl_context_class = {
+    .class_name       = "URLContext",
+    .item_name        = urlcontext_to_name,
+    .option           = options,
+    .version          = LIBAVUTIL_VERSION_INT,
+    .child_next       = urlcontext_child_next,
+    .child_class_next = urlcontext_child_class_next,
+};
+const AVClass ffio_url_class = {
+    .class_name = "AVIOContext",
+    .item_name  = av_default_item_name,
+    .version    = LIBAVUTIL_VERSION_INT,
+    .option     = ffio_url_options,
+    .child_next = ffio_url_child_next,
+    .child_class_next = ffio_url_child_class_next,
+};
+static const AVClass bluray_context_class = {
+    .class_name     = "bluray",
+    .item_name      = av_default_item_name,
+    .option         = options,
+    .version        = LIBAVUTIL_VERSION_INT,
+};
+static const AVClass cache_context_class = {
+    .class_name = "Cache",
+    .item_name  = av_default_item_name,
+    .option     = options,
+    .version    = LIBAVUTIL_VERSION_INT,
+};
+
+static const AVClass cdxl_demuxer_class = {
+    .class_name = "CDXL demuxer",
+    .item_name  = av_default_item_name,
+    .option     = cdxl_options,
+    .version    = LIBAVUTIL_VERSION_INT,
+};
+
+static const AVClass cdxl_demuxer_class = {
+    .class_name = "CDXL demuxer",
+    .item_name  = av_default_item_name,
+    .option     = cdxl_options,
+    .version    = LIBAVUTIL_VERSION_INT,
+};
+
+static const AVClass concat_class = {
+    .class_name = "concat demuxer",
+    .item_name  = av_default_item_name,
+    .option     = options,
+    .version    = LIBAVUTIL_VERSION_INT,
+};
+
+static const AVClass crypto_class = {
+    .class_name     = "crypto",
+    .item_name      = av_default_item_name,
+    .option         = options,
+    .version        = LIBAVUTIL_VERSION_INT,
+};
+
+static const AVClass dash_class = {
+    .class_name = "dash muxer",
+    .item_name  = av_default_item_name,
+    .option     = options,
+    .version    = LIBAVUTIL_VERSION_INT,
+};
+static const AVClass file_class = {
+    .class_name = "file",
+    .item_name  = av_default_item_name,
+    .option     = file_options,
+    .version    = LIBAVUTIL_VERSION_INT,
+};
+
+static const AVClass pipe_class = {
+    .class_name = "pipe",
+    .item_name  = av_default_item_name,
+    .option     = pipe_options,
+    .version    = LIBAVUTIL_VERSION_INT,
+};
+static const AVClass flac_muxer_class = {
+    .class_name = "flac muxer",
+    .item_name  = av_default_item_name,
+    .option     = flacenc_options,
+    .version    = LIBAVUTIL_VERSION_INT,
+};
+static const AVClass flv_class = {
+    .class_name = "flvdec",
+    .item_name  = av_default_item_name,
+    .option     = options,
+    .version    = LIBAVUTIL_VERSION_INT,
+};
+static const AVClass live_flv_class = {
+    .class_name = "live_flvdec",
+    .item_name  = av_default_item_name,
+    .option     = options,
+    .version    = LIBAVUTIL_VERSION_INT,
+};
+static const AVClass ftp_context_class = {
+    .class_name     = "ftp",
+    .item_name      = av_default_item_name,
+    .option         = options,
+    .version        = LIBAVUTIL_VERSION_INT,
+};
+static const AVClass gif_muxer_class = {
+    .class_name = "GIF muxer",
+    .item_name  = av_default_item_name,
+    .version    = LIBAVUTIL_VERSION_INT,
+    .option     = options,
+};
+static const AVClass g729_demuxer_class = {
+    .class_name = "g729 demuxer",
+    .item_name  = av_default_item_name,
+    .option     = g729_options,
+    .version    = LIBAVUTIL_VERSION_INT,
+};
+static const AVClass gsm_class = {
+    .class_name = "gsm demuxer",
+    .item_name  = av_default_item_name,
+    .option     = options,
+    .version    = LIBAVUTIL_VERSION_INT,
+};
+static const AVClass demuxer_class = {
+    .class_name = "GIF demuxer",
+    .item_name  = av_default_item_name,
+    .option     = options,
+    .version    = LIBAVUTIL_VERSION_INT,
+    .category   = AV_CLASS_CATEGORY_DEMUXER,
+};
+static const AVClass hds_class = {
+    .class_name = "HDS muxer",
+    .item_name  = av_default_item_name,
+    .option     = options,
+    .version    = LIBAVUTIL_VERSION_INT,
+};
+static const AVClass hls_class = {
+    .class_name = "hls muxer",
+    .item_name  = av_default_item_name,
+    .option     = options,
+    .version    = LIBAVUTIL_VERSION_INT,
+};

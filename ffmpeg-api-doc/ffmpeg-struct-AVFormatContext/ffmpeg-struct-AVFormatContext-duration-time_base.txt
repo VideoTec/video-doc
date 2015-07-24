@@ -1,0 +1,32 @@
+     /**
+     * This is the fundamental unit of time (in seconds) in terms
+     * of which frame timestamps are represented.
+     *
+     * decoding: set by libavformat
+     * encoding: May be set by the caller before avformat_write_header() to
+     *           provide a hint to the muxer about the desired timebase. In
+     *           avformat_write_header(), the muxer will overwrite this field
+     *           with the timebase that will actually be used for the timestamps
+     *           written into the file (which may or may not be related to the
+     *           user-provided one, depending on the format).
+     */
+    AVRational time_base;
+
+    /**
+     * Decoding: pts of the first frame of the stream in presentation order, in stream time base.
+     * Only set this if you are absolutely 100% sure that the value you set
+     * it to really is the pts of the first frame.
+     * This may be undefined (AV_NOPTS_VALUE).
+     * @note The ASF header does NOT contain a correct start_time the ASF
+     * demuxer must NOT set this.
+     */
+    int64_t start_time;
+
+    /**
+     * Decoding: duration of the stream, in stream time base.
+     * If a source file does not specify a duration, but does specify
+     * a bitrate, this value will be estimated from bitrate and file size.
+     */
+    int64_t duration;
+
+    int64_t nb_frames;                 ///< number of frames in this stream if known or 0

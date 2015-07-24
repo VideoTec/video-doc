@@ -1,0 +1,230 @@
+
+----------------------------
+注意 got_packet_ptr 和 返回值 之间的关系
+----------------------------
+ * @param[out] got_packet_ptr This field is set to 1 by libavcodec if the
+ *                            output packet is non-empty, and to 0 if it is
+ *                            empty. If the function returns an error, the
+ *                            packet can be assumed to be invalid, and the
+ *                            value of got_packet_ptr is undefined and should
+ *                            not be used.
+
+----------------------------
+关于 avcodec_encode_audio2 参数 pkt 注意事项
+----------------------------
+ for(int i = 0; i < 8; i++)
+  {
+      AVPacket pkt = { 0 };
+  int got_packet = 0;
+  av_init_packet(&pkt);
+    //fread(frame_buffer, 1, frame_bytes, fltp_file);
+    ret = avcodec_encode_audio2(aac_encoder_ctx, &pkt, &audio_frame, &got_packet);
+    av_strerror(ret, error_msg, 1024);
+    av_free_packet(&pkt);
+    printf("avcodec_encode_audio2 ret: %d(%s); got_packet:%d; audio_frame.nb_samples:%d\n", ret, error_msg, got_packet, audio_frame.nb_samples);
+  }
+  
+  2015.4.20 原因是
+  The user can supply an output buffer by setting
+ *                  avpkt->data and avpkt->size prior to calling the
+ *                  function, but if the size of the user-provided data is not
+ *                  large enough, encoding will fail
+
+  2015.3.27 修正：
+  问题不是在循环内外，而是在下面的赋值，av_init_packet也不能解决。
+  pkt.size = 0;
+  pkt.data = NULL;
+
+如果 上面代码 AVPacket 在循环外定义，释放，即，avcodec_encode_audio2，利用一个使用过的 avpacket 会失败。
+具体再分析
+E:\libav\libavcodec\aacenc.c
+    if ((ret = ff_alloc_packet(avpkt, 768 * s->channels))) {
+        av_log(avctx, AV_LOG_ERROR, "Error getting output packet\n");
+        return ret;
+    }
+
+
+----------------------------
+关于 avcodec_encode_audio2 编码 fltp-pcm data 到 aac 声音帧 
+----------------------------
+使用 aac 编码（使用的是ffmpeg自带的aac编码器）
+第个 需要压缩的 AVFrame 的 nb_samples 的指定下面几种情况
+调用八次
+
+1024 第一次 取不到 packet 以后每次都可以
+512  第一次 取不到 packet 以后每次都可以
+399  第三次压缩时，出现下面的错误
+E:\libav\libavcodec\audio_frame_queue.c
+ff_af_queue_remove
+    if (removed_samples > nb_samples)
+        av_log(afq->avctx, AV_LOG_WARNING, "frame_size is too large\n");
+
+第一次 取不到 packet 的原因是
+static int aac_encode_frame(AVCodecContext *avctx, AVPacket *avpkt,
+                            const AVFrame *frame, int *got_packet_ptr)
+{
+    if (!avctx->frame_number)   这个判断，第一次进来，肯定是返回零的
+        return 0;
+
+----------------------------
+关于 avcodec_encode_audio2 示例代码
+----------------------------
+    audio_frame_->nb_samples = nb_samples;
+    avcodec_fill_audio_frame(audio_frame_,
+                             audio_channels_,
+                             audio_sample_fmt_,
+                             audio_buffer,
+                             nb_samples * av_get_bytes_per_sample(audio_sample_fmt_) * audio_channels_, 1);
+    LOGI("CMediaTarget::push_audio avcodec_fill_audio_frame: nb_samples: %d", nb_samples);
+
+    AVPacket pkt = { 0 };
+    int got_packet = 0;
+
+    av_init_packet(&pkt);
+    int ret = avcodec_encode_audio2(audio_encoder_ctx_, &pkt, audio_frame_, &got_packet);
+
+----------------------------
+关于 avcodec_encode_audio2 文档
+----------------------------
+/**
+ * Encode a frame of audio.
+ *
+ * Takes input samples from frame and writes the next output packet, if
+ * available, to avpkt. The output packet does not necessarily contain data for
+ * the most recent frame, as encoders can delay, split, and combine input frames
+ * internally as needed.
+ *
+ * @param avctx     codec context
+ * @param avpkt     output AVPacket.
+ *                  The user can supply an output buffer by setting
+ *                  avpkt->data and avpkt->size prior to calling the
+ *                  function, but if the size of the user-provided data is not
+ *                  large enough, encoding will fail. If avpkt->data and
+ *                  avpkt->size are set, avpkt->destruct must also be set. All
+ *                  other AVPacket fields will be reset by the encoder using
+ *                  av_init_packet(). If avpkt->data is NULL, the encoder will
+ *                  allocate it. The encoder will set avpkt->size to the size
+ *                  of the output packet.
+ *
+ *                  If this function fails or produces no output, avpkt will be
+ *                  freed using av_free_packet() (i.e. avpkt->destruct will be
+ *                  called to free the user supplied buffer).
+ * @param[in] frame AVFrame containing the raw audio data to be encoded.
+ *                  May be NULL when flushing an encoder that has the
+ *                  CODEC_CAP_DELAY capability set.
+ *                  If CODEC_CAP_VARIABLE_FRAME_SIZE is set, then each frame
+ *                  can have any number of samples.
+ *                  If it is not set, frame->nb_samples must be equal to
+ *                  avctx->frame_size for all frames except the last.
+ *                  The final frame may be smaller than avctx->frame_size.
+ * @param[out] got_packet_ptr This field is set to 1 by libavcodec if the
+ *                            output packet is non-empty, and to 0 if it is
+ *                            empty. If the function returns an error, the
+ *                            packet can be assumed to be invalid, and the
+ *                            value of got_packet_ptr is undefined and should
+ *                            not be used.
+ * @return          0 on success, negative error code on failure
+ */
+int avcodec_encode_audio2(AVCodecContext *avctx, AVPacket *avpkt,
+                          const AVFrame *frame, int *got_packet_ptr);
+
+----------------------------
+源码
+----------------------------
+int attribute_align_arg avcodec_encode_audio2(AVCodecContext *avctx,
+                                              AVPacket *avpkt,
+                                              const AVFrame *frame,
+                                              int *got_packet_ptr)
+{
+    AVFrame tmp;
+    AVFrame *padded_frame = NULL;
+    int ret;
+    int user_packet = !!avpkt->data;
+
+    *got_packet_ptr = 0;
+
+    if (!(avctx->codec->capabilities & CODEC_CAP_DELAY) && !frame) {
+        av_free_packet(avpkt);
+        av_init_packet(avpkt);
+        return 0;
+    }
+
+    /* ensure that extended_data is properly set */
+    if (frame && !frame->extended_data) {
+        if (av_sample_fmt_is_planar(avctx->sample_fmt) &&
+            avctx->channels > AV_NUM_DATA_POINTERS) {
+            av_log(avctx, AV_LOG_ERROR, "Encoding to a planar sample format, "
+                                        "with more than %d channels, but extended_data is not set.\n",
+                   AV_NUM_DATA_POINTERS);
+            return AVERROR(EINVAL);
+        }
+        av_log(avctx, AV_LOG_WARNING, "extended_data is not set.\n");
+
+        tmp = *frame;
+        tmp.extended_data = tmp.data;
+        frame = &tmp;
+    }
+
+    /* check for valid frame size */
+    if (frame) {
+        if (avctx->codec->capabilities & CODEC_CAP_SMALL_LAST_FRAME) {
+            if (frame->nb_samples > avctx->frame_size)
+                return AVERROR(EINVAL);
+        } else if (!(avctx->codec->capabilities & CODEC_CAP_VARIABLE_FRAME_SIZE)) {
+            if (frame->nb_samples < avctx->frame_size &&
+                !avctx->internal->last_audio_frame) {
+                ret = pad_last_frame(avctx, &padded_frame, frame);
+                if (ret < 0)
+                    return ret;
+
+                frame = padded_frame;
+                avctx->internal->last_audio_frame = 1;
+            }
+
+            if (frame->nb_samples != avctx->frame_size) {
+                ret = AVERROR(EINVAL);
+                goto end;
+            }
+        }
+    }
+
+    ret = avctx->codec->encode2(avctx, avpkt, frame, got_packet_ptr);
+    if (!ret) {
+        if (*got_packet_ptr) {
+            if (!(avctx->codec->capabilities & CODEC_CAP_DELAY)) {
+                if (avpkt->pts == AV_NOPTS_VALUE)
+                    avpkt->pts = frame->pts;
+                if (!avpkt->duration)
+                    avpkt->duration = ff_samples_to_time_base(avctx,
+                                                              frame->nb_samples);
+            }
+            avpkt->dts = avpkt->pts;
+        } else {
+            avpkt->size = 0;
+        }
+
+        if (!user_packet && avpkt->size) {
+            ret = av_buffer_realloc(&avpkt->buf, avpkt->size);
+            if (ret >= 0)
+                avpkt->data = avpkt->buf->data;
+        }
+
+        avctx->frame_number++;
+    }
+
+    if (ret < 0 || !*got_packet_ptr) {
+        av_free_packet(avpkt);
+        av_init_packet(avpkt);
+        goto end;
+    }
+
+    /* NOTE: if we add any audio encoders which output non-keyframe packets,
+     *       this needs to be moved to the encoders, but for now we can do it
+     *       here to simplify things */
+    avpkt->flags |= AV_PKT_FLAG_KEY;
+
+end:
+    av_frame_free(&padded_frame);
+
+    return ret;
+}

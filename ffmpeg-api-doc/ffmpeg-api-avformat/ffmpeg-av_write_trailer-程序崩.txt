@@ -1,0 +1,9 @@
+2015.4.22 
+av_write_trailer(fmctx); 运行到这时程序崩了
+
+原因时 fmctx->pb 为空，解决方法：
+
+    if(fmctx->pb) {
+      av_write_trailer(fmctx);
+      avio_close(fmctx->pb);
+    }

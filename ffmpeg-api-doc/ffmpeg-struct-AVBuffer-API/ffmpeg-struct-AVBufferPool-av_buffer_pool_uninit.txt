@@ -1,0 +1,23 @@
+/**
+ * Mark the pool as being available for freeing. It will actually be freed only
+ * once all the allocated buffers associated with the pool are released. Thus it
+ * is safe to call this function while some of the allocated buffers are still
+ * in use.
+ *
+ * @param pool pointer to the pool to be freed. It will be set to NULL.
+ * @see av_buffer_pool_can_uninit()
+ */
+void av_buffer_pool_uninit(AVBufferPool **pool);
+
+void av_buffer_pool_uninit(AVBufferPool **ppool)
+{
+    AVBufferPool *pool;
+
+    if (!ppool || !*ppool)
+        return;
+    pool   = *ppool;
+    *ppool = NULL;
+
+    if (!avpriv_atomic_int_add_and_fetch(&pool->refcount, -1))
+        buffer_pool_free(pool);
+}

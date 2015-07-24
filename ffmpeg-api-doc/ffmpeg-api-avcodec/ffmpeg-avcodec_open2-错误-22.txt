@@ -1,0 +1,43 @@
+17:42 2015/4/27
+
+错误：avcodec_open2 返回 -22
+
+//return 0 if ok, < 0 on error
+int mtarget_new_audio_stream(MTarget *target, int need_encode) {
+  int ret = 0;
+  AVFormatContext *fmctx = NULL;
+  AVCodecContext *avctx = NULL;
+  AVCodec *codec = NULL;
+
+  CHECK_FAIL(!target, -1, "add audio stream: pointer is null")
+  fmctx = target->fmctx;
+  CHECK_FAIL(!fmctx, -2, "add audio stream: pointer is null")
+
+  codec = avcodec_find_encoder_by_name(target->a_codec_name);  //strcpy(target->a_codec_name, "aac");
+  CHECK_FAIL(!codec, -3, "add audio stream: cannt find encoder")
+  AVStream *st = avformat_new_stream(fmctx, codec);
+  CHECK_FAIL(!st, -4, "add audio stream: new stream error")
+  
+  st->time_base = target->a_timebase;
+  target->a_index = st->index;
+  avctx = st->codec;
+
+  avctx->sample_fmt = target->sample_fmt;
+  avctx->channel_layout = target->channel_layout;
+  avctx->channels = target->channels;
+  avctx->sample_rate = target->sample_rate;
+  avctx->time_base = target->a_timebase;
+  avctx->flags |= CODEC_FLAG_GLOBAL_HEADER;
+
+  avctx->profile = FF_PROFILE_AAC_LOW;
+  avctx->strict_std_compliance = FF_COMPLIANCE_EXPERIMENTAL;
+
+  if(need_encode) {
+    ret = avcodec_open2(avctx, codec, 0);
+    CHECK_FAIL(ret < 0, ret, "add audio stream: open encoder error")
+  }
+  return 0;
+
+fail:
+  return ret;
+}

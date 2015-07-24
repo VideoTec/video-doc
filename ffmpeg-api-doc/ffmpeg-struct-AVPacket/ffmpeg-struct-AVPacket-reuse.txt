@@ -1,0 +1,12 @@
+从MP4读取FRAME，然后封闭成AVPacket用于解码：
+把数据读入缓存buf，然后赋值，pkt.data = buf, pkt.size = size。
+可以正常解码
+
+编码时，每次，avcodec_encode_audio2，怎么处理输入的pkt数据？
+怎么理解?
+        if (!user_packet && avpkt->size) {
+            ret = av_buffer_realloc(&avpkt->buf, avpkt->size);
+            if (ret >= 0)
+                avpkt->data = avpkt->buf->data;
+        }
+ff_alloc_packet(avpkt, 768 * s->channels)

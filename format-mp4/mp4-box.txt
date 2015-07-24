@@ -1,0 +1,98 @@
+MP4 是由一个个“box”组成的，大box中存放小box，一级嵌套一级来存放媒体信息。
+
+MP4 文件结构 是面向对象的
+ISO base media file format contains the timing, structure, and media information for timed sequences of media data, such as audio-visual presentations. 
+The file structure is object-oriented.
+A file can be decomposed[美][ˌdi:kəm'poʊzd]（使）分解 into basic objects very simply and the structure of the objects is implied from their type.
+
+整个文件的数据 都包含在BOX里面。
+BOX 是面向对象的数据块
+Files conforming to the ISO base media file format are formed as a series of objects, called "boxes". 
+All data is contained in boxes and there is no other data within the file. 
+This includes any initial signature required by the specific file format. 
+The "box" is object-oriented building block defined by a unique type identifier and length. 
+It was called "atom" in some specifications (e.g. the first definition of MP4 file format).
+
+A presentation (motion sequence) may be contained in several files.
+All timing and framing (position and size) information must be in the ISO base media file and 
+the ancillary[美][ˈænsəleri]附加的 files may essentially[美][ɪˈsenʃəli]根本上 use any format. 
+They must be only capable of description by the metadata defined in ISO base media file format
+
+------------------------------------
+Container Box:
+------------------------------------  
+A box whose sole purpose is to contain and group a set of related boxes. 
+
+容器BOX  比作文件夹
+终端BOX  比作文件
+
+------------------------------------
+MP4 BOX 基本结构
+------------------------------------
+Base structure, building-block = Box (Atom in early specs)
+Type identifier on 4 bytes
+Length of the box on 4 bytes
+Data specific to the box type, including other boxes on N bytes
+
+size 指明了整个box所占用的大小
+1. 包括header部分
+2. 超过了uint32的最大数值，size就被设置为1，并用接下来的8位uint64来存放大小
+3. 字节序是: big-endian
+
+一个 BOX = header(size + type) + data
+
+aligned(8) class Box (unsigned int(32) boxtype,  
+      optional unsigned int(8)[16] extended_type) { 
+  unsigned int(32) size; 
+  unsigned int(32) type = boxtype; 
+  if (size==1) { 
+  unsigned int(64) largesize; 
+  } else if (size==0) { 
+    // box extends to end of file 
+ } 
+  if (boxtype==‘uuid’) { 
+    unsigned int(8)[16] usertype = extended_type; 
+ } 
+}
+
+------------------------------------
+MP4 BOX FullBox
+------------------------------------
+aligned(8) class FullBox(unsigned int(32) boxtype, unsigned int(8) v, bit(24) f)
+  extends Box(boxtype) {
+  unsigned int(8)   version = v; 
+  bit(24)    flags = f; 
+} 
+The semantics of these two fields are: 
+version is an integer that specifies the version of this format of the box. 
+flags is a map of flags
+
+------------------------------------
+size 大头序的整数
+------------------------------------
+is an integer that specifies the number of bytes in this box, 
+including all its fields and contained boxes; 
+if size is 1 then the actual size is in the field largesize; 
+if size is 0, then this box is the last one in the file, and its contents extend to the end of the file (normally only used for a Media Data Box)
+
+以 fog.mp4 为例：
+文件大小是 164583
+最后一个box（moov）的位置是 162026 大小是 2557
+最后一个box 的下一个box偏移量就是，文件最后一个字节的下一个字节。
+
+------------------------------------
+type 一般把这个四个字符转换成小头序的整数
+------------------------------------
+identifies the box type; 
+standard boxes use a compact[美][ˈkɑ:mˈpækt]压缩 type, which is normally four printable characters, 
+to permit[pərˈmɪt]允许 ease of identification, and is shown so in the boxes below. 
+User extensions use an extended type; in this case, the type field is set to ‘uuid’.
+
+大部分box还包括： version(8bit) 和 flags(24bit) 字段
+version is an integer that specifies the version of this format of the box. 
+flags is a map of flags
+
+------------------------------------
+Chunk:  
+------------------------------------
+A contiguous set of samples for one track.

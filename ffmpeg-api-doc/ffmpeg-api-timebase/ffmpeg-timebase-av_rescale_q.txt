@@ -1,0 +1,34 @@
+头文件：E:\libav\libavutil\mathematics.h
+源文件：E:\libav\libavutil\mathematics.c
+
+/**
+ * Rescale a 64-bit integer by 2 rational numbers.
+ */
+int64_t av_rescale_q(int64_t a, AVRational bq, AVRational cq) av_const;
+
+
+int64_t av_rescale_q_rnd(int64_t a, AVRational bq, AVRational cq,
+                         enum AVRounding rnd)
+{
+    int64_t b = bq.num * (int64_t)cq.den;
+    int64_t c = cq.num * (int64_t)bq.den;
+    return av_rescale_rnd(a, b, c, rnd);
+}
+
+
+参考
+http://www.cnitblog.com/luofuchong/archive/2014/11/28/89869.html
+ffmpeg提供av_rescale_q函数用于time_base之间转换，av_rescale_q(a,b,c)作用相当于执行a*b/c，通过设置b,c的值，可以很方便的实现time_base之间转换
+
+变成以 c 为 time_base 的时间
+
+---------------------------------
+avconv.c 示例代码
+---------------------------------
+
+        pkt.data   = (uint8_t *)in_picture;
+        pkt.size   =  sizeof(AVPicture);
+        pkt.pts    = av_rescale_q(in_picture->pts, enc->time_base, ost->st->time_base);
+        pkt.flags |= AV_PKT_FLAG_KEY;
+
+        write_frame(s, &pkt, ost);

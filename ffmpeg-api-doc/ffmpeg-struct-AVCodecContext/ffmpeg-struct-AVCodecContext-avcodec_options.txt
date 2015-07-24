@@ -1,0 +1,4 @@
+源文件
+E:\libav\libavcodec\options_table.h
+
+定义了，重要字段的意义

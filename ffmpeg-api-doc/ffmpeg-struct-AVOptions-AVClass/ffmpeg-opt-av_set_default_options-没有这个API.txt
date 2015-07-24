@@ -1,0 +1,3 @@
+av_set_default_options
+
+没有这个方法？

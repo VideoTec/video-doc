@@ -1,0 +1,86 @@
+E:\ffmpeg-src\libavutil\error.h
+E:\ffmpeg-src\libavutil\error.c
+
+注意： libav 只一个接口: av_strerror 模仿的是 c-string.h 的 strerror 函数
+char error_msg[1024] = {0};
+av_strerror(ret, error_msg, 1024);
+printf("avcodec open failed: %s\n", error_msg);
+
+/**
+ * Put a description of the AVERROR code errnum in errbuf.
+ * In case of failure the global variable errno is set to indicate the
+ * error. Even in case of failure av_strerror() will print a generic
+ * error message indicating the errnum provided to errbuf.
+ *
+ * @param errnum      error code to describe
+ * @param errbuf      buffer to which description is written
+ * @param errbuf_size the size in bytes of errbuf
+ * @return 0 on success, a negative value if a description for errnum
+ * cannot be found
+ */
+int av_strerror(int errnum, char *errbuf, size_t errbuf_size);
+
+/**
+ * Fill the provided buffer with a string containing an error string
+ * corresponding to the AVERROR code errnum.
+ *
+ * @param errbuf         a buffer
+ * @param errbuf_size    size in bytes of errbuf
+ * @param errnum         error code to describe
+ * @return the buffer in input, filled with the error description
+ * @see av_strerror()
+ */
+static inline char *av_make_error_string(char *errbuf, size_t errbuf_size, int errnum)
+{
+    av_strerror(errnum, errbuf, errbuf_size);
+    return errbuf;
+}
+
+/**
+ * Convenience macro, the return value should be used only directly in
+ * function arguments but never stand-alone.
+ */
+#define AV_ERROR_MAX_STRING_SIZE 64
+#define av_err2str(errnum) \
+    av_make_error_string((char[AV_ERROR_MAX_STRING_SIZE]){0}, AV_ERROR_MAX_STRING_SIZE, errnum)
+
+ 
+用法示例：
+int r = 0;
+AVFormatContext *input_file_ctx = NULL;
+if(r = avformat_open_input(&input_file_ctx, file_name, NULL, NULL)) {
+  LOGI("failed to open video file: %s", av_err2str(r));
+  return 0;
+}
+打印出来：
+01-16 18:05:45.916: I/JNILog(25914): failed to open video file: Invalid data found when processing input
+
+--------------------------------------
+av_strerror 源码
+av_strerror 模仿的是 c-string.h 的 strerror 函数，是其扩展
+--------------------------------------
+int av_strerror(int errnum, char *errbuf, size_t errbuf_size)
+{
+    int ret = 0, i;
+    const struct error_entry *entry = NULL;
+
+    for (i = 0; i < FF_ARRAY_ELEMS(error_entries); i++) {
+        if (errnum == error_entries[i].num) {
+            entry = &error_entries[i];
+            break;
+        }
+    }
+    if (entry) {
+        av_strlcpy(errbuf, entry->str, errbuf_size);
+    } else {
+#if HAVE_STRERROR_R
+        ret = AVERROR(strerror_r(AVUNERROR(errnum), errbuf, errbuf_size));
+#else
+        ret = -1;
+#endif
+        if (ret < 0)
+            snprintf(errbuf, errbuf_size, "Error number %d occurred", errnum);
+    }
+
+    return ret;
+}

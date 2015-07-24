@@ -1,0 +1,11 @@
+14:30 2015/4/24
+
+解码出的图片，带有对应的 avpkt 的时间信息：
+第一：时间信息有：pkt_pts pkt_dts pkt_duration
+第二：对应的 avpkt - 及有可能不是当前传递的 avpkt (CODEC_CAP_DELAY) 
+
+第三：picture->pts 极有可能为零。需要调用者自己计算
+
+int avcodec_decode_video2(AVCodecContext *avctx, AVFrame *picture,
+                         int *got_picture_ptr,
+                         AVPacket *avpkt);

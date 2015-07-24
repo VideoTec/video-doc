@@ -1,0 +1,13 @@
+FAAC is based on the original ISO MPEG reference code. The changes to this code are licensed under the LGPL license. 
+
+源文件地址
+http://www.audiocoding.com/faac.html
+
+----------------------------------------------------------
+源文件分析
+----------------------------------------------------------
+
+
+----------------------------------------------------------
+Windows 编译
+----------------------------------------------------------

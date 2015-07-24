@@ -1,0 +1,8 @@
+文档
+ * @note Codecs which have the CODEC_CAP_DELAY capability set have a delay
+ * between input and output, these need to be fed with avpkt->data=NULL,
+ * avpkt->size=0 at the end to return the remaining frames.
+ 
+ flush 出的 帧的时间戳怎么计算？
+ 
+ 示例文件：codec-delay.mp4，有250张图，到最终解出236张。mp4 video track 显示有 240 samples

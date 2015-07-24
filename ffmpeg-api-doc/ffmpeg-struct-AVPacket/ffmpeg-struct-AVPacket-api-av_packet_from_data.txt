@@ -1,0 +1,37 @@
+从已经创建（av_malloc 创建的）的缓存初始化 reference-counted packet
+ 
+/**
+ * Initialize a reference-counted packet from av_malloc()ed data.
+ *
+ * @param pkt packet to be initialized. This function will set the data, size,
+ *        buf and destruct fields, all others are left untouched.
+ * @param data Data allocated by av_malloc() to be used as packet data. If this
+ *        function returns successfully, the data is owned by the underlying AVBuffer.
+ *        The caller may not access the data through other means.
+ * @param size size of data in bytes, without the padding. I.e. the full buffer
+ *        size is assumed to be size + FF_INPUT_BUFFER_PADDING_SIZE.
+ *
+ * @return 0 on success, a negative AVERROR on error
+ */
+int av_packet_from_data(AVPacket *pkt, uint8_t *data, int size);
+
+int av_packet_from_data(AVPacket *pkt, uint8_t *data, int size)
+{
+    if (size >= INT_MAX - FF_INPUT_BUFFER_PADDING_SIZE)
+        return AVERROR(EINVAL);
+
+    pkt->buf = av_buffer_create(data, size + FF_INPUT_BUFFER_PADDING_SIZE,
+                                av_buffer_default_free, NULL, 0);
+    if (!pkt->buf)
+        return AVERROR(ENOMEM);
+
+    pkt->data = data;
+    pkt->size = size;
+#if FF_API_DESTRUCT_PACKET
+FF_DISABLE_DEPRECATION_WARNINGS
+    pkt->destruct = dummy_destruct_packet;
+FF_ENABLE_DEPRECATION_WARNINGS
+#endif
+
+    return 0;
+}

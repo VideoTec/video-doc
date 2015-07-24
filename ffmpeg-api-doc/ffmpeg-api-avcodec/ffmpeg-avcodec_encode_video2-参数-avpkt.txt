@@ -1,0 +1,66 @@
+关于缓存：
+1. 根据文档定义，可以自定义一个缓存，用于接收压缩数据。
+2. 如果 avpkt->data，avpkt->size 指定为空，
+   编码器会为压缩数据分配空间。
+   这个新分配的空间由调用者释放：av_free_packet
+   注意一： av_interleaved_write_frame 传调用 av_packet_unref 释放其接收的引用计数的 avpkt
+   注意二：
+   av_free_packet
+只释放两种 pkt 的数据缓存：
+1. 引用计数的 pkt     av_buffer_unref(&pkt->buf);
+2. 有析构函数的 pkt   pkt->destruct
+
+关于 AVPacket 的初始化
+1. avpkt->data，avpkt->size 外其它数据都由 av_init_packet 初始化。
+2. 每次传递给压缩函数的 AVPakcet 都需要初始化吗？
+   根据 avconv.c 的代码
+   需要初始化，如果需要由编码器为压缩数据分配空间，需要按照下面方式
+   av_init_packet(&avpkt);
+   avpkt.data = 0;
+   avpkt.size = 0;
+   
+ ------------------------------
+ 23:34 2015/4/23
+ ------------------------------
+ avcodec_encode_video2 avpkt.pts avpkt.dts 和 frame.dts 的关系
+     if (!ret) {
+        if (!*got_packet_ptr)
+            avpkt->size = 0;
+        else if (!(avctx->codec->capabilities & CODEC_CAP_DELAY))
+            avpkt->pts = avpkt->dts = frame->pts;
+
+libx264 也会计算 avpkt->pts avpkt.dts
+ .encode2          = X264_frame,
+ 
+ static int X264_frame(AVCodecContext *ctx, AVPacket *pkt, const AVFrame *frame,
+                      int *got_packet)
+{
+    if (frame) {
+        for (i = 0; i < 3; i++) {
+            x4->pic.img.plane[i]    = frame->data[i];
+            x4->pic.img.i_stride[i] = frame->linesize[i];
+        }
+
+        x4->pic.i_pts  = frame->pts;
+		........
+	}
+    pkt->pts = pic_out.i_pts;
+    pkt->dts = pic_out.i_dts;
+
+ ------------------------------
+ 文档
+ ------------------------------
+ * @param avpkt     output AVPacket.
+ *                  The user can supply an output buffer by setting
+ *                  avpkt->data and avpkt->size prior to calling the
+ *                  function, but if the size of the user-provided data is not
+ *                  large enough, encoding will fail. All other AVPacket fields
+ *                  will be reset by the encoder using av_init_packet(). If
+ *                  avpkt->data is NULL, the encoder will allocate it.
+ *                  The encoder will set avpkt->size to the size of the
+ *                  output packet. The returned data (if any) belongs to the
+ *                  caller, he is responsible for freeing it.
+ *
+ *                  If this function fails or produces no output, avpkt will be
+ *                  freed using av_free_packet() (i.e. avpkt->destruct will be
+ *                  called to free the user supplied buffer).

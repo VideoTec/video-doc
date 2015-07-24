@@ -1,0 +1,47 @@
+---------------------------------
+示例
+---------------------------------
+
+AVDictionary *dict = NULL;
+在 avcodec_open 时，设置。
+
+---------------------------------
+libavcodec/options_table.h -> avcodec_options数组 -> AVCodecContext av_class
+---------------------------------
+
+av_dict_set(&dict, "g", "4", 0);
+{"g", "set the group of picture (GOP) size", OFFSET(gop_size), AV_OPT_TYPE_INT, {.i64 = 12 }, INT_MIN, INT_MAX, V|E},
+
+av_dict_set(&dict, "bf", "3", 0);
+{"bf", "use 'frames' B frames", OFFSET(max_b_frames), AV_OPT_TYPE_INT, {.i64 = DEFAULT }, -1, INT_MAX, V|E},
+
+av_dict_set(&dict, "level", "41", 0);
+{"level", NULL, OFFSET(level), AV_OPT_TYPE_INT, {.i64 = FF_LEVEL_UNKNOWN }, INT_MIN, INT_MAX, V|A|E, "level"},
+
+---------------------------------
+libavcodec/libx264 -> options数组 -> AVCodec priv_class
+---------------------------------
+
+av_dict_set(&dict, "crf", "18", 0); 
+{ "crf", "Select the quality for constant quality mode", OFFSET(crf), AV_OPT_TYPE_FLOAT,  {.dbl = -1 }, -1, FLT_MAX, VE },
+
+av_dict_set(&dict, "preset", "veryfast", 0);   
+{ "preset", "Set the encoding preset (cf. x264 --fullhelp)", OFFSET(preset), AV_OPT_TYPE_STRING, { .str = "medium" }, 0, 0, VE},
+
+---------------------------------
+特殊情况：两个结构体都有， AVCodecContext / AVCodec-libx264
+---------------------------------
+
+av_dict_set(&dict, "profile", "main", 0);
+{ "profile", "Set profile restrictions (cf. x264 --fullhelp) ", OFFSET(profile), AV_OPT_TYPE_STRING, { 0 }, 0, 0, VE},
+{ "profile", NULL, OFFSET(profile), AV_OPT_TYPE_INT, {.i64 = FF_PROFILE_UNKNOWN }, INT_MIN, INT_MAX, V|A|E, "profile"},
+
+
+---------------------------------
+ffmpeg 所有选项
+---------------------------------
+E:\libav\libavcodec\libx264.c
+
+---------------------------------
+libx264 所有选项
+---------------------------------

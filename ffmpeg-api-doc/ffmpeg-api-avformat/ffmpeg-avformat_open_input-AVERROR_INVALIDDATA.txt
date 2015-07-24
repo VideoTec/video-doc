@@ -1,0 +1,13 @@
+  if(ret = avformat_open_input(&file_ctx, file_name, NULL, NULL)) {
+    LOGE("failed to open input file: %s, error-msg: %s", file_name, av_err2str(ret));
+    goto fail;
+  }
+  
+  01-27 17:46:18.346: E/JNILog(18352): failed to open input file: /sdcard/dream.mp3, error-msg: Invalid data found when processing input
+  #define AVERROR_INVALIDDATA        FFERRTAG( 'I','N','D','A') ///< Invalid data found when processing input
+  
+  应该是 av_probe_input_buffer2 返回的错误
+  
+  最后找到原因：枚举所有的支持的输入格式，使用的库只支持一个输入格式
+01-27 18:32:52.673: I/JNILog(28677): QuickTime / MOV
+  不支持MP3输入格式

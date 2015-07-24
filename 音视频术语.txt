@@ -1,0 +1,5 @@
+﻿--------------------------
+profile - 类  配置
+--------------------------
+例如： h264 的 profile
+Baseline / Main / Extended / High

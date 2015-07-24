@@ -1,0 +1,82 @@
+结构体 AVFrame 解释版本
+libavutil/avframe.h
+
+#define AV_NUM_DATA_POINTERS 8
+#define AV_FRAME_FLAG_CORRUPT       (1 << 0)
+#define FF_DECODE_ERROR_INVALID_BITSTREAM   1
+#define FF_DECODE_ERROR_MISSING_REFERENCE   2
+
+typedef struct AVFrame {
+    uint8_t *data[AV_NUM_DATA_POINTERS];
+    int linesize[AV_NUM_DATA_POINTERS];
+    uint8_t **extended_data;
+    int width, height;
+    int nb_samples;
+    int format;
+    int key_frame;
+    enum AVPictureType pict_type;
+    AVRational sample_aspect_ratio;  Sample aspect ratio for the video frame, 0/1 if unknown/unspecified.
+    int64_t pts;
+    int64_t pkt_pts;
+    int64_t pkt_dts;
+    int coded_picture_number;     picture number in bitstream order
+    int display_picture_number;   picture number in display order
+    int quality;
+    void *opaque;
+    uint64_t error[AV_NUM_DATA_POINTERS];
+    int repeat_pict;
+    int interlaced_frame;
+    int top_field_first;
+    int palette_has_changed;
+    int64_t reordered_opaque;
+    int sample_rate;
+    uint64_t channel_layout;
+    AVBufferRef *buf[AV_NUM_DATA_POINTERS];
+    AVBufferRef **extended_buf;
+    int        nb_extended_buf;
+    AVFrameSideData **side_data;
+    int            nb_side_data;
+    int flags;
+    enum AVColorRange color_range;
+    enum AVColorPrimaries color_primaries;
+    enum AVColorTransferCharacteristic color_trc;
+    enum AVColorSpace colorspace;
+    enum AVChromaLocation chroma_location;
+    int64_t best_effort_timestamp;
+    int64_t pkt_pos;
+    int64_t pkt_duration;
+    AVDictionary *metadata;
+    int decode_error_flags;
+    int channels;
+    int pkt_size;
+    AVBufferRef *qp_table_buf;
+
+
+#if FF_API_AVFRAME_LAVC
+    attribute_deprecated uint8_t *base[AV_NUM_DATA_POINTERS];
+#endif
+#if FF_API_AVFRAME_LAVC
+    attribute_deprecated void *hwaccel_picture_private;
+    attribute_deprecated struct AVCodecContext *owner;
+    attribute_deprecated void *thread_opaque;
+    uint8_t motion_subsample_log2;
+#endif
+#if FF_API_AVFRAME_LAVC
+    attribute_deprecated int buffer_hints;
+    attribute_deprecated struct AVPanScan *pan_scan;
+#endif
+#if FF_API_AVFRAME_LAVC
+    attribute_deprecated int type;
+#endif
+#if FF_API_AVFRAME_LAVC
+    attribute_deprecated int reference;
+    attribute_deprecated int8_t *qscale_table;
+    attribute_deprecated int qstride;
+    attribute_deprecated int qscale_type;
+    attribute_deprecated uint8_t *mbskip_table;
+    int16_t (*motion_val[2])[2];
+    attribute_deprecated uint32_t *mb_type;
+    attribute_deprecated short *dct_coeff;
+    attribute_deprecated int8_t *ref_index[2];
+#endif
+} AVFrame;

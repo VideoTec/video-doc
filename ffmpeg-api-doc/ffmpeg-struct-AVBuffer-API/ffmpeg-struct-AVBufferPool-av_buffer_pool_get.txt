@@ -1,0 +1,82 @@
+libavutil/buffer.h
+
+/**
+ * Allocate a new AVBuffer, reusing an old buffer from the pool when available.
+ * This function may be called simultaneously from multiple threads.
+ *
+ * @return a reference to the new buffer on success, NULL on error.
+ */
+AVBufferRef *av_buffer_pool_get(AVBufferPool *pool);
+
+返回的 AVBufferRef 的释放函数是 pool_release_buffer
+/* allocate a new buffer and override its free() callback so that
+ * it is returned to the pool on free */
+
+源码
+
+AVBufferRef *av_buffer_pool_get(AVBufferPool *pool)
+{
+    AVBufferRef *ret;
+    BufferPoolEntry *buf;
+
+    ff_mutex_lock(&pool->mutex);
+    buf = pool->pool;
+    if (buf) {
+        ret = av_buffer_create(buf->data, pool->size, pool_release_buffer,
+                               buf, 0);
+        if (ret) {
+            pool->pool = buf->next;
+            buf->next = NULL;
+        }
+    } else {
+        ret = pool_alloc_buffer(pool);
+    }
+    ff_mutex_unlock(&pool->mutex);
+
+    if (ret)
+        avpriv_atomic_int_add_and_fetch(&pool->refcount, 1);
+
+    return ret;
+}
+
+static void pool_release_buffer(void *opaque, uint8_t *data)
+{
+    BufferPoolEntry *buf = opaque;
+    AVBufferPool *pool = buf->pool;
+
+    ff_mutex_lock(&pool->mutex);
+    buf->next = pool->pool;
+    pool->pool = buf;
+    ff_mutex_unlock(&pool->mutex);
+
+    if (!avpriv_atomic_int_add_and_fetch(&pool->refcount, -1))
+        buffer_pool_free(pool);
+}
+
+/* allocate a new buffer and override its free() callback so that
+ * it is returned to the pool on free */
+static AVBufferRef *pool_alloc_buffer(AVBufferPool *pool)
+{
+    BufferPoolEntry *buf;
+    AVBufferRef     *ret;
+
+    ret = pool->alloc(pool->size);
+    if (!ret)
+        return NULL;
+
+    buf = av_mallocz(sizeof(*buf));
+    if (!buf) {
+        av_buffer_unref(&ret);
+        return NULL;
+    }
+
+    buf->data   = ret->buffer->data;
+    buf->opaque = ret->buffer->opaque;
+    buf->free   = ret->buffer->free;
+    buf->pool   = pool;
+
+    ret->buffer->opaque = buf;
+    ret->buffer->free   = pool_release_buffer;
+
+    return ret;
+}

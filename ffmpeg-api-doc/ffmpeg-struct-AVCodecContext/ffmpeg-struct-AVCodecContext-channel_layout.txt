@@ -1,0 +1,8 @@
+文档
+
+    /**
+     * Audio channel layout.
+     * - encoding: set by user.
+     * - decoding: set by libavcodec.
+     */
+    uint64_t channel_layout;

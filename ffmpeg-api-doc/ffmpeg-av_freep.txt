@@ -1,0 +1,18 @@
+libavutil/mem.h
+
+/**
+ * Free a memory block which has been allocated with av_malloc(z)() or
+ * av_realloc() and set the pointer pointing to it to NULL.
+ * @param ptr Pointer to the pointer to the memory block which should
+ * be freed.
+ * @note passing a pointer to a NULL pointer is safe and leads to no action.
+ * @see av_free()
+ */
+void av_freep(void *ptr);
+
+void av_freep(void *arg)
+{
+    void **ptr = (void **)arg;
+    av_free(*ptr);
+    *ptr = NULL;
+}

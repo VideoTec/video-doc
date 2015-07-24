@@ -1,0 +1,100 @@
+2014.10.15 【计划】《前文参考之适应性二元算术编码（Context-based Adaptive Binary Arithmetic Coding，简称CABAC）是视讯压缩标准H.264采用的算法》
+
+
+1280x534 是什么格式的分辨率？
+分辨率是1280X534的电影其实就是720P的高清了
+
+跟电影的画面比例有关，你的是不是画面比例是2.40：1的电影
+
+是跟电影拍摄时用的胶片格式大小等问题有关  跟压制没关系。。
+标准的720是1280*720
+
+胶片电影的分辨率是2.35:1,这种比例适合影院的超宽幕布.
+1280:720是16:9的比例,这主要是HDTV的规范
+
+http://forum.doom9.org/showthread.php?t=130178
+
+Here is what I have: 1080P movie in 2.40:1 aspect ratio. Resolution 1920x800. Given the resolution Aspect Ratio signaling is 1:1 (pixels are square)
+
+When converting to 720p, I could:
+1) Resize to 1280x534 and keep the pixels square
+2) Resize to 1280x720 and set the sample aspect ratio to 27:20
+
+Both will result in "proper" display and 720p compliance (right?)
+
+Here is where things begin to drift into the area I don't fully understand:
+
+If I reduce vertical resolution from 800 to 720 pixels there will be more data within the frame then if resizes to 534 pixels.
+
+During the display process the player will enforce proper aspect ratio and if viewed on 1280x1024 monitor display 1280 horizontal and (automatically?) resize to 534 vertically to maintain the AR.
+
+However if viewed on 1600x1200 monitor - the entire 720 vertical lines will be displayed and some stretching (with some obvious quality loss) will occur horizontally. However, the quality loss will be smaller then if both horizontal and vertical resize is taking place.
+
+To that end - the question is: which is the "proper" way of encoding?
+Keep the maximum number of vertical lines and control aspect ratio through SAR or control aspect ratio based on the number of pixes available?
+
+Thanks.
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+ 
+
+
+
+
+I had to delete the obj folder -> afterwards it was successfully build
+
+
+
+
+
+
+	
+	
+	
+
+	
+	
+	
+	
+
+
+
+因为眼睛的残影造成。动画的产生
+
+
+SDL 声音的android
+
+
+
+
+
+
+
+
+
+create libav vc project
+1. use configure gen config.h
+2. check libavcodec/Makefile etc.  to add *.c files
+
+
+
+
+	
+	
+	声音处理
+	变调（pitch shift）
+变速（time stretching）
+回声（echo）
+镶边（flanger）

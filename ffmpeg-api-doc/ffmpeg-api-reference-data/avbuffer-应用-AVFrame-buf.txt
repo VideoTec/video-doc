@@ -1,0 +1,13 @@
+AVFrame 字段 buf
+
+    /**
+     * AVBuffer references backing the data for this frame. If all elements of
+     * this array are NULL, then this frame is not reference counted.
+     *
+     * There may be at most one AVBuffer per data plane, so for video this array
+     * always contains all the references. For planar audio with more than
+     * AV_NUM_DATA_POINTERS channels, there may be more buffers than can fit in
+     * this array. Then the extra AVBufferRef pointers are stored in the
+     * extended_buf array.
+     */
+    AVBufferRef *buf[AV_NUM_DATA_POINTERS];

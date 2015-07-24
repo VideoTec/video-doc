@@ -1,0 +1,63 @@
+ffplay 参数 
+-loop number (0-forever)
+-autoexit
+
+ffmpeg -f images -i %05d.jpg -r 12 d:\test.avi
+ (avconv cann't ! why???)
+ 
+ffmpeg -i foo.avi -r 1 -s WxH -f image2 foo-%03d.jpeg
+ffmpeg -i foo.avi -r 1 -s WxH -f image2 foo-%03d.jpeg
+
+
+ffmpeg -f gif -i D:\source\paopaobing_8.gif -pix_fmt yuv420p -i xx\xx.mp3 d:\gif.mp4
+
+chrome 播放小于一秒，的MP4无法播放？
+https://code.google.com/p/chromium/issues/detail?id=159495
+Result
+- Video plays for less than one second, stops
+解决方法：less-than-one-second.mp4
+1. 输出时，指定文件时长，大于一秒
+2. 拼接
+ffmpeg -i D:\source\time_limit.mp3 -f gif  -i "concat:dadatu_16.gif|paopaobing_8.gif" -pix_fmt yuv420p -s 200x200 d:\test.mp4
+
+
+注意：-pix_fmt yuv420p，如果不加这个参数，输出的视频，WindowsMediaPlayer播放不了，默认是yuv444
+注意：10.21号，ffmpeg -f gif -i D:\source\paopaobing_8.gif -pix_fmt yuv420p -i xx\xx.mp3 d:\gif.mp4，提示：pix_fmt 不存在的选项
+               解决方法：ffmpeg -f gif -i D:\source\paopaobing_8.gif -i xx\xx.mp3 -pix_fmt yuv420p d:\gif.mp4 调整：pix_fmt的位置
+
+ffmpeg 输出画质的参数：
+
+对于无损压缩我们提倡使用-qp 胜过-crf
+
+-qp (constant QP [quantization parameter]) with x264
+
+crf（Constant Rate Factor)
+量化比例的范围为0~51，其中0为无损模式，23为缺省值，51可能是最差的。该数字越小，图像质量越好。
+从主观上讲，18~28是一个合理的范围。
+18往往被认为从视觉上看是无损的，它的输出视频质量和输入视频一模一样或者说相差无几
+若Crf值加6，输出码率大概减少一半；若Crf值减6，输出码率翻倍
+
+x264的-preset 参数 (预设值) ultrafast,superfast,veryfast,faster,fast,medium(缺省),slow(可以缩小输出文件体积),slower,veryslow,placebo
+
+x264的profile 参数 baseline,main.high,high10,high422,high444
+
+x264的--tune参数
+film,animation(压制内容是动画),grain(保留纹理),stillimage(合成图片测试，不加反而体积变小了),psnr,ssim,fastdecode,zerolantency
+
+
+windows截屏并且创建直播流
+https://github.com/rdp/screen-capture-recorder-to-video-windows-free
+
+"-rtbufsize 50M -f dshow -i video=\"screen-capture-recorder\" -s 640x480 -f dshow -i audio=\"virtual-audio-capturer\" -r 15 -vcodec libx264 -tune:v zerolatency -acodec libmp3lame -f flv rtmp://119.90.40.38:1955/live/mystream"
+
+ffmpeg -f dshow -i video="screen-capture-recorder" output.flv
+ffmpeg -f dshow -i video="UScreenCapture":audio="Microphone" output.flv
+ffmpeg -f dshow -i video="UScreenCapture" -f dshow -i audio="Microphone" output.flv
+
+ffmpeg -f dshow -i video="UScreenCapture":audio="Realtek AC97 Audio" -vf crop=xwidth:xheight:xleft:xtop c:\output.flv
+
+如果CPU太慢了，不要压缩视频：
+ffmpeg -f dshow -i video="screen-capture-recorder":audio="Microphone" -vcodec libx264 -crf 0 -preset ultrafast -acodec pcm_s16le output.flv
+
+出现下面这个错误：
+[dshow @ 02505aa0] real-time buffer 66% full! frame dropped!

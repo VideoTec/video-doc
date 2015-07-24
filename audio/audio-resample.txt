@@ -1,0 +1,7 @@
+重采样
+Sample rate conversion
+http://en.wikipedia.org/wiki/Sample_rate_conversion
+
+重采样用例：
+Compact Disc Digital Audio and Digital Audio Tape systems use different sampling rates
+American television, European television, and movies all use different frame rates.

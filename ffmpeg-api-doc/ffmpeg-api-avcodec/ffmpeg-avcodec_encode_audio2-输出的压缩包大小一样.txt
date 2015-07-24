@@ -1,0 +1,18 @@
+11:25 2015/5/8
+这次是第二次出现这种情况
+
+int avcodec_encode_audio2(AVCodecContext *avctx, AVPacket *avpkt,
+                          const AVFrame *frame, int *got_packet_ptr);
+						  
+问题出在 输入的 AVFrame 参数上：
+需要指定 nb_samples, 其它参数都可不指定
+
+10:40 2015/7/7 不用指定PTS吗?
+
+ * @param[in] frame AVFrame containing the raw audio data to be encoded.
+ *                  May be NULL when flushing an encoder that has the
+ *                  CODEC_CAP_DELAY capability set.
+ *                  If CODEC_CAP_VARIABLE_FRAME_SIZE is set, then each frame
+ *                  can have any number of samples.
+ *                  If it is not set, frame->nb_samples must be equal to
+ *                  avctx->frame_size for all frames except the last.

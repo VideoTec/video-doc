@@ -1,0 +1,6 @@
+http://forum.doom9.org/showthread.php?t=163264
+How is qcomp exactly affecting bitrate and quantizer?
+
+Quantizer curve compression, or “qcomp”, is a very old and simple idea.
+Lower the quality in areas of the video with high complexity and raise the quality in areas with low complexity. 
+The original implementation dates at least back to the original libavcodec ratecontrol.

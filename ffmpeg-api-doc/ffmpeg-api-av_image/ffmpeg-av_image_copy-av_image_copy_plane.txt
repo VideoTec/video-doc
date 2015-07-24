@@ -1,0 +1,74 @@
+头文件 E:\libav\libavutil\imgutils.h
+源文件 E:\libav\libavutil\imgutils.c
+
+/**
+ * Copy image plane from src to dst.
+ * That is, copy "height" number of lines of "bytewidth" bytes each.
+ * The first byte of each successive line is separated by *_linesize
+ * bytes.
+ *
+ * @param dst_linesize linesize for the image plane in dst
+ * @param src_linesize linesize for the image plane in src
+ */
+void av_image_copy_plane(uint8_t       *dst, int dst_linesize,
+                         const uint8_t *src, int src_linesize,
+                         int bytewidth, int height);
+						 
+/**
+ * Copy image in src_data to dst_data.
+ *
+ * @param dst_linesizes linesizes for the image in dst_data
+ * @param src_linesizes linesizes for the image in src_data
+ */
+void av_image_copy(uint8_t *dst_data[4], int dst_linesizes[4],
+                   const uint8_t *src_data[4], const int src_linesizes[4],
+                   enum AVPixelFormat pix_fmt, int width, int height);
+				   
+				   
+void av_image_copy_plane(uint8_t       *dst, int dst_linesize,
+                         const uint8_t *src, int src_linesize,
+                         int bytewidth, int height)
+{
+    if (!dst || !src)
+        return;
+    for (;height > 0; height--) {
+        memcpy(dst, src, bytewidth);
+        dst += dst_linesize;
+        src += src_linesize;
+    }
+}
+
+void av_image_copy(uint8_t *dst_data[4], int dst_linesizes[4],
+                   const uint8_t *src_data[4], const int src_linesizes[4],
+                   enum AVPixelFormat pix_fmt, int width, int height)
+{
+    const AVPixFmtDescriptor *desc = av_pix_fmt_desc_get(pix_fmt);
+
+    if (!desc || desc->flags & AV_PIX_FMT_FLAG_HWACCEL)
+        return;
+
+    if (desc->flags & AV_PIX_FMT_FLAG_PAL ||
+        desc->flags & AV_PIX_FMT_FLAG_PSEUDOPAL) {
+        av_image_copy_plane(dst_data[0], dst_linesizes[0],
+                            src_data[0], src_linesizes[0],
+                            width, height);
+        /* copy the palette */
+        memcpy(dst_data[1], src_data[1], 4*256);
+    } else {
+        int i, planes_nb = 0;
+
+        for (i = 0; i < desc->nb_components; i++)
+            planes_nb = FFMAX(planes_nb, desc->comp[i].plane + 1);
+
+        for (i = 0; i < planes_nb; i++) {
+            int h = height;
+            int bwidth = av_image_get_linesize(pix_fmt, width, i);
+            if (i == 1 || i == 2) {
+                h= -((-height)>>desc->log2_chroma_h);
+            }
+            av_image_copy_plane(dst_data[i], dst_linesizes[i],
+                                src_data[i], src_linesizes[i],
+                                bwidth, h);
+        }
+    }
+}

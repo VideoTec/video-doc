@@ -1,0 +1,121 @@
+capability[英][ˌkeɪpəˈbɪləti] [美][ˌkeɪpə'bɪləti] n.才能，能力；容量；性能；生产率
+
+应该解释成，编码器性能
+    /**
+     * Codec capabilities.
+     * see CODEC_CAP_*
+     */
+    int capabilities;
+
+----------------------------------------------------------
+CODEC_CAP_EXPERIMENTAL
+----------------------------------------------------------
+experimental[英][ɪkˌsperɪˈmentl] [美][ɪkˌspɛrəˈmɛntl] 实验的；根据实验的；试验性的
+/**
+ * Codec is experimental and is thus avoided in favor of non experimental
+ * encoders
+ */
+#define CODEC_CAP_EXPERIMENTAL     0x0200
+
+和 AVCodecContext strict_std_compliance 字段 FF_COMPLIANCE_EXPERIMENTAL 相关。
+
+----------------------------------------------------------
+libavcodec/avcodec.h 定义下面的编码器性能
+----------------------------------------------------------
+
+/* codec capabilities */
+
+#define CODEC_CAP_DRAW_HORIZ_BAND 0x0001 ///< Decoder can use draw_horiz_band callback.
+/**
+ * Codec uses get_buffer() for allocating buffers and supports custom allocators.
+ * If not set, it might not use get_buffer() at all or use operations that
+ * assume the buffer was allocated by avcodec_default_get_buffer.
+ */
+#define CODEC_CAP_DR1             0x0002
+#define CODEC_CAP_TRUNCATED       0x0008
+#if FF_API_XVMC
+/* Codec can export data for HW decoding (XvMC). */
+#define CODEC_CAP_HWACCEL         0x0010
+#endif /* FF_API_XVMC */
+/**
+ * Encoder or decoder requires flushing with NULL input at the end in order to
+ * give the complete and correct output.
+ *
+ * NOTE: If this flag is not set, the codec is guaranteed to never be fed with
+ *       with NULL data. The user can still send NULL data to the public encode
+ *       or decode function, but libavcodec will not pass it along to the codec
+ *       unless this flag is set.
+ *
+ * Decoders:
+ * The decoder has a non-zero delay and needs to be fed with avpkt->data=NULL,
+ * avpkt->size=0 at the end to get the delayed data until the decoder no longer
+ * returns frames.
+ *
+ * Encoders:
+ * The encoder needs to be fed with NULL data at the end of encoding until the
+ * encoder no longer returns data.
+ *
+ * NOTE: For encoders implementing the AVCodec.encode2() function, setting this
+ *       flag also means that the encoder must set the pts and duration for
+ *       each output packet. If this flag is not set, the pts and duration will
+ *       be determined by libavcodec from the input frame.
+ */
+#define CODEC_CAP_DELAY           0x0020
+/**
+ * Codec can be fed a final frame with a smaller size.
+ * This can be used to prevent truncation of the last audio samples.
+ */
+#define CODEC_CAP_SMALL_LAST_FRAME 0x0040
+#if FF_API_CAP_VDPAU
+/**
+ * Codec can export data for HW decoding (VDPAU).
+ */
+#define CODEC_CAP_HWACCEL_VDPAU    0x0080
+#endif
+/**
+ * Codec can output multiple frames per AVPacket
+ * Normally demuxers return one frame at a time, demuxers which do not do
+ * are connected to a parser to split what they return into proper frames.
+ * This flag is reserved to the very rare category of codecs which have a
+ * bitstream that cannot be split into frames without timeconsuming
+ * operations like full decoding. Demuxers carring such bitstreams thus
+ * may return multiple frames in a packet. This has many disadvantages like
+ * prohibiting stream copy in many cases thus it should only be considered
+ * as a last resort.
+ */
+#define CODEC_CAP_SUBFRAMES        0x0100
+/**
+ * Codec is experimental and is thus avoided in favor of non experimental
+ * encoders
+ */
+#define CODEC_CAP_EXPERIMENTAL     0x0200
+/**
+ * Codec should fill in channel configuration and samplerate instead of container
+ */
+#define CODEC_CAP_CHANNEL_CONF     0x0400
+#if FF_API_NEG_LINESIZES
+/**
+ * @deprecated no codecs use this capability
+ */
+#define CODEC_CAP_NEG_LINESIZES    0x0800
+#endif
+/**
+ * Codec supports frame-level multithreading.
+ */
+#define CODEC_CAP_FRAME_THREADS    0x1000
+/**
+ * Codec supports slice-based (or partition-based) multithreading.
+ */
+#define CODEC_CAP_SLICE_THREADS    0x2000
+/**
+ * Codec supports changed parameters at any point.
+ */
+#define CODEC_CAP_PARAM_CHANGE     0x4000
+/**
+ * Codec supports avctx->thread_count == 0 (auto).
+ */
+#define CODEC_CAP_AUTO_THREADS     0x8000
+/**
+ * Audio encoder supports receiving a different number of samples in each call.
+ */
+#define CODEC_CAP_VARIABLE_FRAME_SIZE 0x10000

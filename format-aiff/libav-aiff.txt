@@ -1,0 +1,49 @@
+E:\libav\libavformat\aiffdec.c
+E:\libav\libavformat\aiffenc.c
+
+AVInputFormat ff_aiff_demuxer = {
+    .name           = "aiff",
+    .long_name      = NULL_IF_CONFIG_SMALL("Audio IFF"),
+    .priv_data_size = sizeof(AIFFInputContext),
+    .read_probe     = aiff_probe,
+    .read_header    = aiff_read_header,
+    .read_packet    = aiff_read_packet,
+    .read_seek      = ff_pcm_read_seek,
+    .codec_tag      = (const AVCodecTag* const []){ ff_codec_aiff_tags, 0 },
+};
+
+AVOutputFormat ff_aiff_muxer = {
+    .name              = "aiff",
+    .long_name         = NULL_IF_CONFIG_SMALL("Audio IFF"),
+    .mime_type         = "audio/aiff",
+    .extensions        = "aif,aiff,afc,aifc",
+    .priv_data_size    = sizeof(AIFFOutputContext),
+    .audio_codec       = AV_CODEC_ID_PCM_S16BE,
+    .video_codec       = AV_CODEC_ID_NONE,
+    .write_header      = aiff_write_header,
+    .write_packet      = aiff_write_packet,
+    .write_trailer     = aiff_write_trailer,
+    .codec_tag         = (const AVCodecTag* const []){ ff_codec_aiff_tags, 0 },
+};
+
+E:\libav\libavformat\aiff.h
+static const AVCodecTag ff_codec_aiff_tags[] = {
+    { AV_CODEC_ID_PCM_S16BE,    MKTAG('N','O','N','E') },
+    { AV_CODEC_ID_PCM_S8,       MKTAG('N','O','N','E') },
+    { AV_CODEC_ID_PCM_S24BE,    MKTAG('N','O','N','E') },
+    { AV_CODEC_ID_PCM_S32BE,    MKTAG('N','O','N','E') },
+    { AV_CODEC_ID_PCM_F32BE,    MKTAG('f','l','3','2') },
+    { AV_CODEC_ID_PCM_F64BE,    MKTAG('f','l','6','4') },
+    { AV_CODEC_ID_PCM_ALAW,     MKTAG('a','l','a','w') },
+    { AV_CODEC_ID_PCM_MULAW,    MKTAG('u','l','a','w') },
+    { AV_CODEC_ID_MACE3,        MKTAG('M','A','C','3') },
+    { AV_CODEC_ID_MACE6,        MKTAG('M','A','C','6') },
+    { AV_CODEC_ID_GSM,          MKTAG('G','S','M',' ') },
+    { AV_CODEC_ID_ADPCM_G726,   MKTAG('G','7','2','6') },
+    { AV_CODEC_ID_PCM_S16BE,    MKTAG('t','w','o','s') },
+    { AV_CODEC_ID_PCM_S16LE,    MKTAG('s','o','w','t') },
+    { AV_CODEC_ID_ADPCM_IMA_QT, MKTAG('i','m','a','4') },
+    { AV_CODEC_ID_QDM2,         MKTAG('Q','D','M','2') },
+    { AV_CODEC_ID_QCELP,        MKTAG('Q','c','l','p') },
+    { AV_CODEC_ID_NONE,         0 },
+};

@@ -1,0 +1,58 @@
+libavfilter/avfiilter.h
+
+/** An instance of a filter */
+struct AVFilterContext {
+    const AVClass *av_class;        ///< needed for av_log() and filters common options
+
+    const AVFilter *filter;         ///< the AVFilter of which this is an instance
+
+    char *name;                     ///< name of this filter instance
+
+    AVFilterPad   *input_pads;      ///< array of input pads
+    AVFilterLink **inputs;          ///< array of pointers to input links
+#if FF_API_FOO_COUNT
+    attribute_deprecated unsigned input_count; ///< @deprecated use nb_inputs
+#endif
+    unsigned    nb_inputs;          ///< number of input pads
+
+    AVFilterPad   *output_pads;     ///< array of output pads
+    AVFilterLink **outputs;         ///< array of pointers to output links
+#if FF_API_FOO_COUNT
+    attribute_deprecated unsigned output_count; ///< @deprecated use nb_outputs
+#endif
+    unsigned    nb_outputs;         ///< number of output pads
+
+    void *priv;                     ///< private data for use by the filter
+
+    struct AVFilterGraph *graph;    ///< filtergraph this filter belongs to
+
+    /**
+     * Type of multithreading being allowed/used. A combination of
+     * AVFILTER_THREAD_* flags.
+     *
+     * May be set by the caller before initializing the filter to forbid some
+     * or all kinds of multithreading for this filter. The default is allowing
+     * everything.
+     *
+     * When the filter is initialized, this field is combined using bit AND with
+     * AVFilterGraph.thread_type to get the final mask used for determining
+     * allowed threading types. I.e. a threading type needs to be set in both
+     * to be allowed.
+     *
+     * After the filter is initialized, libavfilter sets this field to the
+     * threading type that is actually used (0 for no multithreading).
+     */
+    int thread_type;
+
+    /**
+     * An opaque struct for libavfilter internal use.
+     */
+    AVFilterInternal *internal;
+
+    struct AVFilterCommand *command_queue;
+
+    char *enable_str;               ///< enable expression string
+    void *enable;                   ///< parsed expression (AVExpr*)
+    double *var_values;             ///< variable values for the enable expression
+    int is_disabled;                ///< the enabled state from the last expression evaluation
+};

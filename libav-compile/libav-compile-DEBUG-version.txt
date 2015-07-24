@@ -1,0 +1,30 @@
+--------------------------
+How to build a debug version of ffmpeg?
+---------------------------
+
+Added an "--enable-debug" to the configure.
+
+--disable-logging        do not log configure debug information
+--disable-debug          disable debugging symbols
+--enable-debug=LEVEL     set the debug level [$debuglevel]
+
+---------------------------
+源文件中的 DEBUG 宏的使用
+---------------------------
+E:\libav\libavcodec\audio_frame_queue.c
+
+#ifdef DEBUG
+static void af_queue_log_state(AudioFrameQueue *afq)
+{
+    AudioFrame *f;
+    av_dlog(afq->avctx, "remaining delay   = %d\n", afq->remaining_delay);
+    av_dlog(afq->avctx, "remaining samples = %d\n", afq->remaining_samples);
+    av_dlog(afq->avctx, "frames:\n");
+    f = afq->frame_queue;
+    while (f) {
+        av_dlog(afq->avctx, "  [ pts=%9"PRId64" duration=%d ]\n",
+                f->pts, f->duration);
+        f = f->next;
+    }
+}
+#endif /* DEBUG */

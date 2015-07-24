@@ -1,0 +1,32 @@
+VisualOn AAC encoder library
+
+This library contains an encoder implementation of the Advanced Audio
+Coding (AAC) audio codec. The library is based on a codec implementation
+by VisualOn as part of the Stagefright framework from the Google
+Android project.
+
+源码路径
+https://github.com/mstorsjo/vo-aacenc
+
+----------------------------------------------------------
+源文件分析
+E:\libav\libavcodec\libvo-aacenc.c
+----------------------------------------------------------
+AVCodec ff_libvo_aacenc_encoder = {
+    .name           = "libvo_aacenc",
+    .long_name      = NULL_IF_CONFIG_SMALL("Android VisualOn AAC (Advanced Audio Coding)"),
+    .type           = AVMEDIA_TYPE_AUDIO,
+    .id             = AV_CODEC_ID_AAC,
+    .priv_data_size = sizeof(AACContext),
+    .init           = aac_encode_init,
+    .encode2        = aac_encode_frame,
+    .close          = aac_encode_close,
+    .capabilities   = CODEC_CAP_SMALL_LAST_FRAME | CODEC_CAP_DELAY,
+    .sample_fmts    = (const enum AVSampleFormat[]){ AV_SAMPLE_FMT_S16,
+                                                     AV_SAMPLE_FMT_NONE },
+};
+
+
+----------------------------------------------------------
+Windows 编译
+----------------------------------------------------------

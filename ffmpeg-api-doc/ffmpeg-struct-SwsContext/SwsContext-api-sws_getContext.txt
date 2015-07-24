@@ -1,0 +1,77 @@
+头文件：libswscale/swscale.h
+源文件：libswscale/utils.c
+
+/* values for the flags, the stuff on the command line is different */
+#define SWS_FAST_BILINEAR     1
+#define SWS_BILINEAR          2
+#define SWS_BICUBIC           4
+#define SWS_X                 8
+#define SWS_POINT          0x10
+#define SWS_AREA           0x20
+#define SWS_BICUBLIN       0x40
+#define SWS_GAUSS          0x80
+#define SWS_SINC          0x100
+#define SWS_LANCZOS       0x200
+#define SWS_SPLINE        0x400
+还有一些其它的，如： CPU能力，
+
+/**
+ * Allocate and return an SwsContext. You need it to perform
+ * scaling/conversion operations using sws_scale().
+ *
+ * @param srcW the width of the source image
+ * @param srcH the height of the source image
+ * @param srcFormat the source image format
+ * @param dstW the width of the destination image
+ * @param dstH the height of the destination image
+ * @param dstFormat the destination image format
+ * @param flags specify which algorithm and options to use for rescaling
+ * @return a pointer to an allocated context, or NULL in case of error
+ * @note this function is to be removed after a saner alternative is
+ *       written
+ */
+struct SwsContext *sws_getContext(int srcW, int srcH, enum AVPixelFormat srcFormat,
+                                  int dstW, int dstH, enum AVPixelFormat dstFormat,
+                                  int flags, SwsFilter *srcFilter,
+                                  SwsFilter *dstFilter, const double *param);
+
+相当于调用？
+struct SwsContext *sws_alloc_context(void);
+int sws_init_context(struct SwsContext *sws_context, SwsFilter *srcFilter, SwsFilter *dstFilter);
+
+
+SwsContext *sws_getContext(int srcW, int srcH, enum AVPixelFormat srcFormat,
+                           int dstW, int dstH, enum AVPixelFormat dstFormat,
+                           int flags, SwsFilter *srcFilter,
+                           SwsFilter *dstFilter, const double *param)
+{
+    SwsContext *c;
+
+    if (!(c = sws_alloc_context()))
+        return NULL;
+
+    c->flags     = flags;
+    c->srcW      = srcW;
+    c->srcH      = srcH;
+    c->dstW      = dstW;
+    c->dstH      = dstH;
+    c->srcRange  = handle_jpeg(&srcFormat);
+    c->dstRange  = handle_jpeg(&dstFormat);
+    c->srcFormat = srcFormat;
+    c->dstFormat = dstFormat;
+
+    if (param) {
+        c->param[0] = param[0];
+        c->param[1] = param[1];
+    }
+    sws_setColorspaceDetails(c, ff_yuv2rgb_coeffs[SWS_CS_DEFAULT], c->srcRange,
+                             ff_yuv2rgb_coeffs[SWS_CS_DEFAULT] /* FIXME*/,
+                             c->dstRange, 0, 1 << 16, 1 << 16);
+
+    if (sws_init_context(c, srcFilter, dstFilter) < 0) {
+        sws_freeContext(c);
+        return NULL;
+    }
+
+    return c;
+}

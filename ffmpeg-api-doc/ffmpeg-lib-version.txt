@@ -1,0 +1,17 @@
+#include <libavformat/avformat.h>
+
+unsigned avformat_version(void);
+E:\ffmpeg-src\libavformat\utils.c
+unsigned avformat_version(void)
+{
+    av_assert0(LIBAVFORMAT_VERSION_MICRO >= 100);
+    return LIBAVFORMAT_VERSION_INT;
+}
+libavformat\version.h
+#define LIBAVFORMAT_VERSION_INT AV_VERSION_INT(LIBAVFORMAT_VERSION_MAJOR, \
+                                               LIBAVFORMAT_VERSION_MINOR, \
+                                               LIBAVFORMAT_VERSION_MICRO)
+libavutil\version.h
+#define AV_VERSION_INT(a, b, c) (a<<16 | b<<8 | c)
+#define AV_VERSION_DOT(a, b, c) a ##.## b ##.## c
+#define AV_VERSION(a, b, c) AV_VERSION_DOT(a, b, c)

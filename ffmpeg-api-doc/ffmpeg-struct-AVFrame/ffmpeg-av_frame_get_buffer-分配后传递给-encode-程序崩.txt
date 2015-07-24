@@ -1,0 +1,10 @@
+2015.4.22
+E:\WinApp\libav-test\mtarget_file.c
+
+使用 av_frame_get_buffer 分配得到的 frame，传递给 avcodec_encode_video2，程序会崩，为什么？
+改为，下面的方式就可以了
+avpicture_get_size + av_malloc(size) 分配空间
+avpicture_fill  将空间填充到 avframe
+
+写个测试程序，验证下
+可能相关的原因是：av_frame_get_buffer 得到的 AVFrame 是引用计数的。

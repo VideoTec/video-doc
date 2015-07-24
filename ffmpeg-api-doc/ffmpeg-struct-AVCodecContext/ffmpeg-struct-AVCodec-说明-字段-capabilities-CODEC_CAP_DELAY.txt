@@ -1,0 +1,122 @@
+AVCodec capabilities : CODEC_CAP_DELAY
+
+和 AVCodecContext 的 delay 字段相对应
+参考另两个文档
+《aac-encoder-delay》
+《AVCodecContext-delay》
+
+拥有 CODEC_CAP_DELAY 的常用编码器
+ .long_name      = NULL_IF_CONFIG_SMALL("AAC (Advanced Audio Coding)"),
+ .long_name      = NULL_IF_CONFIG_SMALL("libx264 H.264 / AVC / MPEG-4 AVC / MPEG-4 part 10"),
+ .long_name      = NULL_IF_CONFIG_SMALL("MPEG-4 part 2"),
+
+拥有 CODEC_CAP_DELAY 的常用解码器
+ .long_name             = NULL_IF_CONFIG_SMALL("H.264 / AVC / MPEG-4 AVC / MPEG-4 part 10")
+
+没有 CODEC_CAP_DELAY 的编解码器：
+AAC 解码器
+
+/**
+ * Encoder or decoder requires flushing with NULL input at the end in order to
+ * give the complete and correct output.
+ *
+ * NOTE: If this flag is not set, the codec is guaranteed to never be fed with
+ *       with NULL data. The user can still send NULL data to the public encode
+ *       or decode function, but libavcodec will not pass it along to the codec
+ *       unless this flag is set.
+ *
+ * Decoders:
+ * The decoder has a non-zero delay and needs to be fed with avpkt->data=NULL,
+ * avpkt->size=0 at the end to get the delayed data until the decoder no longer
+ * returns frames.
+ *
+ * Encoders:
+ * The encoder needs to be fed with NULL data at the end of encoding until the
+ * encoder no longer returns data.
+ *
+ * NOTE: For encoders implementing the AVCodec.encode2() function, setting this
+ *       flag also means that the encoder must set the pts and duration for
+ *       each output packet. If this flag is not set, the pts and duration will
+ *       be determined by libavcodec from the input frame.
+ */
+#define CODEC_CAP_DELAY           0x0020
+
+aac 编码器有，解码器没有
+AVCodec ff_aac_encoder = {
+    .name           = "aac",
+    .long_name      = NULL_IF_CONFIG_SMALL("AAC (Advanced Audio Coding)"),
+    .type           = AVMEDIA_TYPE_AUDIO,
+    .id             = AV_CODEC_ID_AAC,
+    .priv_data_size = sizeof(AACEncContext),
+    .init           = aac_encode_init,
+    .encode2        = aac_encode_frame,
+    .close          = aac_encode_end,
+    .capabilities   = CODEC_CAP_SMALL_LAST_FRAME | CODEC_CAP_DELAY |
+                      CODEC_CAP_EXPERIMENTAL,
+    .sample_fmts    = (const enum AVSampleFormat[]){ AV_SAMPLE_FMT_FLTP,
+                                                     AV_SAMPLE_FMT_NONE },
+    .priv_class     = &aacenc_class,
+};
+
+AVCodec ff_aac_decoder = {
+    .name            = "aac",
+    .long_name       = NULL_IF_CONFIG_SMALL("AAC (Advanced Audio Coding)"),
+    .type            = AVMEDIA_TYPE_AUDIO,
+    .id              = AV_CODEC_ID_AAC,
+    .priv_data_size  = sizeof(AACContext),
+    .init            = aac_decode_init,
+    .close           = aac_decode_close,
+    .decode          = aac_decode_frame,
+    .sample_fmts     = (const enum AVSampleFormat[]) {
+        AV_SAMPLE_FMT_FLTP, AV_SAMPLE_FMT_NONE
+    },
+    .capabilities    = CODEC_CAP_CHANNEL_CONF | CODEC_CAP_DR1,
+    .channel_layouts = aac_channel_layout,
+};
+
+AVCodec ff_libx264_encoder = {
+    .name             = "libx264",
+    .long_name        = NULL_IF_CONFIG_SMALL("libx264 H.264 / AVC / MPEG-4 AVC / MPEG-4 part 10"),
+    .type             = AVMEDIA_TYPE_VIDEO,
+    .id               = AV_CODEC_ID_H264,
+    .priv_data_size   = sizeof(X264Context),
+    .init             = X264_init,
+    .encode2          = X264_frame,
+    .close            = X264_close,
+    .capabilities     = CODEC_CAP_DELAY | CODEC_CAP_AUTO_THREADS,
+    .priv_class       = &class,
+    .defaults         = x264_defaults,
+    .init_static_data = X264_init_static,
+};
+
+AVCodec ff_h264_decoder = {
+    .name                  = "h264",
+    .long_name             = NULL_IF_CONFIG_SMALL("H.264 / AVC / MPEG-4 AVC / MPEG-4 part 10"),
+    .type                  = AVMEDIA_TYPE_VIDEO,
+    .id                    = AV_CODEC_ID_H264,
+    .priv_data_size        = sizeof(H264Context),
+    .init                  = ff_h264_decode_init,
+    .close                 = h264_decode_end,
+    .decode                = h264_decode_frame,
+    .capabilities          = /*CODEC_CAP_DRAW_HORIZ_BAND |*/ CODEC_CAP_DR1 |
+                             CODEC_CAP_DELAY | CODEC_CAP_SLICE_THREADS |
+                             CODEC_CAP_FRAME_THREADS,
+    .flush                 = flush_dpb,
+    .init_thread_copy      = ONLY_IF_THREADS_ENABLED(decode_init_thread_copy),
+    .update_thread_context = ONLY_IF_THREADS_ENABLED(ff_h264_update_thread_context),
+    .profiles              = NULL_IF_CONFIG_SMALL(profiles),
+};
+
+AVCodec ff_mpeg4_encoder = {
+    .name           = "mpeg4",
+    .long_name      = NULL_IF_CONFIG_SMALL("MPEG-4 part 2"),
+    .type           = AVMEDIA_TYPE_VIDEO,
+    .id             = AV_CODEC_ID_MPEG4,
+    .priv_data_size = sizeof(MpegEncContext),
+    .init           = encode_init,
+    .encode2        = ff_mpv_encode_picture,
+    .close          = ff_mpv_encode_end,
+    .pix_fmts       = (const enum AVPixelFormat[]) { AV_PIX_FMT_YUV420P, AV_PIX_FMT_NONE },
+    .capabilities   = CODEC_CAP_DELAY | CODEC_CAP_SLICE_THREADS,
+    .priv_class     = &mpeg4enc_class,
+};

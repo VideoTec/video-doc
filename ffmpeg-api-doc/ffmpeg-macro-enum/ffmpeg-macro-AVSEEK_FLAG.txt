@@ -1,0 +1,20 @@
+#define AVSEEK_FLAG_BACKWARD 1 ///< seek backward
+#define AVSEEK_FLAG_BYTE     2 ///< seeking based on position in bytes
+#define AVSEEK_FLAG_ANY      4 ///< seek to any frame, even non-keyframes
+#define AVSEEK_FLAG_FRAME    8 ///< seeking based on frame number
+
+ * If flags contain AVSEEK_FLAG_BYTE, then all timestamps are in bytes and
+ * are the file position (this may not be supported by all demuxers).
+ 
+ * If flags contain AVSEEK_FLAG_FRAME, then all timestamps are in frames
+ * in the stream with stream_index (this may not be supported by all demuxers).
+ 
+如果指定了流ID，时间戳 in units of the stream selected by stream_index
+如果流ID为 -1 ，时间戳 in AV_TIME_BASE units
+ * Otherwise all timestamps are in units of the stream selected by stream_index
+ * or if stream_index is -1, in AV_TIME_BASE units.
+ 
+ * If flags contain AVSEEK_FLAG_ANY, then non-keyframes are treated as
+ * keyframes (this may not be supported by all demuxers).
+ 
+ * If flags contain AVSEEK_FLAG_BACKWARD, it is ignored.

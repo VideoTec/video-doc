@@ -1,0 +1,259 @@
+-------------------
+AAC编码器
+-------------------
+https://trac.ffmpeg.org/wiki/Encode/AAC
+FFmpeg can support 
+four AAC-LC encoders (aac, libfaac, libfdk_aac, libvo_aacenc) and 
+two AAC-HE encoders (libaacplus and libfdk_aac).
+
+第三方库
+libfaac
+libfdk   --  质量最高的编码器
+             代码源于：Fraunhofer FDK AAC Codec Library for Android
+libvo
+libaacplus
+
+The Fraunhofer FDK AAC codec library. 
+This is currently the highest-quality AAC encoder available with ffmpeg.
+
+------------------------------------
+ffmpeg 自带AAC编码器
+------------------------------------
+static const int mpeg4audio_sample_rates[16] = {
+    96000, 88200, 64000, 48000, 44100, 32000,
+    24000, 22050, 16000, 12000, 11025, 8000, 7350
+};
+AVCodec ff_aac_encoder = {
+    .name           = "aac",
+    .long_name      = NULL_IF_CONFIG_SMALL("AAC (Advanced Audio Coding)"),
+    .type           = AVMEDIA_TYPE_AUDIO,
+    .id             = AV_CODEC_ID_AAC,
+    .priv_data_size = sizeof(AACEncContext),
+    .init           = aac_encode_init,
+    .encode2        = aac_encode_frame,
+    .close          = aac_encode_end,
+    .supported_samplerates = mpeg4audio_sample_rates,
+    .capabilities   = CODEC_CAP_SMALL_LAST_FRAME | CODEC_CAP_DELAY |
+                      CODEC_CAP_EXPERIMENTAL,
+    .sample_fmts    = (const enum AVSampleFormat[]){ AV_SAMPLE_FMT_FLTP,
+                                                     AV_SAMPLE_FMT_NONE },
+    .priv_class     = &aacenc_class,
+};
+
+------------------------------------
+libvo AAC编码器
+------------------------------------
+/* duplicated from avpriv_mpeg4audio_sample_rates to avoid shared build
+ * failures */
+static const int mpeg4audio_sample_rates[16] = {
+    96000, 88200, 64000, 48000, 44100, 32000,
+    24000, 22050, 16000, 12000, 11025, 8000, 7350
+};
+AVCodec ff_libvo_aacenc_encoder = {
+    .name           = "libvo_aacenc",
+    .long_name      = NULL_IF_CONFIG_SMALL("Android VisualOn AAC (Advanced Audio Coding)"),
+    .type           = AVMEDIA_TYPE_AUDIO,
+    .id             = AV_CODEC_ID_AAC,
+    .priv_data_size = sizeof(AACContext),
+    .init           = aac_encode_init,
+    .encode2        = aac_encode_frame,
+    .close          = aac_encode_close,
+    .supported_samplerates = mpeg4audio_sample_rates,
+    .capabilities   = CODEC_CAP_SMALL_LAST_FRAME | CODEC_CAP_DELAY,
+    .sample_fmts    = (const enum AVSampleFormat[]){ AV_SAMPLE_FMT_S16,
+                                                     AV_SAMPLE_FMT_NONE },
+};
+
+------------------------------------
+libfdk AAC编码器
+------------------------------------
+Fraunhofer FDK AAC (Full title Fraunhofer FDK AAC Codec Library for Android) is an open-source[4] software library for 
+encoding and decoding Advanced Audio Coding (AAC) format audio, developed by Fraunhofer IIS, and included as part of Android.
+
+A cross-platform source distribution is maintained by Martin Storsjö as fdk-aac. 
+The latest fdk-aac release is 0.1.3 (2013-11-25), based on FDK version 3.4.12/2.5.5 (encoder/decoder).[9] 
+The code compiles into a shared library, libfdk-aac
+
+Fraunhofer FDK AAC Codec Library for Android 可以实现 AAC 编解码器部署时的低资源占用，
+因此可用于ARM、MIPS 和 x86 处理器上的安卓操作系统。FDK 软件包可以从 Android 4.1 代码树中获得
+
+https://github.com/mstorsjo/fdk-aac
+https://android.googlesource.com/platform/external/aac/+/master/
+https://trac.ffmpeg.org/wiki/Encode/AAC#fdk_aac
+
+static const AVProfile profiles[] = {
+    { FF_PROFILE_AAC_LOW,   "LC"       },
+    { FF_PROFILE_AAC_HE,    "HE-AAC"   },
+    { FF_PROFILE_AAC_HE_V2, "HE-AACv2" },
+    { FF_PROFILE_AAC_LD,    "LD"       },
+    { FF_PROFILE_AAC_ELD,   "ELD"      },
+    { FF_PROFILE_UNKNOWN },
+};
+static const AVCodecDefault aac_encode_defaults[] = {
+    { "b", "0" },
+    { NULL }
+};
+static const uint64_t aac_channel_layout[] = {
+    AV_CH_LAYOUT_MONO,
+    AV_CH_LAYOUT_STEREO,
+    AV_CH_LAYOUT_SURROUND,
+    AV_CH_LAYOUT_4POINT0,
+    AV_CH_LAYOUT_5POINT0_BACK,
+    AV_CH_LAYOUT_5POINT1_BACK,
+#ifdef AACENCODER_LIB_VL0
+    AV_CH_LAYOUT_7POINT1_WIDE_BACK,
+    AV_CH_LAYOUT_7POINT1,
+#endif
+    0,
+};
+static const int aac_sample_rates[] = {
+    96000, 88200, 64000, 48000, 44100, 32000,
+    24000, 22050, 16000, 12000, 11025, 8000, 0
+};
+AVCodec ff_libfdk_aac_encoder = {
+    .name                  = "libfdk_aac",
+    .long_name             = NULL_IF_CONFIG_SMALL("Fraunhofer FDK AAC"),
+    .type                  = AVMEDIA_TYPE_AUDIO,
+    .id                    = AV_CODEC_ID_AAC,
+    .priv_data_size        = sizeof(AACContext),
+    .init                  = aac_encode_init,
+    .encode2               = aac_encode_frame,
+    .close                 = aac_encode_close,
+    .capabilities          = CODEC_CAP_SMALL_LAST_FRAME | CODEC_CAP_DELAY,
+    .sample_fmts           = (const enum AVSampleFormat[]){ AV_SAMPLE_FMT_S16,
+                                                            AV_SAMPLE_FMT_NONE },
+    .priv_class            = &aac_enc_class,
+    .defaults              = aac_encode_defaults,
+    .profiles              = profiles,
+    .supported_samplerates = aac_sample_rates,
+    .channel_layouts       = aac_channel_layout,
+};
+
+------------------------------------
+libfaac AAC编码器
+------------------------------------
+static const AVProfile profiles[] = {
+    { FF_PROFILE_AAC_MAIN, "Main" },
+    { FF_PROFILE_AAC_LOW,  "LC"   },
+    { FF_PROFILE_AAC_SSR,  "SSR"  },
+    { FF_PROFILE_AAC_LTP,  "LTP"  },
+    { FF_PROFILE_UNKNOWN },
+};
+static const uint64_t faac_channel_layouts[] = {
+    AV_CH_LAYOUT_MONO,
+    AV_CH_LAYOUT_STEREO,
+    AV_CH_LAYOUT_SURROUND,
+    AV_CH_LAYOUT_4POINT0,
+    AV_CH_LAYOUT_5POINT0_BACK,
+    AV_CH_LAYOUT_5POINT1_BACK,
+    0
+};
+AVCodec ff_libfaac_encoder = {
+    .name           = "libfaac",
+    .long_name      = NULL_IF_CONFIG_SMALL("libfaac AAC (Advanced Audio Coding)"),
+    .type           = AVMEDIA_TYPE_AUDIO,
+    .id             = AV_CODEC_ID_AAC,
+    .priv_data_size = sizeof(FaacAudioContext),
+    .init           = Faac_encode_init,
+    .encode2        = Faac_encode_frame,
+    .close          = Faac_encode_close,
+    .capabilities   = CODEC_CAP_SMALL_LAST_FRAME | CODEC_CAP_DELAY,
+    .sample_fmts    = (const enum AVSampleFormat[]){ AV_SAMPLE_FMT_S16,
+                                                     AV_SAMPLE_FMT_NONE },
+    .profiles       = NULL_IF_CONFIG_SMALL(profiles),
+    .channel_layouts = faac_channel_layouts,
+};
+
+------------------------------------
+libaacplus AAC编码器
+------------------------------------
+static const AVProfile profiles[] = {
+    { FF_PROFILE_AAC_LOW, "LC" },
+    { FF_PROFILE_UNKNOWN },
+};
+AVCodec ff_libaacplus_encoder = {
+    .name           = "libaacplus",
+    .long_name      = NULL_IF_CONFIG_SMALL("libaacplus AAC+ (Advanced Audio Codec with SBR+PS)"),
+    .type           = AVMEDIA_TYPE_AUDIO,
+    .id             = AV_CODEC_ID_AAC,
+    .priv_data_size = sizeof(aacPlusAudioContext),
+    .init           = aacPlus_encode_init,
+    .encode2        = aacPlus_encode_frame,
+    .close          = aacPlus_encode_close,
+    .sample_fmts    = (const enum AVSampleFormat[]){ AV_SAMPLE_FMT_S16,
+                                                     AV_SAMPLE_FMT_FLT,
+                                                     AV_SAMPLE_FMT_NONE },
+    .profiles       = profiles,
+    .channel_layouts = (const uint64_t[]) { AV_CH_LAYOUT_MONO,
+                                            AV_CH_LAYOUT_STEREO,
+                                            0 },
+};
+
+-------------------
+AAC解码器
+-------------------
+AVCodec ff_libfdk_aac_decoder = {
+    .name           = "libfdk_aac",
+    .long_name      = NULL_IF_CONFIG_SMALL("Fraunhofer FDK AAC"),
+    .type           = AVMEDIA_TYPE_AUDIO,
+    .id             = AV_CODEC_ID_AAC,
+    .priv_data_size = sizeof(FDKAACDecContext),
+    .init           = fdk_aac_decode_init,
+    .decode         = fdk_aac_decode_frame,
+    .close          = fdk_aac_decode_close,
+    .flush          = fdk_aac_decode_flush,
+    .capabilities   = CODEC_CAP_DR1 | CODEC_CAP_CHANNEL_CONF,
+    .priv_class     = &fdk_aac_dec_class,
+};
+
+static const AVProfile profiles[] = {
+    { FF_PROFILE_AAC_MAIN,  "Main"     },
+    { FF_PROFILE_AAC_LOW,   "LC"       },
+    { FF_PROFILE_AAC_SSR,   "SSR"      },
+    { FF_PROFILE_AAC_LTP,   "LTP"      },
+    { FF_PROFILE_AAC_HE,    "HE-AAC"   },
+    { FF_PROFILE_AAC_HE_V2, "HE-AACv2" },
+    { FF_PROFILE_AAC_LD,    "LD"       },
+    { FF_PROFILE_AAC_ELD,   "ELD"      },
+    { FF_PROFILE_UNKNOWN },
+};
+AVCodec ff_aac_decoder = {
+    .name            = "aac",
+    .long_name       = NULL_IF_CONFIG_SMALL("AAC (Advanced Audio Coding)"),
+    .type            = AVMEDIA_TYPE_AUDIO,
+    .id              = AV_CODEC_ID_AAC,
+    .priv_data_size  = sizeof(AACContext),
+    .init            = aac_decode_init,
+    .close           = aac_decode_close,
+    .decode          = aac_decode_frame,
+    .sample_fmts     = (const enum AVSampleFormat[]) {
+        AV_SAMPLE_FMT_FLTP, AV_SAMPLE_FMT_NONE
+    },
+    .capabilities    = CODEC_CAP_CHANNEL_CONF | CODEC_CAP_DR1,
+    .channel_layouts = aac_channel_layout,
+    .flush = flush,
+    .priv_class      = &aac_decoder_class,
+    .profiles        = profiles,
+};
+/*
+    Note: This decoder filter is intended to decode LATM streams transferred
+    in MPEG transport streams which only contain one program.
+    To do a more complex LATM demuxing a separate LATM demuxer should be used.
+*/
+AVCodec ff_aac_latm_decoder = {
+    .name            = "aac_latm",
+    .long_name       = NULL_IF_CONFIG_SMALL("AAC LATM (Advanced Audio Coding LATM syntax)"),
+    .type            = AVMEDIA_TYPE_AUDIO,
+    .id              = AV_CODEC_ID_AAC_LATM,
+    .priv_data_size  = sizeof(struct LATMContext),
+    .init            = latm_decode_init,
+    .close           = aac_decode_close,
+    .decode          = latm_decode_frame,
+    .sample_fmts     = (const enum AVSampleFormat[]) {
+        AV_SAMPLE_FMT_FLTP, AV_SAMPLE_FMT_NONE
+    },
+    .capabilities    = CODEC_CAP_CHANNEL_CONF | CODEC_CAP_DR1,
+    .channel_layouts = aac_channel_layout,
+    .flush = flush,
+    .profiles        = profiles,
+};

@@ -1,0 +1,13 @@
+文档
+
+    /**
+     * number of audio samples (per channel) described by this frame
+     */
+    int nb_samples;
+
+和 AVCodecContext frame_size 的关系？
+
+11:33 2015/5/8
+作为 avcodec_encode_audio2 的参数时，这个字段，必须指定，否则会出问题
+参考：
+E:\doc\Computer software\音视频技术\ffmpeg-api-doc\ffmpeg-api-avcodec\ffmpeg-avcodec_encode_audio2-输出的压缩包大小一样.txt

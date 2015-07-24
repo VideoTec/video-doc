@@ -1,0 +1,23 @@
+图片格式 分流器 demuxer：
+
+E:\libav\libavformat\img2dec.c
+
+AVInputFormat ff_image2_demuxer = {
+    .name           = "image2",
+    .long_name      = NULL_IF_CONFIG_SMALL("image2 sequence"),
+    .priv_data_size = sizeof(VideoDemuxData),
+    .read_probe     = img_read_probe,
+    .read_header    = img_read_header,
+    .read_packet    = img_read_packet,
+    .flags          = AVFMT_NOFILE,
+    .priv_class     = &img2_class,
+};
+
+AVInputFormat ff_image2pipe_demuxer = {
+    .name           = "image2pipe",
+    .long_name      = NULL_IF_CONFIG_SMALL("piped image2 sequence"),
+    .priv_data_size = sizeof(VideoDemuxData),
+    .read_header    = img_read_header,
+    .read_packet    = img_read_packet,
+    .priv_class     = &img2pipe_class,
+};

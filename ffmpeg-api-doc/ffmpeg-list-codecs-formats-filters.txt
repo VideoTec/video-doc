@@ -1,0 +1,18 @@
+libavformat/avformat.h
+
+AVInputFormat  *av_iformat_next(const AVInputFormat  *f);
+AVOutputFormat *av_oformat_next(const AVOutputFormat *f);
+
+/**
+ * If f is NULL, returns the first registered input format,
+ * if f is non-NULL, returns the next registered input format after f
+ * or NULL if f is the last one.
+ */
+AVInputFormat  *av_iformat_next(const AVInputFormat  *f);
+
+枚举所有的支持的输入格式
+
+  AVInputFormat *ifmt = 0;
+  while ((ifmt = av_iformat_next(ifmt))) {
+    LOGI("%s", ifmt->long_name);
+  }

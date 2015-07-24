@@ -1,0 +1,40 @@
+---------------------------------------------
+libavcodec/options.c
+---------------------------------------------
+static const AVClass av_codec_context_class = {
+    .class_name              = "AVCodecContext",
+    .item_name               = context_to_name,
+    .option                  = avcodec_options,
+    .version                 = LIBAVUTIL_VERSION_INT,
+    .log_level_offset_offset = offsetof(AVCodecContext, log_level_offset),
+    .child_next              = codec_child_next,
+    .child_class_next        = codec_child_class_next,
+    .category                = AV_CLASS_CATEGORY_ENCODER,
+    .get_category            = get_category,
+};
+
+两个函数指针 字段： child_next 、 child_class_next
+
+static void *codec_child_next(void *obj, void *prev)
+{
+    AVCodecContext *s = obj;
+    if (!prev && s->codec && s->codec->priv_class && s->priv_data)
+        return s->priv_data;
+    return NULL;
+}
+
+static const AVClass *codec_child_class_next(const AVClass *prev)
+{
+    AVCodec *c = NULL;
+
+    /* find the codec that corresponds to prev */
+    while (prev && (c = av_codec_next(c)))
+        if (c->priv_class == prev)
+            break;
+
+    /* find next codec with priv options */
+    while (c = av_codec_next(c))
+        if (c->priv_class)
+            return c->priv_class;
+    return NULL;
+}

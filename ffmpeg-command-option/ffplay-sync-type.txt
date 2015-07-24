@@ -1,0 +1,7 @@
+以何种方式同步
+
+-sync type
+Set the master clock to audio (type=audio), video (type=video) or external (type=ext). 
+Default is audio. The master clock is used to control audio-video synchronization. 
+Most media players use audio as master clock, but in some cases (streaming or high quality broadcast) it is necessary to change that. 
+This option is mainly used for debugging purposes.

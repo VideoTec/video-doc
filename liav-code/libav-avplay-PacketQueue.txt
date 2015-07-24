@@ -1,0 +1,157 @@
+-------------------------------------
+几个宏 用于设置 packet 缓存的最大值
+-------------------------------------
+
+#define MAX_QUEUE_SIZE (15 * 1024 * 1024)   最大字节数
+#define MIN_AUDIOQ_SIZE (20 * 16 * 1024)    最小字节数
+#define MIN_FRAMES 5                        最小帧数
+
+11:36 2015/7/1 这段代码怎么同步的？应该是没有同步，整数值，是原子操作。
+        /* if the queue are full, no need to read more */
+        if (!infinite_buffer &&
+              (is->audioq.size + is->videoq.size + is->subtitleq.size > MAX_QUEUE_SIZE
+            || (   (is->audioq   .size  > MIN_AUDIOQ_SIZE || is->audio_stream < 0)
+                && (is->videoq   .nb_packets > MIN_FRAMES || is->video_stream < 0)
+                && (is->subtitleq.nb_packets > MIN_FRAMES || is->subtitle_stream < 0)))) {
+            /* wait 10 ms */
+            SDL_Delay(10);
+            continue;
+        }
+
+-------------------------------------
+PacketQueue 结构体：
+-------------------------------------
+
+typedef struct PacketQueue {
+    AVPacketList *first_pkt, *last_pkt;
+    int nb_packets;
+    int size;               队列所在内存大小 即 字节数
+    int abort_request;      通知所有线程，停止
+    SDL_mutex *mutex;
+    SDL_cond *cond;
+} PacketQueue;
+
+-------------------------------------
+PacketQueue api：
+-------------------------------------
+static void packet_queue_flush(PacketQueue *q)
+
+static void packet_queue_init(PacketQueue *q)
+static void packet_queue_end(PacketQueue *q)   flush 并 删除 mutex cond
+static void packet_queue_abort(PacketQueue *q) flush 并 删除 mutex cond 并 置 abort_request 为真
+
+static int packet_queue_put(PacketQueue *q, AVPacket *pkt)
+static int packet_queue_get(PacketQueue *q, AVPacket *pkt, int block)
+
+/* packet queue handling */
+static void packet_queue_init(PacketQueue *q)
+{
+    memset(q, 0, sizeof(PacketQueue));
+    q->mutex = SDL_CreateMutex();
+    q->cond = SDL_CreateCond();
+    packet_queue_put(q, &flush_pkt);
+}
+
+static void packet_queue_flush(PacketQueue *q)
+{
+    AVPacketList *pkt, *pkt1;
+
+    SDL_LockMutex(q->mutex);
+    for (pkt = q->first_pkt; pkt != NULL; pkt = pkt1) {
+        pkt1 = pkt->next;
+        av_free_packet(&pkt->pkt);
+        av_freep(&pkt);
+    }
+    q->last_pkt = NULL;
+    q->first_pkt = NULL;
+    q->nb_packets = 0;
+    q->size = 0;
+    SDL_UnlockMutex(q->mutex);
+}
+
+static void packet_queue_end(PacketQueue *q)
+{
+    packet_queue_flush(q);
+    SDL_DestroyMutex(q->mutex);
+    SDL_DestroyCond(q->cond);
+}
+
+static int packet_queue_put(PacketQueue *q, AVPacket *pkt)
+{
+    AVPacketList *pkt1;
+
+    /* duplicate the packet */
+    if (pkt != &flush_pkt && av_dup_packet(pkt) < 0)
+        return -1;
+
+    pkt1 = av_malloc(sizeof(AVPacketList));
+    if (!pkt1)
+        return -1;
+    pkt1->pkt = *pkt;
+    pkt1->next = NULL;
+
+
+    SDL_LockMutex(q->mutex);
+
+    if (!q->last_pkt)
+
+        q->first_pkt = pkt1;
+    else
+        q->last_pkt->next = pkt1;
+    q->last_pkt = pkt1;
+    q->nb_packets++;
+    q->size += pkt1->pkt.size + sizeof(*pkt1);
+    /* XXX: should duplicate packet data in DV case */
+    SDL_CondSignal(q->cond);
+
+    SDL_UnlockMutex(q->mutex);
+    return 0;
+}
+
+static void packet_queue_abort(PacketQueue *q)
+{
+    SDL_LockMutex(q->mutex);
+
+    q->abort_request = 1;
+
+    SDL_CondSignal(q->cond);
+
+    SDL_UnlockMutex(q->mutex);
+}
+
+/* return < 0 if aborted, 0 if no packet and > 0 if packet.  */
+block 意思是阻塞，SDL_CondWait
+static int packet_queue_get(PacketQueue *q, AVPacket *pkt, int block)
+{
+    AVPacketList *pkt1;
+    int ret;
+
+    SDL_LockMutex(q->mutex);
+
+    for (;;) {
+        if (q->abort_request) {
+            ret = -1;
+            break;
+        }
+
+        pkt1 = q->first_pkt;
+        if (pkt1) {
+            q->first_pkt = pkt1->next;
+            if (!q->first_pkt)
+                q->last_pkt = NULL;
+            q->nb_packets--;
+            q->size -= pkt1->pkt.size + sizeof(*pkt1);
+            *pkt = pkt1->pkt;
+            av_free(pkt1);
+            ret = 1;
+            break;
+        } else if (!block) {
+            ret = 0;
+            break;
+        } else {
+            SDL_CondWait(q->cond, q->mutex);
+        }
+    }
+    SDL_UnlockMutex(q->mutex);
+    return ret;
+}

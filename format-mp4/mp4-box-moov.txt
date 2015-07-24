@@ -1,0 +1,21 @@
+mp4 moov box
+
+官方解释
+http://mp4ra.org/atoms.html
+moov ：container for all the meta-data
+
+Box Type:  ‘moov’ 
+Container: File 
+Mandatory: Yes 
+Quantity: Exactly one 
+The metadata for a presentation is stored in the single Movie Box which occurs at the top-level of a file. 
+Normally this box is close to the beginning or end of the file, though this is not required.
+
+aligned(8) class MovieBox extends Box(‘moov’){ 
+} 
+
+1. Movie box which is the container for all metadata
+2. Each moov has have a mvhd (Movie header box)
+3. It can contains N trak box. 
+   Each trak box contains media specific meta data information 
+   Usually, it will have 2 tracks (video and audio)

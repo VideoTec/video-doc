@@ -1,0 +1,22 @@
+AV_TIME_BASE_Q是AV_TIME_BASE作为分母后的版本
+
+rational[英][ˈræʃnəl] [美][ˈræʃənəl] [数]有理数
+irrational[英][ɪˈræʃənl] [美][ɪˈræʃənəl] n.无理数；无理性的生物
+
+http://www.enotes.com/homework-help/what-do-letters-r-q-n-z-mean-math-195625
+What do the letters R, Q, N, and Z mean in math?
+R , the set of all real numbers, containing all rational and irrational numbers. Q, N , Z are the subsets of the set R.
+Q, the set of all rational numbers. The rational numbers are any number which could be written  like p/q, where p and q are integrs.
+N is the set of all natural numbers like:1,2,3,4,5,....... 
+  The set has starting number 1 and the consecutive numbers  increments by 1 . It has no end.
+  自然数（natural number），是非负整数（0, 1, 2, 3, 4）。
+  认为自然数不包含零的其中一个理由是因为人们在开始学习数字的时候是由“一、二、三...”开始，
+  而不是由“零、一、二、三...”开始, 因为这样是非常不自然的
+Z is integers( positive  or negatives including  zero).
+
+R= real numbers
+Q= rational numbers
+N= natural numbers 
+Z= integers
+
+http://en.wikipedia.org/wiki/Rational_number

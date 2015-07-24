@@ -1,0 +1,18 @@
+    /**
+     * the average bitrate
+     * - encoding: Set by user; unused for constant quantizer encoding.
+     * - decoding: Set by libavcodec. 0 or some bitrate if this info is available in the stream.
+     */
+    int bit_rate;
+
+在 avcodec_open2 之前设置
+
+第一种设置方法：
+    avctx->bit_rate = 3 * 1024 * 1024;  输出视频的码流为： mpeg4-860 kb/s
+    ret = avcodec_open2(avctx, codec, dict);
+
+第二种设置方法：
+    AVDictionary *dict = NULL;
+    av_dict_set(&dict, "b", "3145728", 0);  输出视频的码流为： mpeg4-860 kb/s
+    ret = avcodec_open2(avctx, codec, &dict);
+    av_dict_free(&dict);

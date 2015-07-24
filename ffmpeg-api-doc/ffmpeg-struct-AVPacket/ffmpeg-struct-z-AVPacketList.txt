@@ -1,0 +1,6 @@
+libavformat/avformat.h
+
+typedef struct AVPacketList {
+    AVPacket pkt;
+    struct AVPacketList *next;
+} AVPacketList;

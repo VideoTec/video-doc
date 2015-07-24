@@ -1,0 +1,24 @@
+Syntax[英][ˈsɪntæks] [美][ˈsɪnˌtæks]句法 Elements
+
+An AAC frame is comprised of blocks called syntax elements. Read the first 3 bits from the frame's bitstream to find the first element type. Decode the element. Proceed to read the first 3 bits of the next element and repeat the decoding process until the frame is depleted.
+
+mpeg-4文件中，AAC数据被拆分为一系列可变长的帧。
+构成一个AAC帧的块被叫做语法元素，读取帧的比特流的前三个位，找到第一个元素的类型，然后解码元素。
+读取下一帧的前三位重复解码过程，直到这个帧被废弃
+
+八种句法元素
+There are 8 different syntax elements:
+
+0 SCE single channel element (codes a single audio channel)
+1 CPE channel pair element (codes stereo signal)
+2 CCE something to do with channel coupling, not implemented in libfaad2
+3 LFE low-frequency effects? referenced as "special effects" in RTP doc
+4 DSE data stream element (user data)
+5 PCE program configuration element (describe bitstream)
+6 FIL fill element (pad space/extension data)
+7 END marks the end of the frame
+
+This is an example layout for a 5.1 audio stream:
+SCE CPE CPE LFE END
+
+center - left/right - surround left/right - lfe - end 

@@ -1,0 +1,23 @@
+libavcodec/options_table.h -> avcodec_options数组 -> AVCodecContext av_class
+
+设置举例：
+在 avcodec_open 时，设置。
+
+    AVDictionary *dict = NULL;
+    av_dict_set(&dict, "preset", "veryfast", 0);
+    av_dict_set(&dict, "g", "4", 0);    
+    av_dict_set(&dict, "bf", "3", 0);    
+    av_dict_set(&dict, "crf", "18", 0);    
+    av_dict_set(&dict, "level", "41", 0);    
+    av_dict_set(&dict, "preset", "veryfast", 0);    
+    av_dict_set(&dict, "profile", "main", 0);
+    ret = avcodec_open2(avctx, codec, &dict);
+    av_dict_free(&dict);
+
+
+    av_dict_set(&dict, "flags", "+qscale", 0);
+    av_dict_set(&dict, "qmin", "8", 0);
+    av_dict_set(&dict, "qmin", "5", 0);
+
+参考：
+E:\doc\Computer software\音视频技术\ffmpeg-api-doc\ffmpeg-struct-AVDictionary\ffmpeg-struct-AVDictionary.txt

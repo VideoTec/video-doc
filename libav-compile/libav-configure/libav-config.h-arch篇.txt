@@ -1,0 +1,124 @@
+------------------------------------------------------------------------------------------------
+分类： 
+#define ARCH_X86 1       //CISC 
+#define ARCH_X86_32 1    //CISC 
+#define ARCH_X86_64 0    //CISC 
+#define ARCH_IA64 0      //CISC also called Intel Itanium architecture
+#define ARCH_M68K 0      //CISC The Motorola 68000 ("'sixty-eight-thousand'"; also called the m68k or Motorola 68k, "sixty-eight-k")
+#define ARCH_ARM 0       //RISC 
+#define ARCH_AARCH64 0   //RISC ARM ARCH64
+#define ARCH_AVR32 0     //RISC Atmel AVR: a 32-bit RISC microprocessor architecture designed by Atmel
+#define ARCH_AVR32_AP 0  //RISC On April 10, 2012 Atmel announced the End of Life of AP7 Core devices on 4/4/2013
+#define ARCH_AVR32_UC 0  //RISC UC3 Core
+#define ARCH_BFIN 0      //RISC Blackfin处理器基于由ADI和Intel公司联合开发
+#define ARCH_MIPS 0      //RISC Microprocessor without interlocked piped stages
+#define ARCH_MIPS64 0    //RISC Microprocessor without interlocked piped stages
+#define ARCH_PARISC 0    //RISC HP（惠普）公司的RISC芯片PA-RISC于1986年问世,被惠普公司与英特尔联合开发的Itanium架构所取代
+#define ARCH_PPC 0       //RISC POWER是1991年，Apple（苹果电脑）、IBM、Motorola（摩托罗拉）组成的AIM联盟所发展出的微处理器架构
+#define ARCH_PPC64 0     //RISC 
+#define ARCH_SH4 0       //RISC 日立SuperH
+#define ARCH_SPARC 0     //RISC Scalable Processor ARChitecture 1985年由太阳微系统所设计
+#define ARCH_SPARC64 0   //RISC 
+#define ARCH_TILEGX 0    //RISC TILE-Gx is a multicore processor family by Tilera.
+#define ARCH_TILEPRO 0
+#define ARCH_ALPHA 0     //RISC DEC公司Alpha处理器
+#define ARCH_S390 0      //IBM ESA/390 (Enterprise Systems Architecture/390) was introduced in September 1990
+#define ARCH_TOMI 0      //Venray的TOMI(Thread Optimized Multiprocessor)
+
+------------------------------------------------------------------------------------------------
+//2010年ARM发布Cortex-15，其具备足够性能进入桌面和服务器领域，开始挑战Intel。 
+#define ARCH_ARM 0
+#define ARCH_AARCH64 0  //ARM ARCH64: ARMv8 架构中引入新的 AArch64 执行状态
+
+//Alpha处理器最早由DEC公司(迪吉多公司)设计制造
+//1998年，随着DEC被一起卖给了康柏。2001年，被康柏卖给Intel。同年，惠普收购康柏，继续开发基于Alpha处理器的产品到2004年
+//Microsoft Windows支持这款处理器，直到Windows NT 4.0 SP6，但是从Windows 2000 beta3开始放弃了对Alpha的支援
+#define ARCH_ALPHA 0     
+                         
+						 
+//Atmel AVR系列是一种基于改进的哈佛结构、精简指令集（Reduced Instruction Set Computing， RISC）的微控制器，由Atmel公司于1996年研发
+//2006年，爱特梅尔推出了 AVR32的新型专利32位架构处理器
+//AVR处理器发展了六个系列，分别是：tinyAVR，ATtiny系列；megaAVR，ATmega系列；XMEGA，ATxmega系列
+#define ARCH_AVR32 0    //a 32-bit RISC microprocessor architecture designed by Atmel
+#define ARCH_AVR32_AP 0  //On April 10, 2012 Atmel announced the End of Life of AP7 Core devices on 4/4/2013
+#define ARCH_AVR32_UC 0  //UC3 Core
+
+//Blackfin? 16/32位嵌入式处理器提供软件灵活性和扩展能力，适合融合应用：多格式音频、视频、语音和图像处理、多模式基带和分组处理、控制处理以及实时安全
+// Analog Devices, Inc. 全球领先的高性能信号处理解决方案供应商，
+//为了满足开发人员对低成本、快速、高效视频技术软件工具日益迫切的需求，
+//最近推出一款用于实时视频分析应用的免费综合视频原件库。
+//这些软件模块针对 Blackfin 处理器 系列做了充分优化，内含图像处理任务级原件，因而能够加快视频分析应用的开发速度
+//IntelliVision 公司的产品一贯受益于 Blackfin 处理器系列的高性能视频处理、压缩和视频流形成功能
+//Blackfin处理器基于由ADI和Intel公司联合开发的微信号架构（MSA），
+//它将一个32位RISC型指令集和双16位乘法累加（MAC）信号处理功能与通用型微控制器所具有的易用性组合在了一起
+//Blackfin处理器是一类专为满足当今嵌入式音频、视频和通信应用的计算要求和功耗约束条件而设计的新型16～32位嵌入式处理器
+#define ARCH_BFIN 0
+
+//IA-64 (also called Intel Itanium architecture) is the architecture of the Itanium family of 64-bit Intel microprocessors.
+//ia64是一种崭新的系统，和x86架构完全没有相似性
+//ia64则是原生的纯64位计算处理器，并且与x86指令不兼容。如果想要执行x86指令需要硬件虚拟化支持，而且效率不高
+//ia64由于架构的改变，性能比起x64的64位兼容模式更高更强。
+//ia64架构处理器也不能够使用x64操作系统
+//x64处理器则可以自由选择x86或是x64操作系统
+#define ARCH_IA64 0
+
+//MC68000: 摩托罗拉公司（Motorola）的半导体部门（现已独立成为飞思卡尔公司（Freescale））出品的一款16/32位CISC（复杂指令集）微处理器
+//The Motorola 68000 ("'sixty-eight-thousand'"; also called the m68k or Motorola 68k, "sixty-eight-k") is a 16/32-bit[1] CISC microprocessor core 
+//Introduced in 1979 with HMOS technology as the first member of the successful 32-bit m68k family of microprocessors
+#define ARCH_M68K 0
+
+//MIPS是世界上很流行的一种RISC处理器
+//MIPS的意思是“无内部互锁流水级的微处理器”(Microprocessor without interlocked piped stages)，其机制是尽量利用软件办法避免流水线中的数据相关问题
+//最早是在80年代初期由斯坦福(Stanford)大学Hennessy教授领导的研究小组研制出来的
+//1984年，MIPS计算机公司成立。1992年，SGI收购了MIPS计算机公司。1998年，MIPS脱离SGI，成为MIPS技术公司
+//MIPS公司设计RISC处理器始于二十世纪八十年代初，1986年推出R2000处理器，1988年推R3000处理器，1991年推出第一款64位商用微处器R4000。
+//之后又陆续推出R8000（于1994年）、R10000（于1996年）和R12000（于1997年）等型号
+//1999年，MIPS公司发布MIPS32和MIPS64架构标准，为未来MIPS处理器的开发奠定了基础
+//服务器RISC处理器来说，主要是IBM 的POWER和SUN 的UltraSPARC 两大处理器之间的竞争
+//2009年6月，龙芯曾经从MIPS公司获得MIPS 32与64架构处理器授权，主要原因是龙芯的处理器架构与MIPS的架构过于相似（95%），龙芯产品涉嫌侵权
+//早期ARM的优势就是面积小，其第二大股东是苹果，第一个客户是苹果的PDA牛顿。
+//牛顿失败后，被苹果无情抛弃的ARM苦苦挣扎了很多年，被TI、LSI等公司小规模采用完全是因为比MIPS便宜。
+//90年代手机开始兴起，为了击败空前强大的摩托罗拉，诺基亚和TI合作，希望开发出首款适用2G网络的通讯芯片。
+//TI先后介绍了自家的MCU核心、标准的MIPS核心、以及标准的ARM核心。
+//诺基亚的思路是选择一款不被大佬掌控的CPU，这样便于在未来的改进上施加影响，显然只有苦逼的ARM符合要求。
+//于是傍着诺基亚的巨型航母，ARM就赶上了移动市场的大潮。
+//之后ARM不断在低功耗、Java加速、单指令多数据、代码压缩等方面发力，彻底满足了诺基亚的需求，也拉开了和MIPS的距离。
+//MIPS在网络路由等领域有统治地位，看看BRCM，Cisco的产品，连x86都很难比，更不要说ARM了，这些领域都是对速度，吞吐量，外设支持等性能要求极其苛刻的领域
+#define ARCH_MIPS 0
+#define ARCH_MIPS64 0
+
+//HP（惠普）公司的RISC芯片PA-RISC于1986年问世
+//它之后被惠普公司与英特尔联合开发的Itanium架构所取代
+#define ARCH_PARISC 0
+
+//POWER是1991年，Apple（苹果电脑）、IBM、Motorola（摩托罗拉）组成的AIM联盟所发展出的微处理器架构
+//是一种精简指令集（RISC）架构的中央处理器（CPU）
+//PowerPC是整个AIM联盟平台的一部分，并且是到目前为止唯一的一部分
+#define ARCH_PPC 0
+#define ARCH_PPC64 0
+
+//ESA/390 (Enterprise Systems Architecture/390) was introduced in September 1990[1] and 
+//was IBM's last 31-bit-address/32-bit-data mainframe computing design, copied by Amdahl, Hitachi, and Fujitsu among other competitors.
+#define ARCH_S390 0
+
+//SuperH（或称SH）是可靠单片机与微处理器架构的品牌名称。SuperH 是以 32 位元存取的精简指令集架构，多用在嵌入式系统
+//SuperH 处理器核心家族在九零年代早期由日立开始开发。许多单片机与微处理器都在这个架构下。其中最有名可能是 惠普 Jornada PDA 用的 SH7709
+#define ARCH_SH4 0
+
+//SPARC，名称源自于可扩充处理器架构（Scalable Processor ARChitecture）的缩写，是一种RISC指令集架构，
+//最早于1985年由太阳微系统所设计，也是SPARC国际公司的注册商标之一
+#define ARCH_SPARC 0
+#define ARCH_SPARC64 0
+
+//TILE-Gx is a multicore processor family by Tilera.
+#define ARCH_TILEGX 0
+#define ARCH_TILEPRO 0
+
+//CPU性能瓶颈包括内存墙（CPU和DRAM时钟速度差距）,指令级并行性墙和能耗墙。
+//Venray的TOMI(Thread Optimized Multiprocessor)试图通过建造不同类型的微处理器重新定义这些问题
+#define ARCH_TOMI 0
+
+#define ARCH_X86 1
+#define ARCH_X86_32 1
+#define ARCH_X86_64 0
+

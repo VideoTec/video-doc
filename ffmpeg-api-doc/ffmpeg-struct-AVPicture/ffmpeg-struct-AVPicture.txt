@@ -1,0 +1,12 @@
+头文件 libavcodec/avcodec.h
+
+#define AV_NUM_DATA_POINTERS 8  定义在 E:\libav\libavutil\frame.h
+
+/**
+ * four components are given, that's all.
+ * the last component is alpha
+ */
+typedef struct AVPicture {
+    uint8_t *data[AV_NUM_DATA_POINTERS];
+    int linesize[AV_NUM_DATA_POINTERS];     ///< number of bytes per line
+} AVPicture;

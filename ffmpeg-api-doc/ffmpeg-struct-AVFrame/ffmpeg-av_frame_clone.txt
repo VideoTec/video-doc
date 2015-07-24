@@ -1,0 +1,24 @@
+头文件 libavutil/frame.h
+源文件 libavutil/frame.c
+
+/**
+ * Create a new frame that references the same data as src.
+ *
+ * This is a shortcut for av_frame_alloc()+av_frame_ref().
+ *
+ * @return newly created AVFrame on success, NULL on error.
+ */
+AVFrame *av_frame_clone(const AVFrame *src);
+
+AVFrame *av_frame_clone(const AVFrame *src)
+{
+    AVFrame *ret = av_frame_alloc();
+
+    if (!ret)
+        return NULL;
+
+    if (av_frame_ref(ret, src) < 0)
+        av_frame_free(&ret);
+
+    return ret;
+}

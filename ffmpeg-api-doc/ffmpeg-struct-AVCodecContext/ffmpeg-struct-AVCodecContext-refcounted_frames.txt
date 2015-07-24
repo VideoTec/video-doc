@@ -1,0 +1,41 @@
+理解解码后，图片缓存，参数
+理解解码     AVCodecContext.refcounted_frames
+
+问题：默认值是什么？
+见 E:\libav\libavcodec\options_table.h 应该是 零
+{"refcounted_frames", NULL, OFFSET(refcounted_frames), AV_OPT_TYPE_INT, {.i64 = 0}, 0, 1, A|V|D },
+
+int avcodec_decode_video2(AVCodecContext *avctx, AVFrame *picture,
+                         int *got_picture_ptr,
+                         AVPacket *avpkt);
+
+ * @param[out] picture The AVFrame in which the decoded video frame will be stored.
+ *             Use av_frame_alloc() to get an AVFrame. The codec will
+ *             allocate memory for the actual bitmap by calling the
+ *             AVCodecContext.get_buffer2() callback.
+ 
+ *             When AVCodecContext.refcounted_frames is set to 1, the frame is
+ *             reference counted and the returned reference belongs to the
+ *             caller. The caller must release the frame using av_frame_unref()
+ *             when the frame is no longer needed. The caller may safely write
+ *             to the frame if av_frame_is_writable() returns 1.
+ 
+ *             When AVCodecContext.refcounted_frames is set to 0, the returned
+ *             reference belongs to the decoder and is valid only until the
+ *             next call to this function or until closing or flushing the
+ *             decoder. The caller may not write to it.
+
+
+AVCodecContext refcounted_frames 字段
+     /**
+     * If non-zero, the decoded audio and video frames returned from
+     * avcodec_decode_video2() and avcodec_decode_audio4() are reference-counted
+     * and are valid indefinitely. The caller must free them with
+     * av_frame_unref() when they are not needed anymore.
+     * Otherwise, the decoded frames must not be freed by the caller and are
+     * only valid until the next decode call.
+     *
+     * - encoding: unused
+     * - decoding: set by the caller before avcodec_open2().
+     */
+    int refcounted_frames;

@@ -1,0 +1,9 @@
+2015.4.22 分配图片空间时出下面的错误
+E:\WinApp\libav-test\mtarget_file.c
+
+#define ENOMEM          12
+
+640x360 pix-fmt:0
+
+  int ret = av_image_alloc(frame->data, frame->linesize,
+                          target->width, target->height, target->pix_fmt, 0);

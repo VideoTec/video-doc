@@ -1,0 +1,14 @@
+{ ERROR_TAG(INVALIDDATA),        "Invalid data found when processing input"       }
+#define AVERROR_INVALIDDATA        FFERRTAG( 'I','N','D','A') ///< Invalid data found when processing input
+
+  int r = 0;
+  AVFormatContext *input_file_ctx = NULL;
+  if(r = avformat_open_input(&input_file_ctx, file_name, NULL, NULL)) {
+    LOGI("failed to open video file: %s", av_err2str(r));
+    return 0;
+  }
+  打印出来：
+  01-16 18:05:45.916: I/JNILog(25914): failed to open video file: Invalid data found when processing input
+  
+  输入文件是 dreams.mp3
+  怀疑可能出问题的地方 E:\ffmpeg-src\libavformat\id3v2.c

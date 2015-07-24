@@ -1,0 +1,19 @@
+/**
+ * Format a line of log the same way as the default callback.
+ * @param line          buffer to receive the formated line
+ * @param line_size     size of the buffer
+ * @param print_prefix  used to store whether the prefix must be printed;
+ *                      must point to a persistent integer initially set to 1
+ */
+void av_log_format_line(void *ptr, int level, const char *fmt, va_list vl,
+                        char *line, int line_size, int *print_prefix);
+
+源码：
+void av_log_format_line(void *ptr, int level, const char *fmt, va_list vl,
+                        char *line, int line_size, int *print_prefix)
+{
+    AVBPrint part[4];
+    format_line(ptr, level, fmt, vl, part, print_prefix, NULL);
+    snprintf(line, line_size, "%s%s%s%s", part[0].str, part[1].str, part[2].str, part[3].str);
+    av_bprint_finalize(part+3, NULL);
+}

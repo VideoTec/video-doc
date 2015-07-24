@@ -1,0 +1,18 @@
+http://www.mpgedit.org/mpgedit/mpeg_format/MP3Format.html
+An MPEG audio file is built up from smaller parts called frames. 
+Generally, frames are independent items. Each frame has its own header and audio informations.
+
+一般分析 mpeg audio 参数的方法：
+When you want to read info about an MPEG file, 
+it is usually enough to find the first frame, read its header and assume that the other frames are the same.
+
+The frame header is constituted by the very first four bytes (32bits) in a frame
+
+frame header 里的重要字段
+MPEG Audio version ID
+00 - MPEG Version 2.5 (unofficial)
+01 - reserved
+10 - MPEG Version 2 (ISO/IEC 13818-3)
+11 - MPEG Version 1 (ISO/IEC 11172-3)
+
+Note: MPEG Version 2.5 is not official standard. It is an extension of the standard used for very low bitrate files. If your decoder does not support this extension, it is recommended for you to use 12 bits for synchronization instead of 11 bits.

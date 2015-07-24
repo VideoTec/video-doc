@@ -1,0 +1,21 @@
+头文件 libavcodec/avcodec.h
+源文件 libavcodec/avpacket.c
+
+/**
+ * Wipe the packet.
+ *
+ * Unreference the buffer referenced by the packet and reset the
+ * remaining packet fields to their default values.
+ *
+ * @param pkt The packet to be unreferenced.
+ */
+void av_packet_unref(AVPacket *pkt);
+
+void av_packet_unref(AVPacket *pkt)
+{
+    av_packet_free_side_data(pkt);
+    av_buffer_unref(&pkt->buf);
+    av_init_packet(pkt);
+    pkt->data = NULL;
+    pkt->size = 0;
+}

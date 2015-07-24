@@ -1,0 +1,12 @@
+11:33 2015/4/25
+libav 没有这个字段
+ffmeg 有这个字段
+
+    /**
+     * number of audio channels, only used for audio.
+     * Code outside libavcodec should access this field using:
+     * av_frame_get_channels(frame)
+     * - encoding: unused
+     * - decoding: Read by user.
+     */
+    int channels;

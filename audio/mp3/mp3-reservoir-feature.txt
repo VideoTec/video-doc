@@ -1,0 +1,31 @@
+reservoir[英][ˈrezəvwɑ:(r)] [美][ˈrezərvwɑ:(r)] n.蓄水池；贮液器；储藏；蓄积
+
+bit reservoir 应用于 CBR 的情况。
+
+The term bit reservoir is used exclusively in the MP3 specification.
+CBR (and also to some degree ABR) uses a constant defined bitrate. 
+Because that bitrate is taken into consideration at every frame, 
+there will be certain moments of such complexity that they can't be properly encoded within the limitations of the chosen bitrate; 
+they need a higher bitrate than the defined one. 
+Therefore, the MP3 spec defines a bit reservoir, 
+intended especially to allow transient sounds to be encoded better.
+
+Example:
+An MP3 file is to be encoded at 160 kbps CBR from CD source material, sampled at 44100 stereo samples per second.
+Because each MP3 frame is 1152 samples long, allowing 160000 bits per second, each frame can contain 4179 bits of data (= 160000 x 1152 / 44100).
+Imagine that a certain frame needs only 3056 bits to be properly encoded (as calculated by the psymodel and the settings of the encoder). 
+This is equivalent to about 117 kbps momentary bitrate (=3056 x 44100 / 1152). 1123 bits are not used (4179 - 3056 = 1123). 
+Those bits together with any unused bits in the next few frames can be saved to a reservoir for use in following frames that may require more than 4179 bits each.
+
+To limit the stream's complexity, the maximum reservoir size is 4088 bits (511 bytes). 
+If the maximum reservoir of 4088 bits is available in addition to the 4179 bits allocated by the 160 kbps CBR bitrate of our example, 
+there are 8267 bits available, equivalent to a momentary bitrate of 316 kbps for one frame, 
+but if used completely, no reservoir would be available to the very next frame, restricting that frame to 4179 bits (160 kbps), even if the psymodel deems that more than this is desirable. 
+
+This limits the ability to cope with sustained passages of complex sound, 
+but often proves adequate to cope with brief transients such as percussive sounds without setting the constant bitrate to, say, 320 kbps throughout the file.
+With VBR, the encoder can choose the needed framesize for each moment, again as defined by the psymodel and the quality settings. 
+
+So VBR (e.g. in LAME) doesn't use bit reservoir nearly as much, but still may do so to collect bits that would otherwise be wasted to fill an available framesize. 
+For example, our example frame requiring 3056 bits (117 kbps) might be stored in a 3343 bit frame (128 kbps) and donate the extra 287 bits to the reservoir, 
+or it might be stored in a 2925 bit frame (112 kbps) using 131 bits from the existing bit reservoir from preceding frames to make up the shortfall.

@@ -1,0 +1,4 @@
+https://github.com/guardianproject/android-ffmpeg-java
+https://github.com/guardianproject/android-ffmpeg
+FFMPEG命令行，android-ffmpeg-java 提供构建参数 - 运行进程的接口。
+ffmpegController.java - 控制命令运行

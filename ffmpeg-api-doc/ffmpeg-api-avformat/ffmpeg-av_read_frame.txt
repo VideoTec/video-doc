@@ -1,0 +1,217 @@
+注意：
+读取的PKT，用完后必须要调用 void av_free_packet(AVPacket *pkt);
+
+AVStream
+enum AVDiscard discard; ///< Selects which packets can be discarded at will and do not need to be demuxed.
+在个标志会，影响到 av_read_frame 函数，discard 的流的PKT，直接忽略了，不会 av_read_frame 出来
+
+/**
+ * Return the next frame of a stream.
+ * This function returns what is stored in the file, and does not validate
+ * that what is there are valid frames for the decoder. It will split what is
+ * stored in the file into frames and return one for each call. It will not
+ * omit invalid data between valid frames so as to give the decoder the maximum
+ * information possible for decoding.
+ *
+ * If pkt->buf is NULL, then the packet is valid until the next
+ * av_read_frame() or until avformat_close_input(). Otherwise the packet
+ * is valid indefinitely. In both cases the packet must be freed with
+ * av_free_packet when it is no longer needed. For video, the packet contains
+ * exactly one frame. For audio, it contains an integer number of frames if each
+ * frame has a known fixed size (e.g. PCM or ADPCM data). If the audio frames
+ * have a variable size (e.g. MPEG audio), then it contains one frame.
+ *
+ * pkt->pts, pkt->dts and pkt->duration are always set to correct
+ * values in AVStream.time_base units (and guessed if the format cannot
+ * provide them). pkt->pts can be AV_NOPTS_VALUE if the video format
+ * has B-frames, so it is better to rely on pkt->dts if you do not
+ * decompress the payload.
+ *
+ * @return 0 if OK, < 0 on error or end of file
+ */
+int av_read_frame(AVFormatContext *s, AVPacket *pkt);
+
+
+int av_read_frame(AVFormatContext *s, AVPacket *pkt)
+{
+    const int genpts = s->flags & AVFMT_FLAG_GENPTS;
+    int eof = 0;
+
+    if (!genpts)
+        return s->packet_buffer
+               ? read_from_packet_buffer(&s->packet_buffer,
+                                         &s->packet_buffer_end, pkt)
+               : read_frame_internal(s, pkt);
+
+    for (;;) {
+        int ret;
+        AVPacketList *pktl = s->packet_buffer;
+
+        if (pktl) {
+            AVPacket *next_pkt = &pktl->pkt;
+
+            if (next_pkt->dts != AV_NOPTS_VALUE) {
+                int wrap_bits = s->streams[next_pkt->stream_index]->pts_wrap_bits;
+                while (pktl && next_pkt->pts == AV_NOPTS_VALUE) {
+                    if (pktl->pkt.stream_index == next_pkt->stream_index &&
+                        (av_compare_mod(next_pkt->dts, pktl->pkt.dts, 2LL << (wrap_bits - 1)) < 0) &&
+                         av_compare_mod(pktl->pkt.pts, pktl->pkt.dts, 2LL << (wrap_bits - 1))) {
+                        // not B-frame
+                        next_pkt->pts = pktl->pkt.dts;
+                    }
+                    pktl = pktl->next;
+                }
+                pktl = s->packet_buffer;
+            }
+
+            /* read packet from packet buffer, if there is data */
+            if (!(next_pkt->pts == AV_NOPTS_VALUE &&
+                  next_pkt->dts != AV_NOPTS_VALUE && !eof))
+                return read_from_packet_buffer(&s->packet_buffer,
+                                               &s->packet_buffer_end, pkt);
+        }
+
+        ret = read_frame_internal(s, pkt);
+        if (ret < 0) {
+            if (pktl && ret != AVERROR(EAGAIN)) {
+                eof = 1;
+                continue;
+            } else
+                return ret;
+        }
+
+        if (av_dup_packet(add_to_pktbuf(&s->packet_buffer, pkt,
+                                        &s->packet_buffer_end)) < 0)
+            return AVERROR(ENOMEM);
+    }
+}
+
+static int read_frame_internal(AVFormatContext *s, AVPacket *pkt)
+{
+    int ret = 0, i, got_packet = 0;
+    AVDictionary *metadata = NULL;
+
+    av_init_packet(pkt);
+
+    while (!got_packet && !s->parse_queue) {
+        AVStream *st;
+        AVPacket cur_pkt;
+
+        /* read next packet */
+        ret = ff_read_packet(s, &cur_pkt);
+        if (ret < 0) {
+            if (ret == AVERROR(EAGAIN))
+                return ret;
+            /* flush the parsers */
+            for (i = 0; i < s->nb_streams; i++) {
+                st = s->streams[i];
+                if (st->parser && st->need_parsing)
+                    parse_packet(s, NULL, st->index);
+            }
+            /* all remaining packets are now in parse_queue =>
+             * really terminate parsing */
+            break;
+        }
+        ret = 0;
+        st  = s->streams[cur_pkt.stream_index];
+
+        if (cur_pkt.pts != AV_NOPTS_VALUE &&
+            cur_pkt.dts != AV_NOPTS_VALUE &&
+            cur_pkt.pts < cur_pkt.dts) {
+            av_log(s, AV_LOG_WARNING,
+                   "Invalid timestamps stream=%d, pts=%"PRId64", "
+                   "dts=%"PRId64", size=%d\n",
+                   cur_pkt.stream_index, cur_pkt.pts,
+                   cur_pkt.dts, cur_pkt.size);
+        }
+        if (s->debug & FF_FDEBUG_TS)
+            av_log(s, AV_LOG_DEBUG,
+                   "ff_read_packet stream=%d, pts=%"PRId64", dts=%"PRId64", "
+                   "size=%d, duration=%d, flags=%d\n",
+                   cur_pkt.stream_index, cur_pkt.pts, cur_pkt.dts,
+                   cur_pkt.size, cur_pkt.duration, cur_pkt.flags);
+
+        if (st->need_parsing && !st->parser && !(s->flags & AVFMT_FLAG_NOPARSE)) {
+            st->parser = av_parser_init(st->codec->codec_id);
+            if (!st->parser)
+                /* no parser available: just output the raw packets */
+                st->need_parsing = AVSTREAM_PARSE_NONE;
+            else if (st->need_parsing == AVSTREAM_PARSE_HEADERS)
+                st->parser->flags |= PARSER_FLAG_COMPLETE_FRAMES;
+            else if (st->need_parsing == AVSTREAM_PARSE_FULL_ONCE)
+                st->parser->flags |= PARSER_FLAG_ONCE;
+        }
+
+        if (!st->need_parsing || !st->parser) {
+            /* no parsing needed: we just output the packet as is */
+            *pkt = cur_pkt;
+            compute_pkt_fields(s, st, NULL, pkt);
+            if ((s->iformat->flags & AVFMT_GENERIC_INDEX) &&
+                (pkt->flags & AV_PKT_FLAG_KEY) && pkt->dts != AV_NOPTS_VALUE) {
+                ff_reduce_index(s, st->index);
+                av_add_index_entry(st, pkt->pos, pkt->dts,
+                                   0, 0, AVINDEX_KEYFRAME);
+            }
+            got_packet = 1;
+        } else if (st->discard < AVDISCARD_ALL) {
+            if ((ret = parse_packet(s, &cur_pkt, cur_pkt.stream_index)) < 0)
+                return ret;
+        } else {
+            /* free packet */
+            av_free_packet(&cur_pkt);
+        }
+    }
+
+    if (!got_packet && s->parse_queue)
+        ret = read_from_packet_buffer(&s->parse_queue, &s->parse_queue_end, pkt);
+
+    av_opt_get_dict_val(s, "metadata", AV_OPT_SEARCH_CHILDREN, &metadata);
+    if (metadata) {
+        s->event_flags |= AVFMT_EVENT_FLAG_METADATA_UPDATED;
+        av_dict_copy(&s->metadata, metadata, 0);
+        av_dict_free(&metadata);
+        av_opt_set_dict_val(s, "metadata", NULL, AV_OPT_SEARCH_CHILDREN);
+    }
+
+    if (s->debug & FF_FDEBUG_TS)
+        av_log(s, AV_LOG_DEBUG,
+               "read_frame_internal stream=%d, pts=%"PRId64", dts=%"PRId64", "
+               "size=%d, duration=%d, flags=%d\n",
+               pkt->stream_index, pkt->pts, pkt->dts,
+               pkt->size, pkt->duration, pkt->flags);
+
+    return ret;
+}
+
+static int read_from_packet_buffer(AVPacketList **pkt_buffer,
+                                   AVPacketList **pkt_buffer_end,
+                                   AVPacket      *pkt)
+{
+    AVPacketList *pktl;
+    av_assert0(*pkt_buffer);
+    pktl        = *pkt_buffer;
+    *pkt        = pktl->pkt;
+    *pkt_buffer = pktl->next;
+    if (!pktl->next)
+        *pkt_buffer_end = NULL;
+    av_freep(&pktl);
+    return 0;
+}
+
+static AVPacket *add_to_pktbuf(AVPacketList **packet_buffer, AVPacket *pkt,
+                               AVPacketList **plast_pktl)
+{
+    AVPacketList *pktl = av_mallocz(sizeof(AVPacketList));
+    if (!pktl)
+        return NULL;
+
+    if (*packet_buffer)
+        (*plast_pktl)->next = pktl;
+    else
+        *packet_buffer = pktl;
+
+    /* Add the packet in the buffered packet list. */
+    *plast_pktl = pktl;
+    pktl->pkt   = *pkt;
+    return &pktl->pkt;
+}

@@ -1,0 +1,14 @@
+源文件
+libavformat/avio.h
+
+int avio_open(AVIOContext **s, const char *url, int flags);
+
+/**
+ * @name URL open modes
+ * The flags argument to avio_open must be one of the following
+ * constants, optionally ORed with other flags.
+ * @{
+ */
+#define AVIO_FLAG_READ  1                                      /**< read-only */
+#define AVIO_FLAG_WRITE 2                                      /**< write-only */
+#define AVIO_FLAG_READ_WRITE (AVIO_FLAG_READ|AVIO_FLAG_WRITE)  /**< read-write pseudo[美]['su:doʊ]假的 flag */

@@ -1,0 +1,99 @@
+
+
+/**
+ * Add a new stream to a media file.
+ *
+ * When demuxing, it is called by the demuxer in read_header(). If the
+ * flag AVFMTCTX_NOHEADER is set in s.ctx_flags, then it may also
+ * be called in read_packet().
+ *
+ * When muxing, should be called by the user before avformat_write_header().
+ *
+ * User is required to call avcodec_close() and avformat_free_context() to
+ * clean up the allocation by avformat_new_stream().
+ *
+ * @param s media file handle
+ * @param c If non-NULL, the AVCodecContext corresponding to the new stream
+ * will be initialized to use this codec. This is needed for e.g. codec-specific
+ * defaults to be set, so codec should be provided if it is known.
+ *
+ * @return newly created stream or NULL on error.
+ */
+AVStream *avformat_new_stream(AVFormatContext *s, const AVCodec *c);
+
+源文件
+E:\libav\libavformat\utils.c
+
+源代码
+AVStream *avformat_new_stream(AVFormatContext *s, const AVCodec *c)
+{
+    AVStream *st;
+    int i;
+
+    if (av_reallocp_array(&s->streams, s->nb_streams + 1,
+                          sizeof(*s->streams)) < 0) {
+        s->nb_streams = 0;
+        return NULL;
+    }
+
+    st = av_mallocz(sizeof(AVStream));
+    if (!st)
+        return NULL;
+    if (!(st->info = av_mallocz(sizeof(*st->info)))) {
+        av_free(st);
+        return NULL;
+    }
+
+    st->codec = avcodec_alloc_context3(c);
+    if (!st->codec) {
+        av_free(st->info);
+        av_free(st);
+        return NULL;
+    }
+    if (s->iformat) {
+        /* no default bitrate if decoding */
+        st->codec->bit_rate = 0;
+
+        /* default pts setting is MPEG-like */
+        avpriv_set_pts_info(st, 33, 1, 90000);
+    }
+
+    st->index      = s->nb_streams;
+    st->start_time = AV_NOPTS_VALUE;
+    st->duration   = AV_NOPTS_VALUE;
+    /* we set the current DTS to 0 so that formats without any timestamps
+     * but durations get some timestamps, formats with some unknown
+     * timestamps have their first few packets buffered and the
+     * timestamps corrected before they are returned to the user */
+    st->cur_dts       = 0;
+    st->first_dts     = AV_NOPTS_VALUE;
+    st->probe_packets = MAX_PROBE_PACKETS;
+
+    st->last_IP_pts = AV_NOPTS_VALUE;
+    for (i = 0; i < MAX_REORDER_DELAY + 1; i++)
+        st->pts_buffer[i] = AV_NOPTS_VALUE;
+
+    st->sample_aspect_ratio = (AVRational) { 0, 1 };
+
+    st->info->fps_first_dts = AV_NOPTS_VALUE;
+    st->info->fps_last_dts  = AV_NOPTS_VALUE;
+
+    s->streams[s->nb_streams++] = st;
+    return st;
+}
+
+-------------------------
+示例
+-------------------------
+
+
+-------------------------
+-------------------------
+output_context->oformat->audio_codec = AV_CODEC_ID_AAC;
+AVCodec *audio_codec = avcodec_find_encoder(output_context->oformat->audio_codec);
+output_audio_stream = avformat_new_stream(output_context, audio_codec);
+
+AVStream *audio_st = avformat_new_stream(fmt_ctx_, audio_encoder);
+
+设置 stream 对应的 AVCodecContext 上下文参数
+打开 AVCodecContext avcodec_open2(audio_encoder_ctx_, NULL, NULL);

@@ -1,0 +1,13 @@
+----------------------------------------
+声音 raw data 空间分配
+----------------------------------------
+int av_samples_alloc_array_and_samples(uint8_t ***audio_data, int *linesize, int nb_channels,
+                                       int nb_samples, enum AVSampleFormat sample_fmt, int align);
+int av_samples_alloc(uint8_t **audio_data, int *linesize, int nb_channels,
+                     int nb_samples, enum AVSampleFormat sample_fmt, int align);
+
+----------------------------------------
+图像 raw data 空间分配
+----------------------------------------
+int avpicture_alloc(AVPicture *picture, enum AVPixelFormat pix_fmt, int width, int height);
+void avpicture_free(AVPicture *picture);

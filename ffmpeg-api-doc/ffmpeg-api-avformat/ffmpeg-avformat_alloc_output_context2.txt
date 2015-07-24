@@ -1,0 +1,81 @@
+libavformat/avformat.h
+
+ffmpeg 的接口 libav没有
+AVFormatContext *output_context = NULL;
+status = avformat_alloc_output_context2(&output_context, NULL, "mp4", NULL);
+
+/**
+ * Allocate an AVFormatContext for an output format.
+ * avformat_free_context() can be used to free the context and
+ * everything allocated by the framework within it.
+ *
+ * @param *ctx is set to the created format context, or to NULL in
+ * case of failure
+ * @param oformat format to use for allocating the context, if NULL
+ * format_name and filename are used instead
+ * @param format_name the name of output format to use for allocating the
+ * context, if NULL filename is used instead
+ * @param filename the name of the filename to use for allocating the
+ * context, may be NULL
+ * @return >= 0 in case of success, a negative AVERROR code in case of
+ * failure
+ */
+int avformat_alloc_output_context2(AVFormatContext **ctx, AVOutputFormat *oformat,
+                                   const char *format_name, const char *filename);
+
+源码
+
+ int avformat_alloc_output_context2(AVFormatContext **avctx, AVOutputFormat *oformat,
+                                    const char *format, const char *filename)
+ {
+     AVFormatContext *s = avformat_alloc_context();
+     int ret = 0;
+ 
+     *avctx = NULL;
+     if (!s)
+         goto nomem;
+ 
+     if (!oformat) {
+         if (format) {
+              oformat = av_guess_format(format, NULL, NULL);
+              if (!oformat) {
+                  av_log(s, AV_LOG_ERROR, "Requested output format '%s' is not a suitable output format\n", format);
+                  ret = AVERROR(EINVAL);
+                  goto error;
+              }
+          } else {
+              oformat = av_guess_format(NULL, filename, NULL);
+              if (!oformat) {
+                  ret = AVERROR(EINVAL);
+                  av_log(s, AV_LOG_ERROR, "Unable to find a suitable output format for '%s'\n",
+                         filename);
+                  goto error;
+              }
+          }
+      }
+  
+      s->oformat = oformat;
+      if (s->oformat->priv_data_size > 0) {
+          s->priv_data = av_mallocz(s->oformat->priv_data_size);
+          if (!s->priv_data)
+              goto nomem;
+          if (s->oformat->priv_class) {
+              *(const AVClass**)s->priv_data= s->oformat->priv_class;
+              av_opt_set_defaults(s->priv_data);
+          }
+      } else
+          s->priv_data = NULL;
+  
+      if (filename)
+          av_strlcpy(s->filename, filename, sizeof(s->filename));
+      *avctx = s;
+      return 0;
+  nomem:
+      av_log(s, AV_LOG_ERROR, "Out of memory\n");
+      ret = AVERROR(ENOMEM);
+  error:
+      avformat_free_context(s);
+      return ret;
+  }
+  
+  libav 没有这个工具函数

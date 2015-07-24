@@ -1,0 +1,28 @@
+下面的代码，运行失败
+
+sws_getContext 返回空
+怎么查错误？
+1. 看源码？
+2. 打 LOG av_log_set_callback + av_log_set_level(AV_LOG_DEBUG) 什么都没有
+
+10:32 2015/4/25 含有郁闷的结果：
+CHECK_FAIL(!ret, -1, "iscaler create: alloc error");  错误判断条件错了
+
+IScaler *iscaler_create(int s_w, int s_h, int s_pix_fmt,
+                        int d_w, int d_h, int d_pix_fmt) {
+  int ret = 0;
+  IScaler *s = malloc(sizeof(*s));
+  LOGI("iscaler create: s: %dx%d(%s), d: %dx%d(%s)",
+       s_w, s_h, av_get_pix_fmt_name(s_pix_fmt),
+       d_w, d_h, av_get_pix_fmt_name(d_pix_fmt));
+  s->sws_ctx = sws_getContext(s_w, s_h, s_pix_fmt,
+                              d_w, d_h, d_pix_fmt,
+                              SWS_BILINEAR, NULL, NULL, NULL);
+  CHECK_FAIL(!ret, -1, "iscaler create: alloc error");
+  return s;
+
+fail:
+  if(s)
+    iscaler_destroy(&s);
+  return 0;
+}

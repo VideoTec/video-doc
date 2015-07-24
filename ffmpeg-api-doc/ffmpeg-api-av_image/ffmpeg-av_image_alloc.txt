@@ -1,0 +1,54 @@
+头文件 E:\libav\libavutil\imgutils.h
+源文件 E:\libav\libavutil\imgutils.c
+
+/**
+ * Allocate an image with size w and h and pixel format pix_fmt, and
+ * fill pointers and linesizes accordingly.
+ * The allocated image buffer has to be freed by using
+ * av_freep(&pointers[0]).
+ *
+ * @param align the value to use for buffer size alignment
+ * @return the size in bytes required for the image buffer, a negative
+ * error code in case of failure
+ */
+int av_image_alloc(uint8_t *pointers[4], int linesizes[4],
+                   int w, int h, enum AVPixelFormat pix_fmt, int align);
+
+av_image_alloc 源码分析：
+av_image_check_size -> av_image_fill_linesizes 
+-> av_image_fill_pointers 计算需要的空间
+-> av_malloc(ret + align)
+-> av_image_fill_pointers 分配指针
+
+int av_image_alloc(uint8_t *pointers[4], int linesizes[4],
+                   int w, int h, enum AVPixelFormat pix_fmt, int align)
+{
+    const AVPixFmtDescriptor *desc = av_pix_fmt_desc_get(pix_fmt);
+    int i, ret;
+    uint8_t *buf;
+
+    if (!desc)
+        return AVERROR(EINVAL);
+
+    if ((ret = av_image_check_size(w, h, 0, NULL)) < 0)
+        return ret;
+    if ((ret = av_image_fill_linesizes(linesizes, pix_fmt, w)) < 0)
+        return ret;
+
+    for (i = 0; i < 4; i++)
+        linesizes[i] = FFALIGN(linesizes[i], align);
+
+    if ((ret = av_image_fill_pointers(pointers, pix_fmt, h, NULL, linesizes)) < 0)
+        return ret;
+    buf = av_malloc(ret + align);
+    if (!buf)
+        return AVERROR(ENOMEM);
+    if ((ret = av_image_fill_pointers(pointers, pix_fmt, h, buf, linesizes)) < 0) {
+        av_free(buf);
+        return ret;
+    }
+    if (desc->flags & AV_PIX_FMT_FLAG_PAL || desc->flags & AV_PIX_FMT_FLAG_PSEUDOPAL)
+        avpriv_set_systematic_pal2((uint32_t*)pointers[1], pix_fmt);
+
+    return ret;
+}

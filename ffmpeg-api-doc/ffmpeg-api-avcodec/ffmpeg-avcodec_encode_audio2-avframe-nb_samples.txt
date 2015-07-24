@@ -1,0 +1,15 @@
+2015.03.27
+在编码AAC声音帧时，输出的编码包的大小明显不对，pkt.size == 4
+最后找到原因是，
+    AVFrame *audio_frame = av_frame_alloc();
+    少写了这一句：audio_frame->nb_samples = nb_samples_per_frame;
+    av_samples_fill_arrays(audio_frame->data, 0, buf, nb_channels, nb_samples_per_frame, sample_fmt, 0);
+
+avcodec_encode_audio2 压缩得到的 packet 结构体里 
+1. 可能会填充 duration，
+2. 但是不能计算 pts  因为没有足够信息
+   在传给 write_frame 需要计算pkt的pts ， 并且要转到 stream 的time_base av_packet_rescale_ts(&pkt, enc->time_base, ost->st->time_base);    
+    av_init_packet(&pkt); 
+    pkt.size = 0;
+    pkt.data = NULL;
+    avcodec_encode_audio2(aac_encoder, &pkt, audio_frame, &got_pkt);

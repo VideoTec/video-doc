@@ -1,0 +1,4 @@
+帧内压缩的编码：
+1. MJPEG
+2. Intraframe MPEG-2
+2. dv

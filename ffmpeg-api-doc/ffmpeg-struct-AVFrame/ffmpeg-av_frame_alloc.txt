@@ -1,0 +1,61 @@
+AVFrame *audio_frame = av_frame_alloc();
+av_samples_alloc(audio_frame->data, audio_frame->linesize, 2, output_audio_stream->codec->frame_size, output_audio_stream->codec->sample_fmt, 0);
+
+
+audio_frame_ = av_frame_alloc();
+audio_frame_->nb_samples = nb_samples;
+avcodec_fill_audio_frame(audio_frame_,
+                         audio_channels_,
+                         audio_sample_fmt_,
+                         audio_buffer,
+                         nb_samples * av_get_bytes_per_sample(audio_sample_fmt_) * audio_channels_, 1);
+
+libavutil/frame.h
+libavutil/frame.c
+
+/**
+ * Allocate an AVFrame and set its fields to default values.  The resulting
+ * struct must be freed using av_frame_free().
+ *
+ * @return An AVFrame filled with default values or NULL on failure.
+ *
+ * @note this only allocates the AVFrame itself, not the data buffers. Those
+ * must be allocated through other means, e.g. with av_frame_get_buffer() or
+ * manually.
+ */
+AVFrame *av_frame_alloc(void);
+
+-----------------------------------
+源码
+-----------------------------------
+AVFrame *av_frame_alloc(void)
+{
+    AVFrame *frame = av_mallocz(sizeof(*frame));
+
+    if (!frame)
+        return NULL;
+
+    frame->extended_data = NULL;
+    get_frame_defaults(frame);
+
+    return frame;
+}
+
+static void get_frame_defaults(AVFrame *frame)
+{
+    if (frame->extended_data != frame->data)
+        av_freep(&frame->extended_data);
+
+    memset(frame, 0, sizeof(*frame));
+
+    frame->pts                 = AV_NOPTS_VALUE;
+    frame->key_frame           = 1;
+    frame->sample_aspect_ratio = (AVRational){ 0, 1 };
+    frame->format              = -1; /* unknown */
+    frame->extended_data       = frame->data;
+    frame->color_primaries     = AVCOL_PRI_UNSPECIFIED;
+    frame->color_trc           = AVCOL_TRC_UNSPECIFIED;
+    frame->colorspace          = AVCOL_SPC_UNSPECIFIED;
+    frame->color_range         = AVCOL_RANGE_UNSPECIFIED;
+    frame->chroma_location     = AVCHROMA_LOC_UNSPECIFIED;
+}

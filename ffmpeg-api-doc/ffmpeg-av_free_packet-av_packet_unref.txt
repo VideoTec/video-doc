@@ -1,0 +1,52 @@
+av_free_packet(&audio_pkt);
+
+libavcodec/avpacket.c
+libavcodec/avcodec.h
+
+/**
+ * Free a packet.
+ *
+ * @param pkt packet to free
+ */
+void av_free_packet(AVPacket *pkt);
+
+/**
+ * Wipe the packet.
+ *
+ * Unreference the buffer referenced by the packet and reset the
+ * remaining packet fields to their default values.
+ *
+ * @param pkt The packet to be unreferenced.
+ */
+void av_packet_unref(AVPacket *pkt);
+
+------------------------
+源码
+------------------------
+void av_free_packet(AVPacket *pkt)
+{
+    if (pkt) {
+FF_DISABLE_DEPRECATION_WARNINGS
+        if (pkt->buf)
+            av_buffer_unref(&pkt->buf);
+#if FF_API_DESTRUCT_PACKET
+        else if (pkt->destruct)
+            pkt->destruct(pkt);
+        pkt->destruct = NULL;
+#endif
+FF_ENABLE_DEPRECATION_WARNINGS
+        pkt->data            = NULL;
+        pkt->size            = 0;
+
+        av_packet_free_side_data(pkt);
+    }
+}
+
+void av_packet_unref(AVPacket *pkt)
+{
+    av_packet_free_side_data(pkt);
+    av_buffer_unref(&pkt->buf);
+    av_init_packet(pkt);
+    pkt->data = NULL;
+    pkt->size = 0;
+}

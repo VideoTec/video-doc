@@ -1,0 +1,18 @@
+头文件 libavcodec/avcodec.h
+源文件 libavcodec/avpacket.c
+
+/**
+ * Move every field in src to dst and reset src.
+ *
+ * @see av_packet_unref
+ *
+ * @param src Source packet, will be reset
+ * @param dst Destination packet
+ */
+void av_packet_move_ref(AVPacket *dst, AVPacket *src);
+
+void av_packet_move_ref(AVPacket *dst, AVPacket *src)
+{
+    *dst = *src;
+    av_init_packet(src);
+}

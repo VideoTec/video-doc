@@ -1,0 +1,34 @@
+在 libavutil/error.c 的字符串没有找到对应的字符串
+可能是 AVERROR(EINVAL)
+
+doc/errno.txt: 有定义
+EINVAL           POSIX  +  ++++++  Invalid argument
+
+01-21 20:19:52.452: I/JNILog(21858): avcodec_open2 error-msg: Invalid argument
+编码 AAC AV_CODEC_ID_AAC 时指定 AV_SAMPLE_FMT_S16P 这个格式
+
+01-22 00:25:23.580: I/JNILog(15305): avcodec_open2 error-msg: Invalid argument
+因为，output_audio_stream->codec 的 codec 指针为空
+ret = avcodec_open2(output_audio_stream->codec, audio_codec, NULL);
+
+01-21 23:29:11.290: I/JNILog(8988): swr_convert error-msg: Invalid argument
+  swr_ctx = swr_alloc_set_opts(NULL,
+                       g_out_channel_layout,
+                       g_out_audio_format,
+                       g_out_sample_rate,
+                       codec_ctx->channel_layout,
+                       codec_ctx->sample_fmt,
+                       codec_ctx->sample_rate,
+                       0, NULL);
+  忘记 swr_init(swr_ctx) 了
+  
+01-27 10:08:03.823: E/JNILog(32128): failed to open file: /sdcard/test11.mp4, error-msg: Invalid argument
+01-27 10:47:48.339: E/JNILog(1577): failed to open audio decoder context: /sdcard/test11.mp4, error-msg: Invalid argument
+下面的代码出错了
+  AVDictionary *dict = NULL;
+  if(ret = avcodec_open2(codec_ctx, audio_codec, &dict)) {
+    LOGE("failed to open audio decoder context: %s, error-msg: %s", file_name, av_err2str(ret));
+    goto fail;
+  }
+
+

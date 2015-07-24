@@ -1,0 +1,54 @@
+头文件： E:\libav\libavutil\pixdesc.h
+源文件： E:\libav\libavutil\pixdesc.c
+
+所有信息保存在下面的结构体数组里
+const AVPixFmtDescriptor av_pix_fmt_descriptors[AV_PIX_FMT_NB] = {
+    [AV_PIX_FMT_YUV420P] = {
+        .name = "yuv420p",
+        .nb_components = 3,
+        .log2_chroma_w = 1,
+        .log2_chroma_h = 1,
+        .comp = {
+            { 0, 0, 1, 0, 7 },        /* Y */
+            { 1, 0, 1, 0, 7 },        /* U */
+            { 2, 0, 1, 0, 7 },        /* V */
+        },
+        .flags = AV_PIX_FMT_FLAG_PLANAR,
+    },
+
+------------------------------------------------------
+文档
+------------------------------------------------------
+/**
+ * Return the pixel format corresponding to name.
+ *
+ * If there is no pixel format with name name, then looks for a
+ * pixel format with the name corresponding to the native endian
+ * format of name.
+ * For example in a little-endian system, first looks for "gray16",
+ * then for "gray16le".
+ *
+ * Finally if no pixel format has been found, returns PIX_FMT_NONE.
+ */
+enum AVPixelFormat av_get_pix_fmt(const char *name);
+
+/**
+ * Return the short name for a pixel format, NULL in case pix_fmt is
+ * unknown.
+ *
+ * @see av_get_pix_fmt(), av_get_pix_fmt_string()
+ */
+const char *av_get_pix_fmt_name(enum AVPixelFormat pix_fmt);
+
+/**
+ * Print in buf the string corresponding to the pixel format with
+ * number pix_fmt, or an header if pix_fmt is negative.
+ *
+ * @param buf the buffer where to write the string
+ * @param buf_size the size of buf
+ * @param pix_fmt the number of the pixel format to print the
+ * corresponding info string, or a negative value to print the
+ * corresponding header.
+ */
+char *av_get_pix_fmt_string(char *buf, int buf_size,
+                            enum AVPixelFormat pix_fmt);

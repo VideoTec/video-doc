@@ -1,0 +1,23 @@
+源文件
+E:\libav\libavcodec\options.c
+
+static const AVClass av_codec_context_class = {
+    .class_name              = "AVCodecContext",
+    .item_name               = context_to_name,
+    .option                  = avcodec_options,
+    .version                 = LIBAVUTIL_VERSION_INT,
+    .log_level_offset_offset = offsetof(AVCodecContext, log_level_offset),
+    .child_next              = codec_child_next,
+    .child_class_next        = codec_child_class_next,
+};
+
+const AVClass *avcodec_get_class(void)
+{
+    return &av_codec_context_class;
+}
+
+int avcodec_get_context_defaults3(AVCodecContext *s, const AVCodec *codec)
+{
+    memset(s, 0, sizeof(AVCodecContext));
+
+    s->av_class = &av_codec_context_class;  

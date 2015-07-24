@@ -1,0 +1,20 @@
+@param align the value to use for buffer size alignment
+
+int av_image_alloc(uint8_t *pointers[4], int linesizes[4],
+                   int w, int h, enum AVPixelFormat pix_fmt, int align);
+  
+源码中的作用：
+    for (i = 0; i < 4; i++)
+        linesizes[i] = FFALIGN(linesizes[i], align);   #define FFALIGN(x, a) (((x)+(a)-1)&~((a)-1))
+
+    ret = av_image_fill_pointers(pointers, pix_fmt, h, NULL, linesizes)
+    buf = av_malloc(ret + align);
+
+avpicture_alloc 调用 av_image_alloc 示例，align 传递为 1
+    int ret = av_image_alloc(picture->data, picture->linesize,
+                             width, height, pix_fmt, 1);
+							 
+16:35 2015/5/8
+使用 av_image_alloc 时， yuv420p(300x300)
+传递 align 1 能成功运行  返回值为 135000
+传递 align 0 时运行失败  返回值为 0 没有分配空间

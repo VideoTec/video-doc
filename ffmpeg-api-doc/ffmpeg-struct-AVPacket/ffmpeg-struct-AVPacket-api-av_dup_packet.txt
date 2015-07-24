@@ -1,0 +1,54 @@
+头文件
+libavcodec/avcodec.h
+E:\libav\libavcodec\avpacket.c
+
+/**
+ * @warning This is a hack - the packet memory allocation stuff is broken. The
+ * packet is allocated if it was not really allocated.
+ */
+int av_dup_packet(AVPacket *pkt);
+
+源文件：
+int av_dup_packet(AVPacket *pkt)
+{
+    AVPacket tmp_pkt;
+
+FF_DISABLE_DEPRECATION_WARNINGS
+    if (!pkt->buf && pkt->data
+#if FF_API_DESTRUCT_PACKET
+        && !pkt->destruct
+#endif
+        ) {
+FF_ENABLE_DEPRECATION_WARNINGS
+        tmp_pkt = *pkt;
+
+        pkt->data      = NULL;
+        pkt->side_data = NULL;
+        DUP_DATA(pkt->data, tmp_pkt.data, pkt->size, 1, ALLOC_BUF);
+#if FF_API_DESTRUCT_PACKET
+FF_DISABLE_DEPRECATION_WARNINGS
+        pkt->destruct = dummy_destruct_packet;
+FF_ENABLE_DEPRECATION_WARNINGS
+#endif
+
+        if (pkt->side_data_elems) {
+            int i;
+
+            DUP_DATA(pkt->side_data, tmp_pkt.side_data,
+                     pkt->side_data_elems * sizeof(*pkt->side_data), 0, ALLOC_MALLOC);
+            memset(pkt->side_data, 0,
+                   pkt->side_data_elems * sizeof(*pkt->side_data));
+            for (i = 0; i < pkt->side_data_elems; i++) {
+                DUP_DATA(pkt->side_data[i].data, tmp_pkt.side_data[i].data,
+                         tmp_pkt.side_data[i].size, 1, ALLOC_MALLOC);
+                pkt->side_data[i].size = tmp_pkt.side_data[i].size;
+                pkt->side_data[i].type = tmp_pkt.side_data[i].type;
+            }
+        }
+    }
+    return 0;
+
+failed_alloc:
+    av_free_packet(pkt);
+    return AVERROR(ENOMEM);
+}

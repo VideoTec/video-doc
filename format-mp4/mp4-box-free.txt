@@ -1,0 +1,9 @@
+MP4 的 free box
+
+http://mp4ra.org/atoms.html
+官方网站解释：
+free	free space
+
+1. 一般跟在 ftyp-box 后面
+2. 一般结构示例：
+00 00 00 08 66 72 65 65

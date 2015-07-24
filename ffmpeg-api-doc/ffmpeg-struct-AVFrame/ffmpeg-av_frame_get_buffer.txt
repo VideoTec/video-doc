@@ -1,0 +1,131 @@
+头文件 libavutil/frame.h
+源文件 libavutil/frame.c
+
+/**
+ * Allocate new buffer(s) for audio or video data.
+ *
+ * The following fields must be set on frame before calling this function:
+ * - format (pixel format for video, sample format for audio)
+ * - width and height for video
+ * - nb_samples and channel_layout for audio
+ *
+ * This function will fill AVFrame.data and AVFrame.buf arrays and, if
+ * necessary, allocate and fill AVFrame.extended_data and AVFrame.extended_buf.
+ * For planar formats, one buffer will be allocated for each plane.
+ *
+ * @param frame frame in which to store the new buffers.
+ * @param align required buffer size alignment
+ *
+ * @return 0 on success, a negative AVERROR on error.
+ */
+int av_frame_get_buffer(AVFrame *frame, int align);
+
+int av_frame_get_buffer(AVFrame *frame, int align)
+{
+    if (frame->format < 0)
+        return AVERROR(EINVAL);
+
+    if (frame->width > 0 && frame->height > 0)
+        return get_video_buffer(frame, align);
+    else if (frame->nb_samples > 0 && frame->channel_layout)
+        return get_audio_buffer(frame, align);
+
+    return AVERROR(EINVAL);
+}
+
+static int get_video_buffer(AVFrame *frame, int align)
+{
+    const AVPixFmtDescriptor *desc = av_pix_fmt_desc_get(frame->format);
+    int ret, i;
+
+    if (!desc)
+        return AVERROR(EINVAL);
+
+    if ((ret = av_image_check_size(frame->width, frame->height, 0, NULL)) < 0)
+        return ret;
+
+    if (!frame->linesize[0]) {
+        ret = av_image_fill_linesizes(frame->linesize, frame->format,
+                                      frame->width);
+        if (ret < 0)
+            return ret;
+
+        for (i = 0; i < 4 && frame->linesize[i]; i++)
+            frame->linesize[i] = FFALIGN(frame->linesize[i], align);
+    }
+
+    for (i = 0; i < 4 && frame->linesize[i]; i++) {
+        int h = frame->height;
+        if (i == 1 || i == 2)
+            h = -((-h) >> desc->log2_chroma_h);
+
+        frame->buf[i] = av_buffer_alloc(frame->linesize[i] * h);
+        if (!frame->buf[i])
+            goto fail;
+
+        frame->data[i] = frame->buf[i]->data;
+    }
+    if (desc->flags & AV_PIX_FMT_FLAG_PAL || desc->flags & AV_PIX_FMT_FLAG_PSEUDOPAL) {
+        av_buffer_unref(&frame->buf[1]);
+        frame->buf[1] = av_buffer_alloc(1024);
+        if (!frame->buf[1])
+            goto fail;
+        frame->data[1] = frame->buf[1]->data;
+    }
+
+    frame->extended_data = frame->data;
+
+    return 0;
+fail:
+    av_frame_unref(frame);
+    return AVERROR(ENOMEM);
+}
+
+static int get_audio_buffer(AVFrame *frame, int align)
+{
+    int channels = av_get_channel_layout_nb_channels(frame->channel_layout);
+    int planar   = av_sample_fmt_is_planar(frame->format);
+    int planes   = planar ? channels : 1;
+    int ret, i;
+
+    if (!frame->linesize[0]) {
+        ret = av_samples_get_buffer_size(&frame->linesize[0], channels,
+                                         frame->nb_samples, frame->format,
+                                         align);
+        if (ret < 0)
+            return ret;
+    }
+
+    if (planes > AV_NUM_DATA_POINTERS) {
+        frame->extended_data = av_mallocz(planes *
+                                          sizeof(*frame->extended_data));
+        frame->extended_buf  = av_mallocz((planes - AV_NUM_DATA_POINTERS) *
+                                          sizeof(*frame->extended_buf));
+        if (!frame->extended_data || !frame->extended_buf) {
+            av_freep(&frame->extended_data);
+            av_freep(&frame->extended_buf);
+            return AVERROR(ENOMEM);
+        }
+        frame->nb_extended_buf = planes - AV_NUM_DATA_POINTERS;
+    } else
+        frame->extended_data = frame->data;
+
+    for (i = 0; i < FFMIN(planes, AV_NUM_DATA_POINTERS); i++) {
+        frame->buf[i] = av_buffer_alloc(frame->linesize[0]);
+        if (!frame->buf[i]) {
+            av_frame_unref(frame);
+            return AVERROR(ENOMEM);
+        }
+        frame->extended_data[i] = frame->data[i] = frame->buf[i]->data;
+    }
+    for (i = 0; i < planes - AV_NUM_DATA_POINTERS; i++) {
+        frame->extended_buf[i] = av_buffer_alloc(frame->linesize[0]);
+        if (!frame->extended_buf[i]) {
+            av_frame_unref(frame);
+            return AVERROR(ENOMEM);
+        }
+        frame->extended_data[i + AV_NUM_DATA_POINTERS] = frame->extended_buf[i]->data;
+    }
+    return 0;
+
+}

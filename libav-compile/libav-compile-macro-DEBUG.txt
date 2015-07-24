@@ -1,0 +1,32 @@
+示例，av_dlog，宏的定义
+
+/**
+ * av_dlog macros
+ * Useful to print debug messages that shouldn't get compiled in normally.
+ */
+
+#ifdef DEBUG
+#    define av_dlog(pctx, ...) av_log(pctx, AV_LOG_DEBUG, __VA_ARGS__)
+#else
+#    define av_dlog(pctx, ...)
+#endif
+
+手动在 confg.mk 脚本里添加 -DDEBUG
+CPPFLAGS= -DDEBUG -D_ISOC99_SOURCE -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE -D_WIN32_WINNT=0x0502 -Dstrtod=avpriv_strtod -Dsnprintf=avpriv_snprintf -D_snprintf=avpriv_snprintf -Dvsnprintf=avpriv_vsnprintf
+
+-------------------------------------------------------------------------------------
+怎么编译DEBUG版本的库，分析 configure 脚本，可以判断和下面两个选项无关
+Developer options (useful when working on Libav itself):
+  --disable-debug          disable debugging symbols
+
+  --enable-debug=LEVEL     set the debug level [$debuglevel]
+  --enable-debug=LEVEL 
+sets the debugging level for the compilation command, 
+that is it will add to it the flag: -g LEVEL. 
+
+The meaning of that flag partly depends on the compiler used, for 
+example check the man page for gcc if you're using that. 
+
+Also if you want to debug ffmpeg the tool, it's better to use ffmpeg_g 
+which contains all the debugging symbols which are stripped away from 
+ffmpeg (the same is valid for the other tools as well).

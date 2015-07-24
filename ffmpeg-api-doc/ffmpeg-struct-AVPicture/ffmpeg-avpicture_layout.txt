@@ -1,0 +1,58 @@
+头文件 libavcodec/avcodec.h
+源文件 E:\libav\libavcodec\avpicture.c
+
+/**
+ * Copy pixel data from an AVPicture into a buffer.
+ * The data is stored compactly, without any gaps for alignment or padding
+ * which may be applied by avpicture_fill().
+ *
+ * @see avpicture_get_size()
+ *
+ * @param[in] src AVPicture containing image data
+ * @param[in] pix_fmt The format in which the picture data is stored.
+ * @param[in] width the width of the image in pixels.
+ * @param[in] height the height of the image in pixels.
+ * @param[out] dest A buffer into which picture data will be copied.
+ * @param[in] dest_size The size of 'dest'.
+ * @return The number of bytes written to dest, or a negative value (error code) on error.
+ */
+int avpicture_layout(const AVPicture* src, enum AVPixelFormat pix_fmt,
+                     int width, int height,
+                     unsigned char *dest, int dest_size);
+
+源文件
+int avpicture_layout(const AVPicture* src, enum AVPixelFormat pix_fmt,
+                     int width, int height,
+                     unsigned char *dest, int dest_size)
+{
+    int i, j, nb_planes = 0, linesizes[4];
+    const AVPixFmtDescriptor *desc = av_pix_fmt_desc_get(pix_fmt);
+    int size = avpicture_get_size(pix_fmt, width, height);
+
+    if (size > dest_size || size < 0)
+        return AVERROR(EINVAL);
+
+    for (i = 0; i < desc->nb_components; i++)
+        nb_planes = FFMAX(desc->comp[i].plane, nb_planes);
+
+    nb_planes++;
+
+    av_image_fill_linesizes(linesizes, pix_fmt, width);
+    for (i = 0; i < nb_planes; i++) {
+        int h, shift = (i == 1 || i == 2) ? desc->log2_chroma_h : 0;
+        const unsigned char *s = src->data[i];
+        h = (height + (1 << shift) - 1) >> shift;
+
+        for (j = 0; j < h; j++) {
+            memcpy(dest, s, linesizes[i]);
+            dest += linesizes[i];
+            s += src->linesize[i];
+        }
+    }
+
+    if (desc->flags & AV_PIX_FMT_FLAG_PAL)
+        memcpy((unsigned char *)(((size_t)dest + 3) & ~3),
+               src->data[1], 256 * 4);
+
+    return size;
+}

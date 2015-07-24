@@ -1,0 +1,26 @@
+源文件
+libavutil/frame.c
+
+static void get_frame_defaults(AVFrame *frame)
+{
+    if (frame->extended_data != frame->data)
+        av_freep(&frame->extended_data);
+
+    memset(frame, 0, sizeof(*frame));
+
+    frame->pts                 = AV_NOPTS_VALUE;
+    frame->key_frame           = 1;
+    frame->sample_aspect_ratio = (AVRational){ 0, 1 };
+    frame->format              = -1; /* unknown */
+    frame->extended_data       = frame->data;
+    frame->color_primaries     = AVCOL_PRI_UNSPECIFIED;
+    frame->color_trc           = AVCOL_TRC_UNSPECIFIED;
+    frame->colorspace          = AVCOL_SPC_UNSPECIFIED;
+    frame->color_range         = AVCOL_RANGE_UNSPECIFIED;
+    frame->chroma_location     = AVCHROMA_LOC_UNSPECIFIED;
+}
+
+下列函数会调用这个初始化
+AVFrame *av_frame_alloc(void)
+void av_frame_unref(AVFrame *frame)
+void av_frame_move_ref(AVFrame *dst, AVFrame *src)

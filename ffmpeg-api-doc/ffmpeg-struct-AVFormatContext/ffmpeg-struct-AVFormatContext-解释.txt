@@ -1,0 +1,73 @@
+AVFormatContext 解释
+
+#define AVFMT_FLAG_GENPTS       0x0001 ///< Generate missing pts even if it requires parsing future frames.
+#define AVFMT_FLAG_IGNIDX       0x0002 ///< Ignore index.
+#define AVFMT_FLAG_NONBLOCK     0x0004 ///< Do not block when reading packets from input.
+#define AVFMT_FLAG_IGNDTS       0x0008 ///< Ignore DTS on frames that contain both DTS & PTS
+#define AVFMT_FLAG_NOFILLIN     0x0010 ///< Do not infer any values from other values, just return what is stored in the container
+#define AVFMT_FLAG_NOPARSE      0x0020 ///< Do not use AVParsers, you also must set AVFMT_FLAG_NOFILLIN as the fillin code works on frames and no parsing -> no frames. Also seeking to frames can not work if parsing to find frame boundaries has been disabled
+#define AVFMT_FLAG_NOBUFFER     0x0040 ///< Do not buffer frames when possible
+#define AVFMT_FLAG_CUSTOM_IO    0x0080 ///< The caller has supplied a custom AVIOContext, don't avio_close() it.
+#define AVFMT_FLAG_DISCARD_CORRUPT  0x0100 ///< Discard frames marked corrupted
+#define AVFMT_FLAG_FLUSH_PACKETS    0x0200 ///< Flush the AVIOContext every packet.
+#define AVFMT_FLAG_BITEXACT         0x0400
+
+typedef struct AVFormatContext {
+    const AVClass *av_class;
+    struct AVInputFormat *iformat;
+    struct AVOutputFormat *oformat;
+    void *priv_data;
+    AVIOContext *pb;
+    int ctx_flags;
+    unsigned int nb_streams;
+    AVStream **streams;
+    char filename[1024];
+    int64_t start_time;
+    int64_t duration;
+    int bit_rate;
+    unsigned int packet_size;
+    int max_delay;
+    int flags;
+    unsigned int probesize;
+    int max_analyze_duration;
+    const uint8_t *key;
+    int keylen;
+    unsigned int nb_programs;
+    AVProgram **programs;
+    enum AVCodecID video_codec_id;
+    enum AVCodecID audio_codec_id;
+    enum AVCodecID subtitle_codec_id;
+    unsigned int max_index_size;
+    unsigned int max_picture_buffer;
+    unsigned int nb_chapters;
+    AVChapter **chapters;
+    AVDictionary *metadata;
+    int64_t start_time_realtime;
+    int fps_probe_size;
+    int error_recognition;
+    AVIOInterruptCB interrupt_callback;
+    int debug;                           #define FF_FDEBUG_TS        0x0001
+    int64_t max_interleave_delta;
+    int strict_std_compliance;
+    int event_flags;                     #define AVFMT_EVENT_FLAG_METADATA_UPDATED 0x0001 ///< The call resulted in updated metadata.
+
+    /*****************************************************************
+     * All fields below this line are not part of the public API. They
+     * may not be used outside of libavformat and can be changed and
+     * removed at will.
+     * New public fields should be added right above.
+     *****************************************************************
+     */
+#define RAW_PACKET_BUFFER_SIZE 2500000
+    int64_t data_offset; /**< offset of the first packet */
+    struct AVPacketList *packet_buffer;
+    struct AVPacketList *packet_buffer_end;
+    struct AVPacketList *raw_packet_buffer;
+    struct AVPacketList *raw_packet_buffer_end;
+    struct AVPacketList *parse_queue;
+    struct AVPacketList *parse_queue_end;
+    int raw_packet_buffer_remaining_size;
+    int64_t offset;
+    AVRational offset_timebase;
+    AVFormatInternal *internal;
+} AVFormatContext;

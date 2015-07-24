@@ -1,0 +1,2 @@
+Compact Disc has a sampling rate of 44.1 kHz
+Digital Audio Tape, which uses 48 kHz

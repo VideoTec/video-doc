@@ -1,0 +1,214 @@
+计划列表：
+2014.10.14 【计划】《使用VC2013编译X264》
+                   《X264的config.h分析》
+2014.10.15 【计划】《编译64位x264》
+				   《x264ASM assembly language - x86inc.asm》
+				   《X264和opencl》
+
+
+
+
+
+
+
+
+
+
+x264源代码目录结构
+common
+doc
+encoder
+extras
+filters
+input
+output
+tools
+
+根据Makefile文件分析x264目录结构
+SRCS = common/mc.c common/predict.c common/pixel.c common/macroblock.c \
+       common/frame.c common/dct.c common/cpu.c common/cabac.c \
+       common/common.c common/osdep.c common/rectangle.c \
+       common/set.c common/quant.c common/deblock.c common/vlc.c \
+       common/mvpred.c common/bitstream.c \
+       encoder/analyse.c encoder/me.c encoder/ratecontrol.c \
+       encoder/set.c encoder/macroblock.c encoder/cabac.c \
+       encoder/cavlc.c encoder/encoder.c encoder/lookahead.c
+
+SRCCLI = x264.c input/input.c input/timecode.c input/raw.c input/y4m.c \
+         output/raw.c output/matroska.c output/matroska_ebml.c \
+         output/flv.c output/flv_bytestream.c filters/filters.c \
+         filters/video/video.c filters/video/source.c filters/video/internal.c \
+         filters/video/resize.c filters/video/cache.c filters/video/fix_vfr_pts.c \
+         filters/video/select_every.c filters/video/crop.c filters/video/depth.c
+
+ifneq ($(findstring HAVE_THREAD 1, $(CONFIG)),)
+SRCCLI += input/thread.c
+SRCS   += common/threadpool.c
+endif
+
+ifneq ($(findstring HAVE_WIN32THREAD 1, $(CONFIG)),)
+SRCS += common/win32thread.c
+endif
+
+
+ifdef ARCH_X86
+SRCS   += common/x86/mc-c.c common/x86/predict-c.c
+OBJASM  = $(ASMSRC:%.asm=%.o)
+$(OBJASM): common/x86/x86inc.asm common/x86/x86util.asm
+OBJCHK += tools/checkasm-a.o
+endif
+
+ifeq ($(HAVE_OPENCL),yes)
+common/oclobj.h: common/opencl/x264-cl.h $(wildcard $(SRCPATH)/common/opencl/*.cl)
+	cat $^ | $(SRCPATH)/tools/cltostr.sh $@
+GENERATED += common/oclobj.h
+SRCS += common/opencl.c(添加这个文件，需要先添加，oclobj.h头文件) encoder/slicetype-cl.c
+endif
+
+
+汇编文件
+# MMX/SSE optims
+ifneq ($(AS),)
+X86SRC0 = const-a.asm cabac-a.asm dct-a.asm deblock-a.asm mc-a.asm \
+          mc-a2.asm pixel-a.asm predict-a.asm quant-a.asm \
+          cpu-a.asm dct-32.asm bitstream-a.asm
+ifneq ($(findstring HIGH_BIT_DEPTH, $(CONFIG)),)
+X86SRC0 += sad16-a.asm
+else
+X86SRC0 += sad-a.asm
+endif
+X86SRC = $(X86SRC0:%=common/x86/%)
+
+ifeq ($(ARCH),X86)
+ARCH_X86 = yes
+ASMSRC   = $(X86SRC) common/x86/pixel-32.asm
+endif
+
+ifeq ($(ARCH),X86_64)
+ARCH_X86 = yes
+ASMSRC   = $(X86SRC:-32.asm=-64.asm) common/x86/trellis-64.asm
+endif
+
+ifdef ARCH_X86
+SRCS   += common/x86/mc-c.c common/x86/predict-c.c
+OBJASM  = $(ASMSRC:%.asm=%.o)
+$(OBJASM): common/x86/x86inc.asm common/x86/x86util.asm
+OBJCHK += tools/checkasm-a.o
+endif
+endif
+
+
+
+
+新建MSVC工程：
+第一步：添加config.h（https://raw.githubusercontent.com/ShiftMediaProject/x264/master/SMC/config.h）
+        添加x264_config.h（https://raw.githubusercontent.com/ShiftMediaProject/x264/master/SMC/x264_config.h）
+		添加 oclobj.h  opencl object: static const char x264_opencl_source[] = {}
+
+第二步：添加common/mc.c编译
+
+error C4996: 'fileno': The POSIX name for this item is deprecated. Instead, use the ISO C++ conformant name: _fileno. See online help for details
+在#include<stdio.h>前面加上#define  _CRT_SECURE_NO_WARNINGS就可以不报错
+1）VS2013没有解决，还是把，fileno改为，_fileno   
+2）不用改，但是要把 /sdl-  设置SDL检查为否，就可以了
+
+strcpy( paths[idx]+len+path, "P" );  这个可以，直接用上面的方法，定义_CRT_SECURE_NO_WARNINGS宏，就解决了。
+1>e:\x264\encoder\slicetype.c(1343): error C4996: 'strcpy': This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+1>          c:\program files (x86)\microsoft visual studio 12.0\vc\include\string.h(112) : see declaration of 'strcpy'
+
+第二步：添加common/deblock.c编译
+	if ((h->mb.i_partition == D_16x16 && !h->mb.i_cbp_luma && !intra_cur) || qp <= qp_thresh)
+		return;  错在这里，应该加｛｝，使后面的代码成为单独的块。
+
+	uint8_t(*bs)[8][4] = h->mb.cache.deblock_strength;
+
+VS2013编译错误：error C2063: 'uint8_t' : not a function
+
+
+	char(*tt)[4];  //添加一个无意义的句子，就好了，奇怪 ，这个应该怎么理解呢？ 
+	uint8_t(*bs)[8][4] = h->mb.cache.deblock_strength;
+	
+第三步：修改config.h文件
+#define HAVE_OPENCL 0
+#define HAVE_MMX 0
+
+第三步：
+        if( previous_nal_size )
+            memcpy( buf, h0->nal_buffer, previous_nal_size );   加｛｝，使后面的代码，成为单独的块
+
+        intptr_t delta = buf - h0->nal_buffer;
+		
+encoder.c(1886): error C2275: 'intptr_t' : illegal use of this type as an expression
+
+When you name your source files *.c, MSVC assumes it's compiling C, which means C89. All block-local variables need to be declared at the beginning of your functions.
+
+Workarounds include:
+
+declaring/initializing all local variables at the beginning of a code block (directly after an opening brace {)
+rename the source files to *.cpp or equivalent and compile as C++.
+upgrading to VS 2013, which relaxes this restriction.
+
+第三步：
+// update qscale for 1 frame based on actual bits used so far
+static float rate_estimate_qscale( x264_t *h )
+{
+    float q;
+    x264_ratecontrol_t *rcc = h->rc;
+    ratecontrol_entry_t UNINIT(rce);
+    int pict_type = h->sh.i_type;
+    int64_t total_bits = 8*(h->stat.i_frame_size[SLICE_TYPE_I]
+                          + h->stat.i_frame_size[SLICE_TYPE_P]
+                          + h->stat.i_frame_size[SLICE_TYPE_B])
+                       - rcc->filler_bits_sum;
+
+ratecontrol.c(2329): error C4700: uninitialized local variable 'rce' used
+
+
+第三步：
+*** Building with YASM ***
+第三步：vc-build-dependencies-build-customizations.png 设置，自定义编译。
+
+编译汇编文件，定义宏：
+PREFIX
+STACK_ALIGNMENT=4
+HIGH_BIT_DEPTH=0
+BIT_DEPTH=8
+WIN32=1
+ARCH_X86_64=0
+
+In order to build x264 using msvc you must first download and install YASM.
+YASM is required to compile all x264 assembly files.
+
+1) Download yasm for Visual Studio from here:
+http://yasm.tortall.net/Download.html
+
+Currently only up to VS2010 is supported on the web page so just download that.
+
+2) Follow the instructions found within the downloaded archive for installing YASM
+    Note: With newer version of VS the BuildCustomization path should be the version specific to the VS version you are using.
+        so for instance the path for Visual Studio 2013 is:
+        C:\Program Files (x86)\MSBuild\Microsoft.Cpp\v4.0\V120\BuildCustomizations
+        
+3) Currently there is a bug in Visual Studio 2013 so in order to make the build customizations work you must edit a file
+    a) Open vsyasm.props that you just extracted
+    b) Replace the 1 occurrence of [Input] with "%(FullPath)"  (make sure to include the "s)
+
+4) In order to use version 1.3.0 of vsyasm you will also have to fix a error in the distributed build customizations
+    a) Open vsyasm.props that you just extracted
+    b) Replace the 1 occurrence of $(Platform) with win$(PlatformArchitecture)
+    
+5) ???
+
+6) Profit
+
+
+
+链接时出错，可能原因是下面这个警告：因为三个同名的源文件，造成，编译时，只编译一个
+1>C:\Program Files (x86)\MSBuild\Microsoft.Cpp\v4.0\V120\Microsoft.CppBuild.targets(935,5): warning MSB8027: Two or more files with the name of cabac.c will produce outputs to the same location. This can lead to an incorrect build result.  The files involved are ..\..\common\cabac.c, ..\..\encoder\cabac.c.
+1>C:\Program Files (x86)\MSBuild\Microsoft.Cpp\v4.0\V120\Microsoft.CppBuild.targets(935,5): warning MSB8027: Two or more files with the name of macroblock.c will produce outputs to the same location. This can lead to an incorrect build result.  The files involved are ..\..\common\macroblock.c, ..\..\encoder\macroblock.c.
+1>C:\Program Files (x86)\MSBuild\Microsoft.Cpp\v4.0\V120\Microsoft.CppBuild.targets(935,5): warning MSB8027: Two or more files with the name of set.c will produce outputs to the same location. This can lead to an incorrect build result.  The files involved are ..\..\common\set.c, ..\..\encoder\set.c.
+1>Debug\cabac.obj : warning LNK4042: object specified more than once; extras ignored
+1>Debug\macroblock.obj : warning LNK4042: object specified more than once; extras ignored
+1>Debug\set.obj : warning LNK4042: object specified more than once; extras ignored
+
+解决方法：指定，encoder，里的源文件的，输出OBJ文件名称：$(IntDir)\macroblockEnc.obj

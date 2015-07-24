@@ -1,0 +1,47 @@
+创建新的 refrence-counted packet
+E:\libav\libavcodec\avpacket.c
+
+/**
+ * Allocate the payload of a packet and initialize its fields with
+ * default values.
+ *
+ * @param pkt packet
+ * @param size wanted payload size
+ * @return 0 if OK, AVERROR_xxx otherwise
+ */
+int av_new_packet(AVPacket *pkt, int size);
+
+int av_new_packet(AVPacket *pkt, int size)
+{
+    AVBufferRef *buf = NULL;
+    int ret = packet_alloc(&buf, size);
+    if (ret < 0)
+        return ret;
+
+    av_init_packet(pkt);
+    pkt->buf      = buf;
+    pkt->data     = buf->data;
+    pkt->size     = size;
+#if FF_API_DESTRUCT_PACKET
+FF_DISABLE_DEPRECATION_WARNINGS
+    pkt->destruct = dummy_destruct_packet;
+FF_ENABLE_DEPRECATION_WARNINGS
+#endif
+
+    return 0;
+}
+
+static int packet_alloc(AVBufferRef **buf, int size)
+{
+    int ret;
+    if ((unsigned)size >= (unsigned)size + FF_INPUT_BUFFER_PADDING_SIZE)
+        return AVERROR(EINVAL);
+
+    ret = av_buffer_realloc(buf, size + FF_INPUT_BUFFER_PADDING_SIZE);
+    if (ret < 0)
+        return ret;
+
+    memset((*buf)->data + size, 0, FF_INPUT_BUFFER_PADDING_SIZE);
+
+    return 0;
+}

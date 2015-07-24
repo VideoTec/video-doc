@@ -1,0 +1,79 @@
+libavformat/avformat.h
+libavformat/mux.c
+
+av_write_trailer(output_context);
+大部分 AVOutputFormat 的 write_trailer 会调用 avio_close ？
+看源里没有调用 avio_close 需要单独调用吧。
+
+avconv.c 调用 avio_close
+    /* close files */
+    for (i = 0; i < nb_output_files; i++) {
+        OutputFile *of = output_files[i];
+        AVFormatContext *s = of->ctx;
+        if (s && s->oformat && !(s->oformat->flags & AVFMT_NOFILE) && s->pb)
+            avio_close(s->pb);
+        avformat_free_context(s);
+        av_dict_free(&of->opts);
+
+        av_freep(&output_files[i]);
+    }
+
+/**
+ * Write the stream trailer to an output media file and free the
+ * file private data.
+ *
+ * May only be called after a successful call to avformat_write_header.
+ *
+ * @param s media file handle
+ * @return 0 if OK, AVERROR_xxx on error
+ */
+int av_write_trailer(AVFormatContext *s);
+
+----------------------------------------------
+源码
+----------------------------------------------
+int av_write_trailer(AVFormatContext *s)
+{
+    int ret, i;
+
+    for (;; ) {
+        AVPacket pkt;
+        ret = interleave_packet(s, &pkt, NULL, 1);  清空缓存的 avpkt
+        if (ret < 0)
+            goto fail;
+        if (!ret)
+            break;
+
+        ret = write_packet(s, &pkt);
+        if (ret >= 0)
+            s->streams[pkt.stream_index]->nb_frames++;
+
+        av_free_packet(&pkt);
+
+        if (ret < 0)
+            goto fail;
+        if(s->pb && s->pb->error)
+            goto fail;
+    }
+
+fail:
+    if (s->oformat->write_trailer)
+        if (ret >= 0) {
+        ret = s->oformat->write_trailer(s);
+        } else {
+            s->oformat->write_trailer(s);
+        }
+
+    if (s->pb)
+       avio_flush(s->pb);
+    if (ret == 0)
+       ret = s->pb ? s->pb->error : 0;
+    for (i = 0; i < s->nb_streams; i++) {
+        av_freep(&s->streams[i]->priv_data);
+        av_freep(&s->streams[i]->index_entries);
+    }
+    if (s->oformat->priv_class)
+        av_opt_free(s->priv_data);
+    av_freep(&s->priv_data);
+    return ret;
+}

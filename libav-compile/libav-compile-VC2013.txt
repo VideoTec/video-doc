@@ -1,0 +1,456 @@
+总结，libav，MSVC Project建立步骤：
+1. 设置“生成依赖项”: 生成自定义项文件，asm，文件编译。vsyasm，见：《MSVC整合YASM》
+2. 根据config.h和对应的makefile添加源文件，添加asm文件
+3. 设置C编译选项：
+   1）头文件搜索路径。
+   2）宏定义。
+_CRT_SECURE_NO_WARNINGS;_USE_MATH_DEFINES;HAVE_AV_CONFIG_H;inline=__inline;strtod=avpriv_strtod;snprintf=avpriv_snprintf;_snprintf=avpriv_snprintf;vsnprintf=avpriv_vsnprintf;strtoll=_strtoi64;
+   3）W4，及忽略的警告。
+4244;4127;4018;4389;4146;4057;4204;4706;4305;4152;4324;4013;4100;4214;4273
+   4）运行时库，选择静态库。
+   5）源文件名，有重复的，定义obj输出文件名称。
+4. 设置汇编编译选项：
+   1）头文件搜索路径。
+   2）宏定义。
+   3）定义Pre Include文件：config.asm
+ 5. 构建。
+ 6. 用测试EXE链接。
+
+附：
+1. MSVC整合YASM
+   简单方法，把下面的exe放到目录：C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin
+   并且改名为 yasm.exe
+   http://www.tortall.net/projects/yasm/releases/yasm-1.3.0-win32.exe
+
+   复杂方法，使用下面的压缩包里的文件
+   http://www.tortall.net/projects/yasm/releases/vsyasm-1.3.0-win32.zip
+   
+2. 输出的头文件
+2. libavutil\Makefile注意下面两句：
+OBJS-$(CONFIG_LZO)                      += lzo.o
+OBJS += $(COMPAT_OBJS:%=../compat/%)需要两个源文件： compat\msvcrt\snprintf.c compat\strtod.c
+BUILT_HEADERS = avconfig.h 这个头文件也要输出
+3. libavcodec makefile分析
+4. libavformat makefile分析
+5. 测试程序的源代码： 库中自带的测试程序：libav\doc\examples
+自己写的测试程序
+extern "C" {
+#include <libavutil\cpu.h>
+#include <libavutil\avutil.h>
+#include <libavutil\opt.h>
+#include <libavutil\samplefmt.h>
+#include <libavresample\avresample.h>
+#include <libswscale\swscale.h>
+#include <libavformat\avformat.h>
+#include <libavcodec\avcodec.h>
+}
+
+int _tmain(int argc, _TCHAR* argv[])
+{
+	int cput_flags = av_get_cpu_flags();
+
+	AVAudioResampleContext *avr = avresample_alloc_context();
+	av_opt_set_int(avr, "in_channel_layout", AV_CH_LAYOUT_5POINT1, 0);
+	av_opt_set_int(avr, "out_channel_layout", AV_CH_LAYOUT_STEREO, 0);
+	av_opt_set_int(avr, "in_sample_rate", 48000, 0);
+	av_opt_set_int(avr, "out_sample_rate", 44100, 0);
+	av_opt_set_int(avr, "in_sample_fmt", AV_SAMPLE_FMT_FLTP, 0);
+	av_opt_set_int(avr, "out_sample_fmt", AV_SAMPLE_FMT_S16, 0);
+	avresample_open(avr);
+
+	unsigned swscale_ver = swscale_version();
+    SwsContext *sws = sws_alloc_context();
+	sws_scale(sws, nullptr, 0, 0, 0, nullptr, 0);
+    
+    avfilter_register_all();
+
+	av_register_all();
+	return 0;
+}
+
+cl -D_ISOC99_SOURCE -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE -D_WIN32_WINNT=0x0502 -Dstrtod=avpriv_strtod -Dsnprintf=avpriv_snprintf -D_snprintf=avpriv_snprintf -Dvsnprintf=avpriv_vsnprintf -nologo -D_USE_MATH_DEFINES -D_CRT_SECURE_NO_WARNINGS -Dinline=__inline -FIstdlib.h -Dstrtoll=_strtoi64 -W4 -wd4244 -wd4127 -wd4018 -wd4389 -wd4146 -wd4057 -wd4204 -wd4706 -wd4305 -wd4152 -wd4324 -we4013 -wd4100 -wd4214 -wd4273 -O2 -c -Fo./ffconf..CSS.500.4976.o ./ffconf..CSS.500.4976.c
+
+CPPFLAGS= -D_ISOC99_SOURCE -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE -D_WIN32_WINNT=0x0502 -Dstrtod=avpriv_strtod -Dsnprintf=avpriv_snprintf -D_snprintf=avpriv_snprintf -Dvsnprintf=avpriv_vsnprintf
+CFLAGS= -nologo -D_USE_MATH_DEFINES -D_CRT_SECURE_NO_WARNINGS -Dinline=__inline -FIstdlib.h -Dstrtoll=_strtoi64    -ZI -MTd -W4 -wd4244 -wd4127 -wd4018 -wd4389 -wd4146 -wd4057 -wd4204 -wd4706 -wd4305 -wd4152 -wd4324 -we4013 -wd4100 -wd4214 -wd4273 -Od   -Oy-
+ASFLAGS= -nologo -D_USE_MATH_DEFINES -D_CRT_SECURE_NO_WARNINGS -Dinline=__inline -FIstdlib.h -Dstrtoll=_strtoi64  -ZI -MTd
+
+bash，脚本，编译libavcodec/x86/h264_qpel_8bit.asm的命令行：
+yasm -f win32  -DPREFIX -I./ -I./ -Pconfig.asm -I libavcodec/x86/ -o libavcodec/x86/h264_qpel_8bit.o libavcodec/x86/h264_qpel_8bit.asm
+
+bash，脚本，编译avconv.c的命令行：
+cl 
+-I. -I. 
+-D_ISOC99_SOURCE -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE -D_WIN32_WINNT=0x0502 
+-Dstrtod=avpriv_strtod -Dsnprintf=avpriv_snprintf -D_snprintf=avpriv_snprintf -Dvsnprintf=avpriv_vsnprintf -nologo -D_USE_MATH_DEFINES -D_CRT_SECURE_NO_WARNINGS -Dinline=__inline -FIstdlib.h -Dstrtoll=_strtoi64    
+-W4 -wd4244 -wd4127 -wd4018 -wd4389 -wd4146 -wd4057 -wd4204 -wd4706 -wd4305 -wd4152 -wd4324 -we4013 -wd4100 -wd4214 -wd4273 
+-O2      
+-c -Foavconv.o avconv.c
+
+bash，脚本，编译libavcodec\h261.c的命令行：
+cl 
+-I. -I. 
+-D_ISOC99_SOURCE -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE -D_WIN32_WINNT=0x0502 
+-Dstrtod=avpriv_strtod -Dsnprintf=avpriv_snprintf -D_snprintf=avpriv_snprintf -Dvsnprintf=avpriv_vsnprintf -nologo -D_USE_MATH_DEFINES -D_CRT_SECURE_NO_WARNINGS -Dinline=__inline -FIstdlib.h -Dstrtoll=_strtoi64 
+-DHAVE_AV_CONFIG_H 
+-W4 -wd4244 -wd4127 -wd4018 -wd4389 -wd4146 -wd4057 -wd4204 -wd4706 -wd4305 -wd4152 -wd4324 -we4013 -wd4100 -wd4214 -wd4273 
+-O2     
+-c -Folibavcodec/h261.o libavcodec/h261.c
+
+下面三个宏是gcc使用的，VC可以不用
+-D_ISOC99_SOURCE -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE
+
+-FIstdlib.h
+In VS, "Forced Include Files". The tag is /FI
+
+-nologo VC工程默认是开启的。
+
+link -libpath:libavcodec -libpath:libavdevice -libpath:libavfilter -libpath:libavformat -libpath:libavresample -libpath:libavutil -libpath:libswscale -nologo   
+-out:avconv.exe cmdutils.o avconv_opt.o avconv_filter.o avconv.o  avconv_dxva2.o 
+libavfilter.a libavformat.a libavcodec.a libavresample.a libswscale.a libavutil.a psapi.lib advapi32.lib shell32.lib  ole32.lib
+---------------------------------------------------------------------------------------------------
+这个需要吗？library.mak: CPPFLAGS += -DHAVE_AV_CONFIG_H 必须要添加？是的。
+
+链接时找不到外部符号的错误：原因有：error LNK2019: unresolved external symbol 
+1。某个源文件没有添加工程里。
+2。工程中有两个源文件，名称同名，造成，只生成一个中间文件。
+1>Debug\float_dsp.obj : warning LNK4042: object specified more than once; extras ignored
+
+需要定义的宏
+-Dinline=__inline VC里：/D "inline=__inline"
+-Dstrtod=avpriv_strtod -Dsnprintf=avpriv_snprintf -D_snprintf=avpriv_snprintf -Dvsnprintf=avpriv_vsnprintf -Dstrtoll=_strtoi64
+-D_ISOC99_SOURCE 
+-D_FILE_OFFSET_BITS=64 
+-D_LARGEFILE_SOURCE 
+-D_WIN32_WINNT=0x0502 这个不必要
+-D_USE_MATH_DEFINES   数学常量
+-D_CRT_SECURE_NO_WARNINGS
+-FIstdlib.h ？？
+-nologo 这个是什么意思？
+这些宏定义，可直接写在，属性->命令行里。
+总结：
+-DHAVE_AV_CONFIG_H -D_ISOC99_SOURCE -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE -D_USE_MATH_DEFINES -D_CRT_SECURE_NO_WARNINGS
+-Dinline=__inline -Dstrtod=avpriv_strtod -Dsnprintf=avpriv_snprintf -D_snprintf=avpriv_snprintf -Dvsnprintf=avpriv_vsnprintf -Dstrtoll=_strtoi64
+
+//忽略不必要的警告
+-W4 -wd4244 -wd4127 -wd4018 -wd4389 -wd4146 -wd4057 -wd4204 -wd4706 -wd4305 -wd4152 -wd4324 -we4013 -wd4100 -wd4214 -wd4273
+
+-D_USE_MATH_DEFINES 定义这个宏，就可解决下面的问题
+http://msdn.microsoft.com/zh-cn/library/4hwaceh6.aspx 数学常量
+#define _USE_MATH_DEFINES // for C++
+#include <cmath>
+#define _USE_MATH_DEFINES // for C
+#include <math.h>
+1>i:\libav\libavutil\opt.c(88): error C2065: “M_PI”: 未声明的标识符
+1>i:\libav\libavutil\opt.c(89): error C2065: “M_E”: 未声明的标识符
+
+在config.h里添加：#define restrict __restrict 
+void (*butterflies_float)(float *restrict v1, float *restrict v2, int len);
+1>i:\libav\libavutil\float_dsp.h(148): error C2146: 语法错误: 缺少“)”(在标识符“v1”的前面)
+1>i:\libav\libavutil\float_dsp.h(148): error C2146: 语法错误: 缺少“;”(在标识符“v1”的前面)
+1>i:\libav\libavutil\float_dsp.h(148): error C2061: 语法错误: 标识符“v1”
+1>i:\libav\libavutil\float_dsp.h(148): error C2059: 语法错误:“)”
+
+在config.h里添加：#define EXTERN_PREFIX "_"
+#if defined(_MSC_VER)
+#pragma comment(linker, "/include:"EXTERN_PREFIX"avpriv_strtod")
+#pragma comment(linker, "/include:"EXTERN_PREFIX"avpriv_snprintf")
+#endif
+1>i:\libav\libavutil\internal.h(130): warning C4083: 应输入“)”；找到标识符“EXTERN_PREFIX”
+1>i:\libav\libavutil\internal.h(131): warning C4083: 应输入“)”；找到标识符“EXTERN_PREFIX”
+
+http://ffmpeg.org/pipermail/ffmpeg-cvslog/2013-May/064087.html
+If building libav with -MD in the cflags 
+(for making the MSVC compiler generate code for using a dynamically linked libc), 
+the system headers that declare strtod, snprintf and vsnprintf 
+declare the functions as imported from a DLL. 
+
+Warning LNK4049 is a more general version of Linker Tools Warning LNK4217. The linker generates Warning LNK4049 when it cannot determine from which function the imported symbol was referenced.（有多个相同的函数，链接时不知引用那个）
+
+头文件，需要包含：
+E:\libav\libavutil\Makefile HEADERS = **
+
+编译完libavutil后，编写下面的测试代码，编译成功，链接失败
+extern "C" {
+#include <libavutil\cpu.h>
+}
+
+int _tmain(int argc, _TCHAR* argv[])
+{
+	int cput_flags = av_get_cpu_flags();
+	return 0;
+}
+
+1>libavutil.lib(mem.obj) : error LNK2001: unresolved external symbol _avpriv_strtod
+这个函数是定义在：E:\libav\compat\strtod.c
+COMPAT_OBJS= strtod.o msvcrt/snprintf.o
+OBJS += $(COMPAT_OBJS:%=../compat/%)
+configure 文件里相关代码：
+    msvcrt)
+        add_compat strtod.o strtod=avpriv_strtod
+        add_compat msvcrt/snprintf.o snprintf=avpriv_snprintf   \
+                                     _snprintf=avpriv_snprintf  \
+                                     vsnprintf=avpriv_vsnprintf
+        ;;
+工程里，添加两个源文件：strtod.c snprintf.c。
+链接出下面的警告：
+libavutil.lib(eval.obj) : warning LNK4217: locally defined symbol _avpriv_strtod imported in function _av_strtod
+This warning will not appear when you compile by using the option /clr.
+是因为，下面加入的方式问题？E:\libav\libavutil\internal.h。注释掉，就没有LNK4217警告了，但是有错误：
+libavutil.lib(eval.obj) : error LNK2019: unresolved external symbol __imp__avpriv_strtod referenced in function _av_strtod
+#if defined(_MSC_VER)
+#pragma comment(linker, "/include:"EXTERN_PREFIX"avpriv_strtod")
+#pragma comment(linker, "/include:"EXTERN_PREFIX"avpriv_snprintf")
+#endif
+
+添加汇编源码解决下面问题：
+libavutil.lib(cpu.obj) : error LNK2019: unresolved external symbol _ff_get_cpu_flags_x86 referenced in function _av_get_cpu_flags
+汇编，参数
+ASFLAGS= -nologo -D_USE_MATH_DEFINES -D_CRT_SECURE_NO_WARNINGS -Dinline=__inline -FIstdlib.h -Dstrtoll=_strtoi64  -ZI -MTd
+config.asm 这个文件怎么用？ YASMFLAGS  += $(IFLAGS:%=%/) -Pconfig.asm config.asm was added after we changed config.h to #define FOO 0/1
+编译x86\cpu.c，需要下面头文件
+#include "libavutil/x86/asm.h"
+#include "libavutil/x86/cpu.h"
+#include "libavutil/cpu.h"
+#include "libavutil/cpu_internal.h"
+编译float_dsp_init.c，需要下面头文件
+#include "libavutil/float_dsp.h"
+编译lls_init.c，需要下面头文件
+#include "libavutil/lls.h"
+
+e:\libav\msvc\include\libavutil\common.h  这个是，安装的头文件：下面intmath.h未安装，造成错误。
+#ifdef HAVE_AV_CONFIG_H
+#   include "config.h"
+#   include "intmath.h"
+#endif
+由于这个问题：正确解决方法是，libavutil的头文件包含路径应该为libav。但是这个造成一个问题，config.h，的问题。
+类似问题：
+#ifdef HAVE_AV_CONFIG_H
+#    include "internal.h"
+#endif /* HAVE_AV_CONFIG_H */
+#if ARCH_X86
+#   include "x86/emms.h"
+#endif
+
+#include "libm.h"
+
+YASMFLAGS=-f win32  -DPREFIX
+编译汇编代码，出错：
+1>  Assembling emms.asm
+1>C:\Program Files (x86)\MSBuild\Microsoft.Cpp\v4.0\V120\BuildCustomizations\vsyasm.targets(45,5): error MSB3721: The command ""C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin\"vsyasm.exe -Xvc -f win32 -o "Debug\\" -rnasm -pnasm  E:\libav\libavutil\x86\emms.asm" exited with code 1.
+
+"C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin\"vsyasm.exe -Xvc -f win32 -o "Debug\\" -l "" -P "" --mapdir= "" -E "" --prefix "" --suffix "" -rnasm -pnasm  E:\libav\libavutil\x86\cpuid.asm   直接运行这句，发现问题：FATAL: unable to open include file `libavutil/x86/x86inc.asm'
+E:\libav\libavutil\x86\x86util.asm 包含下面这句：%include "libavutil/x86/x86inc.asm"
+暂时的解决方法：%include "libavutil/x86/x86inc.asm"改为"x86inc.asm"
+修改成：IFLAGS     := -I. -I$(SRC_PATH)， -I../include/，指定头文件搜索路径
+
+对比X264的asm文件编译：
+"C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin\"vsyasm.exe -Xvc -f win32 -d "PREFIX" -d "STACK_ALIGNMENT=4" -d "HIGH_BIT_DEPTH=0" -d "BIT_DEPTH=8" -d "WIN32=1" -d "ARCH_X86_64=0" -o "Debug\\" -l "" -P "" --mapdir= "" -E "" --prefix "" --suffix "" -rnasm -pnasm  E:\x264\common\x86\cabac-a.asm
+
+找不到宏定义：
+E:\libav\Makefile 
+IFLAGS     := -I. -I$(SRC_PATH)
+YASMFLAGS  += $(IFLAGS:%=%/) -Pconfig.asm  【Pre Include File】
+E:\libav\libavutil\x86\x86inc.asm(47): error : undefined symbol `ARCH_X86_64' in preprocessor
+
+汇编文件 和 源文件文件名相同，VC，的中间文件都存在同一个目录，造成下面错误：
+1>Debug\float_dsp.obj : warning LNK4042: object specified more than once; extras ignored
+1>Debug\lls.obj : warning LNK4042: object specified more than once; extras ignored
+1>Debug\cpu.obj : warning LNK4042: object specified more than once; extras ignored
+解决方法，修改汇编文件的中间文件名。注意，不修改yasm的中间文件名。yasm的Object File Name [-o "Debug\\aa.obj"] 不能修改输出的文件名，但是，工程链接时的obj文件名称
+
+测试程序编译成功链接libavutil成功。
+
+一个大问题：那些包含 #include "libavutil/xx" 头文件的文件列表：
+问题：有必要非这样写吗？有些在一个目录里的文件，可以，直接包含就可以吧？
+compat\strtod.c
+#include "libavutil/avstring.h"
+#include "libavutil/mathematics.h"
+
+compat\msvcrt\snprintf.c
+#include "libavutil/error.h"
+
+libavutil\x86\lls_init.c
+#include "libavutil/lls.h"
+#include "libavutil/x86/cpu.h"
+
+libavutil\x86\float_dsp_init.c
+#include "libavutil/attributes.h"
+#include "libavutil/cpu.h"
+#include "libavutil/float_dsp.h"
+
+libavutil\x86\cpu.c
+libavutil\x86\cpu.h
+#include "libavutil/cpu.h"
+#include "libavutil/cpu_internal.h"
+#include "libavutil/x86/asm.h"
+#include "libavutil/x86/cpu.h"
+
+libavutil\x86\w64xmmtest.h
+#include "libavutil/bswap.h"
+
+libavutil\x86\emms.h
+libavutil\x86\bswap.h
+libavutil\x86\intreadwrite.h
+#include "libavutil/attributes.h"
+#include "libavutil/attributes.h"
+#include "libavutil/attributes.h"
+
+libavutil\common.h
+libavutil\bswap.h
+libavutil\intreadwrite.h
+libavutil\pixfmt.h
+#include "libavutil/avconfig.h"
+#include "libavutil/avconfig.h"
+#include "libavutil/avconfig.h"
+#include "libavutil/avconfig.h"
+
+编译libavresample库，新问题(最终发现：yasm的Object File Name [-o "Debug\\aa.obj"] 不能修改输出的中间文件名)
+1>libavresample.lib(audio_convert_init.obj) : error LNK2019: 无法解析的外部符号 _ff_conv_s16_to_s32_sse2，该符号在函数 _ff_audio_convert_init_x86 中被引用
+1>libavresample.lib(audio_convert_init.obj) : error LNK2019: 无法解析的外部符号 _ff_conv_s16_to_flt_sse2，该符号在函数 _ff_audio_convert_init_x86 中被引用
+1>libavresample.lib(audio_convert_init.obj) : error LNK2019: 无法解析的外部符号 _ff_conv_s16_to_flt_sse4，该符号在函数 _ff_audio_convert_init_x86 中被引用
+原因是：虽然，VC，显示编译成功，但是没有生成，中间文件，这里指定的输出文件，无效：-o "Debug\/audio_convert_asm.o"
+"C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin\"vsyasm.exe -Xvc -f win32 -i "../include" -d "HAVE_AV_CONFIG_H" -o "Debug\/audio_convert_asm.o" -l "" -P "config.asm" --mapdir= "" -E "" --prefix "" --suffix "" -rnasm -pnasm  I:\libav\libavresample\x86\audio_convert.asm
+在命令行中，运行上面的命令，得到下面的错误信息：下面这个不是错误，是因为，当前路径不对。
+vsyasm: option `--prefix' needs an argument!
+vsyasm: option `--suffix' needs an argument!
+
+比较下，libavutil，成功编译的命令行
+"C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin\"vsyasm.exe -Xvc -f win32 -i "../include" -d "PREFIX" -d "HAVE_AV_CONFIG_H" -o "Debug\\" -l "" -P "config.asm" --mapdir= "" -E "" --prefix "" --suffix "" -rnasm -pnasm  I:\libav\libavutil\x86\cpuid.asm
+
+注意，不修改yasm的中间文件名。yasm的Object File Name [-o "Debug\\aa.obj"] 不能修改输出的文件名，但是，工程链接时的obj文件名称
+解决方法：个性C文件的输出obj文件名称。
+
+libswscale 《swscale代表什么意思》
+第一步：建立静态库工程
+第二步：添加C源文件，增加头文件搜索路径, -W4 
+第三步：为C文件，增加编译参数，编译并，复制必要的头文件到，指定的搜索路径
+-DHAVE_AV_CONFIG_H -D_ISOC99_SOURCE -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE -D_USE_MATH_DEFINES -D_CRT_SECURE_NO_WARNINGS -Dinline=__inline -Dstrtod=avpriv_strtod -Dsnprintf=avpriv_snprintf -D_snprintf=avpriv_snprintf -Dvsnprintf=avpriv_vsnprintf -Dstrtoll=_strtoi64  -wd4244 -wd4127 -wd4018 -wd4389 -wd4146 -wd4057 -wd4204 -wd4706 -wd4305 -wd4152 -wd4324 -we4013 -wd4100 -wd4214 -wd4273 
+第四步：添中到Test.exe链接，添加ASM文件
+1. 必须要先选中VC++ Build Customization Files的vsyasm，再添加ASM文件，否则不可编译
+2. (这个宏不用加HAVE_AV_CONFIG_H) （必须添加 PREFIX，查找这个问题，花费了6小时时间） 和 File -> Pre Include File config.asm 和 指定头文件搜索路径
+
+一个工程内，有两个相同的文件名，会出下面的警告：
+1>C:\Program Files (x86)\MSBuild\Microsoft.Cpp\v4.0\V120\Microsoft.CppBuild.targets(935,5): warning MSB8027: Two or more files with the name of rgb2rgb.c will produce outputs to the same location. This can lead to an incorrect build result.  The files involved are ..\..\libswscale\rgb2rgb.c, ..\..\libswscale\x86\rgb2rgb.c
+
+libswscale编译新问题：
+1>libswscale.lib(swscale-x86.obj) : error LNK2019: unresolved external symbol _ff_hscale8to15_4_mmx referenced in function _ff_sws_init_swscale_x86
+E:\libav\libswscale\x86\output.asm 为什么有些函数没有编译进obj文件里呢？
+;-----------------------------------------------------------------------------
+; horizontal line scaling
+;
+; void hscale<source_width>to<intermediate_nbits>_<filterSize>_<opt>
+;                               (SwsContext *c, int{16,32}_t *dst,
+;                                int dstW, const uint{8,16}_t *src,
+;                                const int16_t *filter,
+;                                const int32_t *filterPos, int filterSize);
+;
+; Scale one horizontal line. Input is either 8-bits width or 16-bits width
+; ($source_width can be either 8, 9, 10 or 16, difference is whether we have to
+; downscale before multiplying). Filter is 14-bits. Output is either 15bits
+; (in int16_t) or 19bits (in int32_t), as given in $intermediate_nbits. Each
+; output pixel is generated from $filterSize input pixels, the position of
+; the first pixel is given in filterPos[nOutputPixel].
+;-----------------------------------------------------------------------------
+#if ARCH_X86_32
+    if (EXTERNAL_MMX(cpu_flags)) {
+        ASSIGN_MMX_SCALE_FUNC(c->hyScale, c->hLumFilterSize, mmx, mmx);
+        ASSIGN_MMX_SCALE_FUNC(c->hcScale, c->hChrFilterSize, mmx, mmx);
+		
+怎么解决这个问题：利用，bash，make -f D -V=1 来查看，正常的编译参数。解决：必须添加 -DPREFIX
+yasm -f win32  -DPREFIX -I./ -I./ -Pconfig.asm -I libswscale/x86/ -M -o libswscale/x86/output.o libswscale/x86/output.asm > libswscale/x86/output.d
+yasm -f win32  -DPREFIX -I./ -I./ -Pconfig.asm -I libswscale/x86/ -o libswscale/x86/output.o libswscale/x86/output.asm
+
+E:\libav\libavutil\x86\x86inc.asm
+%ifdef PREFIX
+    %define mangle(x) _ %+ x
+%else
+    %define mangle(x) x
+%endif
+
+附C源文件编译命令行
+cl -nologo -I. -I. -D_ISOC99_SOURCE -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE -D_WIN32_WINNT=0x0502 -Dstrtod=avpriv_strtod -Dsnprintf=avpriv_snprintf -D_snprintf=avpriv_snprintf -Dvsnprintf=avpriv_vsnprintf -DHAVE_AV_CONFIG_H -I. -I. -D_ISOC99_SOURCE -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE -D_WIN32_WINNT=0x0502 -Dstrtod=avpriv_strtod -Dsnprintf=avpriv_snprintf -D_snprintf=avpriv_snprintf -Dvsnprintf=avpriv_vsnprintf -DHAVE_AV_CONFIG_H -nologo -D_USE_MATH_DEFINES -D_CRT_SECURE_NO_WARNINGS -Dinline=__inline -FIstdlib.h -Dstrtoll=_strtoi64    -ZI -MTd -W4 -wd4244 -wd4127 -wd4018 -wd4389 -wd4146 -wd4057 -wd4204 -wd4706 -wd4305 -wd4152 -wd4324 -we4013 -wd4100 -wd4214 -wd4273 -Od   -Oy-  -showIncludes -Zs libavutil/file_open.c 2>&1 | awk '/including/ { sub(/^.*file: */, ""); gsub(/\\/, "/"); if (!match($0, / /)) print "libavutil/file_open.o:", $0 }' > libavutil/file_open.d
+
+cl 
+-I. -I. 
+-D_ISOC99_SOURCE -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE -D_WIN32_WINNT=0x0502 
+-Dstrtod=avpriv_strtod -Dsnprintf=avpriv_snprintf -D_snprintf=avpriv_snprintf -Dvsnprintf=avpriv_vsnprintf 
+-DHAVE_AV_CONFIG_H -nologo -D_USE_MATH_DEFINES -D_CRT_SECURE_NO_WARNINGS -Dinline=__inline -FIstdlib.h -Dstrtoll=_strtoi64    
+-ZI -MTd 
+-W4 -wd4244 -wd4127 -wd4018 -wd4389 -wd4146 -wd4057 -wd4204 -wd4706 -wd4305 -wd4152 -wd4324 -we4013 -wd4100 -wd4214 -wd4273 
+-Od   -Oy-   
+-c -Folibavutil/file_open.o libavutil/file_open.c
+
+libavformt 
+1. 依赖libavcodec的一些头文件
+   依赖最严重的源文件E:\libav\libavformat\sdp.c
+2. libavformt调用了一些libavcodec的函数
+
+libavcodec
+
+编译Release版本，新的警告，可能与release的编译优化选项有关
+1>LINK : warning C4742: 'ff_dither_8x8_128' has different alignment in 'E:\libav\libswscale\swscale.c' and 'E:\libav\libswscale\swscale_unscaled.c': 8 and 1
+1>LINK : warning C4744: 'ff_dither_8x8_128' has different type in 'E:\libav\libswscale\swscale.c' and 'E:\libav\libswscale\swscale_unscaled.c': '__declspec(align(8)) array (64 bytes)' and 'array (64 bytes)'
+1>LINK : warning C4742: 'ff_dither_8x8_73' has different alignment in 'E:\libav\libswscale\output.c' and 'E:\libav\libswscale\yuv2rgb.c': 8 and 1
+1>LINK : warning C4744: 'ff_dither_8x8_73' has different type in 'E:\libav\libswscale\output.c' and 'E:\libav\libswscale\yuv2rgb.c': '__declspec(align(8)) array (64 bytes)' and 'array (64 bytes)'
+1>LINK : warning C4742: 'ff_dither_8x8_32' has different alignment in 'E:\libav\libswscale\output.c' and 'E:\libav\libswscale\yuv2rgb.c': 8 and 1
+1>LINK : warning C4744: 'ff_dither_8x8_32' has different type in 'E:\libav\libswscale\output.c' and 'E:\libav\libswscale\yuv2rgb.c': '__declspec(align(8)) array (64 bytes)' and 'array (64 bytes)'
+1>LINK : warning C4742: 'ff_dither_8x8_220' has different alignment in 'E:\libav\libswscale\output.c' and 'E:\libav\libswscale\yuv2rgb.c': 8 and 1
+1>LINK : warning C4744: 'ff_dither_8x8_220' has different type in 'E:\libav\libswscale\output.c' and 'E:\libav\libswscale\yuv2rgb.c': '__declspec(align(8)) array (64 bytes)' and 'array (64 bytes)'
+1>LINK : warning C4742: 'ff_dither_4x4_16' has different alignment in 'E:\libav\libswscale\output.c' and 'E:\libav\libswscale\yuv2rgb.c': 8 and 1
+1>LINK : warning C4744: 'ff_dither_4x4_16' has different type in 'E:\libav\libswscale\output.c' and 'E:\libav\libswscale\yuv2rgb.c': '__declspec(align(8)) array (32 bytes)' and 'array (32 bytes)'
+
+Compiler Warning (Level 1) C4742
+'var' has different alignment in 'file1' and 'file2': number and number
+To resolve this warning, either use the same type definition or use different names for the variables.
+
+This is a release build(therefore the optimizations), but in debug builds without the optimizations it does not show these warnings. 
+
+《libavformat源文件分析》《libavcodec源文件分析》
+
+libavformat 添加protoccol
+OBJS-$(CONFIG_FILE_PROTOCOL)             += file.o
+
+libavformat 添加muxer/demuxer
+特殊的：
+OBJS-$(CONFIG_NETWORK)                   += network.o
+OBJS-$(CONFIG_RIFFDEC)                   += riffdec.o
+OBJS-$(CONFIG_RIFFENC)                   += riffenc.o
+OBJS-$(CONFIG_RTPDEC)                    += rdt.o                       \
+                                            rtp.o                       \
+                                            rtpdec.o                    \
+                                            rtpdec_amr.o                \
+                                            rtpdec_asf.o                \
+                                            rtpdec_g726.o               \
+                                            rtpdec_h263.o               \
+                                            rtpdec_h263_rfc2190.o       \
+                                            rtpdec_h264.o               \
+                                            rtpdec_ilbc.o               \
+                                            rtpdec_jpeg.o               \
+                                            rtpdec_latm.o               \
+                                            rtpdec_mpeg12.o             \
+                                            rtpdec_mpeg4.o              \
+                                            rtpdec_mpegts.o             \
+                                            rtpdec_qcelp.o              \
+                                            rtpdec_qdm2.o               \
+                                            rtpdec_qt.o                 \
+                                            rtpdec_svq3.o               \
+                                            rtpdec_vp8.o                \
+                                            rtpdec_xiph.o               \
+                                            srtp.o
+OBJS-$(CONFIG_RTPENC_CHAIN)              += rtpenc_chain.o rtp.o
+
+OBJS-$(HAVE_LIBC_MSVCRT)                 += file_open.o
+
+自定义添加的：
+OBJS-$(CONFIG_MOV_DEMUXER)               += isom.o mov_chan.o mov.o
+OBJS-$(CONFIG_MOV_MUXER)                 += isom.o mov_chan.o movenc.o avc.o hevc.o movenchint.o
+
+链接找不到下面的符号
+1>libavformat.lib(movenc.obj) : error LNK2019: unresolved external symbol _ff_put_wav_header ----->E:\libav\libavformat\riffenc.c
+1>libavformat.lib(mov.obj) : error LNK2019: unresolved external symbol _ff_get_wav_header ----->E:\libav\libavformat\riffdec.c
+1>libavformat.lib(mov.obj) : error LNK2001: unresolved external symbol _avpriv_ac3_channel_layout_tab ----->E:\libav\libavcodec\ac3tab.c
+1>libavformat.lib(isom.obj) : error LNK2019: unresolved external symbol _avpriv_mpeg4audio_get_config ----->E:\libav\libavcodec\mpeg4audio.c
+1>libavformat.lib(isom.obj) : error LNK2001: unresolved external symbol _avpriv_mpa_freq_tab  ----->E:\libav\libavcodec\mpegaudiodata.c
+1>libavformat.lib(movenchint.obj) : error LNK2019: unresolved external symbol _ff_rtp_chain_mux_open ----->E:\libav\libavformat\rtpenc_chain.c
+
+

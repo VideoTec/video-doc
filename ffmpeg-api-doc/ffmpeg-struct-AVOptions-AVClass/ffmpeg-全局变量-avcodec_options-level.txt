@@ -1,0 +1,27 @@
+第一点：AVCodecContext
+
+    /**
+     * level
+     * - encoding: Set by user.
+     * - decoding: Set by libavcodec.
+     */
+     int level;
+#define FF_LEVEL_UNKNOWN -99
+
+第二点 avcodec_options
+
+{"level", NULL, OFFSET(level), AV_OPT_TYPE_INT, {.i64 = FF_LEVEL_UNKNOWN }, INT_MIN, INT_MAX, V|A|E, "level"},
+
+第三点 level 什么意思，有那些值？
+
+static int mpeg4_decode_profile_level(MpegEncContext *s, GetBitContext *gb)
+  s->avctx->profile = get_bits(gb, 4);
+  s->avctx->level   = get_bits(gb, 4);
+
+ff_h264_decode_slice_header(H264Context *h, H264SliceContext *sl)
+  h->avctx->level   = h->sps.level_idc;  H264Context *h / struct SPS::level_idc
+
+static av_cold int X264_init(AVCodecContext *avctx)
+  if (avctx->level > 0)
+    x4->params.i_level_idc = avctx->level;  x264_param_t X264Context::params
+

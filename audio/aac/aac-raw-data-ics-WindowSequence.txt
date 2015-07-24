@@ -1,0 +1,21 @@
+两位 
+
+decode_ics_info 用于解析这个值
+
+MDCT 窗函数类型
+
+enum WindowSequence {
+    ONLY_LONG_SEQUENCE,    长窗
+    LONG_START_SEQUENCE,   长块到短块的过度窗
+    EIGHT_SHORT_SEQUENCE,  短窗
+    LONG_STOP_SEQUENCE,    短块到长块的过度窗
+};
+
+在信号处理中，窗函数(window function)是一种除在给定区间之外取值均为0的实函数。
+譬如：在给定区间内为常数而在区间外为0的窗函数被形象地称为矩形窗。
+任何函数与窗函数之积仍为窗函数，所以相乘的结果就像透过窗口“看”其他函数一样。
+窗函数在
+频谱分析、
+滤波器设计、
+波束形成、以及
+音频数据压缩（如在Ogg Vorbis音频格式中）等方面有广泛的应用

@@ -1,0 +1,26 @@
+libav 中的结构体定义
+
+http://www.cnblogs.com/gaozehua/archive/2012/02/14/2351843.html
+解码ics_info()
+
+/**
+ * Individual Channel Stream
+ */
+typedef struct IndividualChannelStream {
+    uint8_t max_sfb;            ///< number of scalefactor[美][s'keɪlɪfæktər] 比例尺因子 bands per group
+	                            表示每个窗组内的 scalefactor band 的个数
+    enum WindowSequence window_sequence[2];
+    uint8_t use_kb_window[2];   ///< If set, use Kaiser-Bessel window, otherwise use a sine window.  0：正弦窗 1：KBD窗
+    int num_window_groups;
+    uint8_t group_len[8];
+    LongTermPrediction ltp;
+    const uint16_t *swb_offset; ///< table of offsets to the lowest spectral coefficient of a scalefactor band, sfb, for a particular window
+    const uint8_t *swb_sizes;   ///< table of scalefactor band sizes for a particular window
+    int num_swb;                ///< number of scalefactor window bands
+    int num_windows;
+    int tns_max_bands;
+    int predictor_present;
+    int predictor_initialized;
+    int predictor_reset_group;
+    uint8_t prediction_used[41];
+} IndividualChannelStream;

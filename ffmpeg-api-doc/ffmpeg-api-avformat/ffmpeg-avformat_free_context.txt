@@ -1,0 +1,128 @@
+/**
+ * Free an AVFormatContext and all its streams.
+ * @param s context to free
+ */
+void avformat_free_context(AVFormatContext *s);
+
+------------------------------
+注意: 
+avformat_close_input(&fmtctx);  // which include avformat_free_context
+avformat_close_input            会调用 avformat_free_context + avio_close
+------------------------------
+
+注意：会 free 一部分 AVCodecConntext，但不会调用 avcodec_close
+        av_free(st->codec->extradata);
+        av_free(st->codec->subtitle_header);
+        av_free(st->codec);
+
+注意：avio_close 什么时候调用，什么时候释放 pb?
+
+------------------------------
+avconv.c 示例代码 
+------------------------------
+    /* close files */
+    for (i = 0; i < nb_output_files; i++) {
+        OutputFile *of = output_files[i];
+        AVFormatContext *s = of->ctx;
+        if (s && s->oformat && !(s->oformat->flags & AVFMT_NOFILE) && s->pb)
+            avio_close(s->pb);
+        avformat_free_context(s);
+        av_dict_free(&of->opts);
+
+        av_freep(&output_files[i]);
+    }
+
+----------------------
+libav 源码
+----------------------
+void avformat_free_context(AVFormatContext *s)
+{
+    int i, j;
+    AVStream *st;
+
+    if (!s)
+        return;
+
+    av_opt_free(s);
+    if (s->iformat && s->iformat->priv_class && s->priv_data)
+        av_opt_free(s->priv_data);
+
+    for (i = 0; i < s->nb_streams; i++) {
+        /* free all data in a stream component */
+        st = s->streams[i];
+
+        for (j = 0; j < st->nb_side_data; j++)
+            av_freep(&st->side_data[j].data);
+        av_freep(&st->side_data);
+        st->nb_side_data = 0;
+
+        if (st->parser) {
+            av_parser_close(st->parser);
+        }
+        if (st->attached_pic.data)
+            av_free_packet(&st->attached_pic);
+        av_dict_free(&st->metadata);
+        av_freep(&st->probe_data.buf);
+        av_free(st->index_entries);
+        av_free(st->codec->extradata);
+        av_free(st->codec->subtitle_header);
+        av_free(st->codec);
+        av_free(st->priv_data);
+        av_free(st->info);
+        av_free(st);
+    }
+    for (i = s->nb_programs - 1; i >= 0; i--) {
+        av_dict_free(&s->programs[i]->metadata);
+        av_freep(&s->programs[i]->stream_index);
+        av_freep(&s->programs[i]);
+    }
+    av_freep(&s->programs);
+    av_freep(&s->priv_data);
+    while (s->nb_chapters--) {
+        av_dict_free(&s->chapters[s->nb_chapters]->metadata);
+        av_free(s->chapters[s->nb_chapters]);
+    }
+    av_freep(&s->chapters);
+    av_dict_free(&s->metadata);
+    av_freep(&s->streams);
+    av_freep(&s->internal);
+    av_free(s);
+}
+
+----------------------
+ffmpeg 源码 多了个 ff_free_stream 函数
+----------------------
+void avformat_free_context(AVFormatContext *s)
+{
+    int i;
+
+    if (!s)
+        return;
+
+    av_opt_free(s);
+    if (s->iformat && s->iformat->priv_class && s->priv_data)
+        av_opt_free(s->priv_data);
+    if (s->oformat && s->oformat->priv_class && s->priv_data)
+        av_opt_free(s->priv_data);
+
+    for (i = s->nb_streams - 1; i >= 0; i--) {
+        ff_free_stream(s, s->streams[i]);
+    }
+    for (i = s->nb_programs - 1; i >= 0; i--) {
+        av_dict_free(&s->programs[i]->metadata);
+        av_freep(&s->programs[i]->stream_index);
+        av_freep(&s->programs[i]);
+    }
+    av_freep(&s->programs);
+    av_freep(&s->priv_data);
+    while (s->nb_chapters--) {
+        av_dict_free(&s->chapters[s->nb_chapters]->metadata);
+        av_freep(&s->chapters[s->nb_chapters]);
+    }
+    av_freep(&s->chapters);
+    av_dict_free(&s->metadata);
+    av_freep(&s->streams);
+    av_freep(&s->internal);
+    flush_packet_queue(s);
+    av_free(s);
+}

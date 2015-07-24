@@ -1,0 +1,475 @@
+《分析libavcodec\makefile》最重要的是文件分类
+
+分组：source,codecs,basic
+第一步：source：先把最基本的源文件加入工程，并编译。需要把allcodecs里的所有编码等等都注释了
+第二步：basic： 最基本的配置：见configure脚本的定义，分成一个个小块，每个块有一个或者多个源文件
+                                                     并且定义了块之间的依赖关系
+SUBSYSTEM_LIST="
+    dct
+    doc
+    error_resilience
+    fft
+    lsp
+    lzo
+    mdct
+    network
+    rdft
+"
+# options emitted with CONFIG_ prefix but not available on the command line
+CONFIG_EXTRA="
+    aandcttables
+    ac3dsp
+    audio_frame_queue
+    audiodsp
+    blockdsp
+    bswapdsp
+    cabac
+    dvprofile
+    fdctdsp
+    gcrypt
+    golomb
+    gplv3
+    h263dsp
+    h264chroma
+    h264dsp
+    h264pred
+    h264qpel
+    hpeldsp
+    huffman
+    huffyuvdsp
+    huffyuvencdsp
+    idctdsp
+    iirfilter
+    intrax8
+    lgplv3
+    lpc
+    me_cmp
+    mpeg_er
+    mpegaudio
+    mpegaudiodsp
+    mpegvideo
+    mpegvideoenc
+    nettle
+    pixblockdsp
+    qpeldsp
+    rangecoder
+    riffdec
+    riffenc
+    rtpdec
+    rtpenc_chain
+    sinewin
+    startcode
+    tpeldsp
+    videodsp
+    vp3dsp
+"
+
+THREADS_LIST="
+    pthreads
+    w32threads
+"
+
+me_cmp_select="fdctdsp idctdsp pixblockdsp"
+mpegvideo_select="blockdsp hpeldsp idctdsp me_cmp videodsp"
+mpegvideoenc_select="me_cmp mpegvideo pixblockdsp qpeldsp"
+
+OBJS-$(CONFIG_AANDCTTABLES)            += aandcttab.o
+OBJS-$(CONFIG_MPEG_ER)                 += mpeg_er.o
+OBJS-$(CONFIG_SINEWIN)                 += sinewin.o
+OBJS-$(CONFIG_AUDIO_FRAME_QUEUE)       += audio_frame_queue.o     struct AudioFrame struct AudioFrameQueue
+OBJS-$(CONFIG_IIRFILTER)               += iirfilter.o             IIR filter
+OBJS-$(CONFIG_ERROR_RESILIENCE)        += error_resilience.o
+OBJS-$(HAVE_LIBC_MSVCRT)               += file_open.o
+OBJS-$(HAVE_THREADS)                   += pthread.o pthread_slice.o pthread_frame.o
+RDFT-OBJS-$(CONFIG_HARDCODED_TABLES)   += sin_tables.o
+OBJS-$(CONFIG_GOLOMB)                  += golomb.o
+OBJS-$(CONFIG_CABAC)                   += cabac.o                  Context Adaptive Binary Arithmetic Coder
+                                                                   前文参考之适应性二元算术编码
+																   CABAC分为三个部份，Binarizer, Context Modeler和 Arithmetic Coding Engine
+OBJS-$(CONFIG_STARTCODE)               += startcode.o              Accelerated start code search function for start codes common to
+                                                                   MPEG-1/2/4 video, VC-1, H.264/5
+OBJS-$(CONFIG_TPELDSP)                 += tpeldsp.o                thirdpel DSP functions
+
+//这两个暂时用不到
+OBJS-$(CONFIG_RDFT)                    += rdft.o $(RDFT-OBJS-yes)
+OBJS-$(CONFIG_LSP)                     += lsp.o
+
+//h264chroma
+OBJS-$(CONFIG_H264CHROMA)              += h264chroma.o
+OBJS-$(CONFIG_H264CHROMA)              += x86/h264chroma_init.o
+YASM-OBJS-$(CONFIG_H264CHROMA)         += x86/h264_chromamc.o x86/h264_chromamc_10bit.o
+
+//h264dsp
+OBJS-$(CONFIG_H264DSP)                 += h264dsp.o h264idct.o
+OBJS-$(CONFIG_H264DSP)                 += x86/h264dsp_init.o
+YASM-OBJS-$(CONFIG_H264DSP)            += x86/h264_deblock.o x86/h264_deblock_10bit.o x86/h264_idct.o 
+                                          x86/h264_idct_10bit.o x86/h264_weight.o x86/h264_weight_10bit.o
+
+//h264pred
+OBJS-$(CONFIG_H264PRED)                += h264pred.o
+OBJS-$(CONFIG_H264PRED)                += x86/h264_intrapred_init.o
+YASM-OBJS-$(CONFIG_H264PRED)           += x86/h264_intrapred.o x86/h264_intrapred_10bit.o
+
+//h264qpel
+OBJS-$(CONFIG_H264QPEL)                += h264qpel.o
+OBJS-$(CONFIG_H264QPEL)                += x86/h264_qpel.o
+YASM-OBJS-$(CONFIG_H264QPEL)           += x86/h264_qpel_8bit.o x86/h264_qpel_10bit.o x86/fpel.o x86/qpel.o
+
+//fdctdsp
+OBJS-$(CONFIG_FDCTDSP)                 += fdctdsp.o faandct.o jfdctfst.o jfdctint.o
+OBJS-$(CONFIG_FDCTDSP)                 += x86/fdctdsp_init.o
+MMX-OBJS-$(CONFIG_FDCTDSP)             += x86/fdct.o
+
+//blockdsp
+OBJS-$(CONFIG_BLOCKDSP)                += blockdsp.o
+OBJS-$(CONFIG_BLOCKDSP)                += x86/blockdsp.o
+
+//intrax8
+OBJS-$(CONFIG_INTRAX8)                 += intrax8.o intrax8dsp.o
+
+//hpeldsp
+OBJS-$(CONFIG_HPELDSP)                 += hpeldsp.o
+OBJS-$(CONFIG_HPELDSP)                 += x86/hpeldsp_init.o
+MMX-OBJS-$(CONFIG_HPELDSP)             += x86/fpel_mmx.o x86/hpeldsp_mmx.o
+YASM-OBJS-$(CONFIG_HPELDSP)            += x86/fpel.o x86/hpeldsp.o
+
+//pixblockdsp
+OBJS-$(CONFIG_PIXBLOCKDSP)             += pixblockdsp.o
+OBJS-$(CONFIG_PIXBLOCKDSP)             += x86/pixblockdsp_init.o
+YASM-OBJS-$(CONFIG_PIXBLOCKDSP)        += x86/pixblockdsp.o
+
+//videodsp
+OBJS-$(CONFIG_VIDEODSP)                += videodsp.o
+OBJS-$(CONFIG_VIDEODSP)                += x86/videodsp_init.o
+YASM-OBJS-$(CONFIG_VIDEODSP)           += x86/videodsp.o
+
+//me_cmp
+OBJS-$(CONFIG_ME_CMP)                  += me_cmp.o  Motion estimation: MpegEncContext
+OBJS-$(CONFIG_ME_CMP)                  += x86/me_cmp_init.o
+YASM-OBJS-$(CONFIG_ME_CMP)             += x86/me_cmp.o
+
+//h263dsp
+OBJS-$(CONFIG_H263DSP)                 += h263dsp.o
+OBJS-$(CONFIG_H263DSP)                 += x86/h263dsp_init.o
+YASM-OBJS-$(CONFIG_H263DSP)            += x86/h263_loopfilter.o
+
+//fft mdct
+FFT-OBJS-$(CONFIG_HARDCODED_TABLES)    += cos_tables.o cos_fixed_tables.o
+OBJS-$(CONFIG_FFT)                     += avfft.o fft_fixed.o fft_float.o $(FFT-OBJS-yes)
+OBJS-$(CONFIG_FFT)                     += x86/fft_init.o
+YASM-OBJS-$(CONFIG_FFT)                += x86/fft.o
+OBJS-$(CONFIG_MDCT)                    += mdct_fixed.o mdct_float.o
+
+//idctdsp
+OBJS-$(CONFIG_IDCTDSP)                 += idctdsp.o faanidct.o simple_idct.o jrevdct.o
+OBJS-$(CONFIG_IDCTDSP)                 += x86/idctdsp_init.o
+MMX-OBJS-$(CONFIG_IDCTDSP)             += x86/idctdsp_mmx.o x86/simple_idct.o
+
+//qpeldsp
+OBJS-$(CONFIG_QPELDSP)                 += qpeldsp.o
+OBJS-$(CONFIG_QPELDSP)                 += x86/qpeldsp_init.o
+YASM-OBJS-$(CONFIG_QPELDSP)            += x86/qpeldsp.o x86/fpel.o x86/qpel.o
+
+//mpegvideo mpegvideoenc( The simplest mpeg encoder (well, it was the simplest!) )
+mpegvideo.o mpegvideo_enc.o mpegvideo_motion.o mpegvideodsp.o mpegvideoencdsp.o
+mpeg12data.o mpegutils.o motion_est.o ratecontrol.o
+x86/mpegvideo.o x86/mpegvideodsp.o x86/mpegvideoenc.o x86/mpegvideoencdsp_init.o x86/mpegvideoencdsp.o
+OBJS-$(CONFIG_MPEGVIDEO)               += mpegvideo.o mpegvideodsp.o mpegvideo_motion.o mpegutils.o
+OBJS-$(CONFIG_MPEGVIDEO)               += x86/mpegvideo.o x86/mpegvideodsp.o
+OBJS-$(CONFIG_MPEGVIDEOENC)            += mpegvideo_enc.o mpeg12data.o motion_est.o ratecontrol.o mpegvideoencdsp.o
+OBJS-$(CONFIG_MPEGVIDEOENC)            += x86/mpegvideoenc.o x86/mpegvideoencdsp_init.o
+YASM-OBJS-$(CONFIG_MPEGVIDEOENC)       += x86/mpegvideoencdsp.o
+
+第三步：添加codecs（aac -> h263 -> rv10/rv20[这时需要处理大量链接错误] ->）
+1)aac: 
+2)h261
+3)h263, h263i, mpeg4, flv
+4)rv10,rv20,mpeg1video,mpeg2video,jpegls,mjpeg
+5)msmpeg4v1 msmpeg4v2 msmpeg4v3
+6) svq3 h264
+
+1）aac: 
+aacadtsdec.o aaccoder.o aacdec.o aacenc.o aacps.o aacpsdsp.o aacpsy.o aacsbr.o aactab.o  
+mpeg4audio.o kbdwin.o sbrdsp.o psymodel.o
+aac_decoder_select="mdct sinewin"
+aac_encoder_select="audio_frame_queue iirfilter mdct sinewin"
+OBJS-$(CONFIG_AAC_ENCODER)             += aacenc.o aaccoder.o aacpsy.o aactab.o psymodel.o mpeg4audio.o kbdwin.o
+OBJS-$(CONFIG_AAC_DECODER)             += aacdec.o aactab.o aacsbr.o aacps.o aacadtsdec.o mpeg4audio.o kbdwin.o sbrdsp.o aacpsdsp.o
+
+OBJS-$(CONFIG_AAC_DECODER)             += x86/sbrdsp_init.o
+YASM-OBJS-$(CONFIG_AAC_DECODER)        += x86/sbrdsp.o
+
+2)h261
+h261_decoder_select="mpeg_er mpegvideo"
+h261_encoder_select="aandcttables mpegvideoenc"
+OBJS-$(CONFIG_H261_DECODER)            += h261dec.o h261data.o h261.o
+OBJS-$(CONFIG_H261_ENCODER)            += h261enc.o h261data.o h261.o
+
+3)h263, h263i, mpeg4, flv
+h263_decoder_select="error_resilience h263_parser h263dsp mpeg_er mpegvideo qpeldsp"
+h263_encoder_select="aandcttables h263dsp mpegvideoenc"
+h263i_decoder_select="h263_decoder"
+h263p_encoder_select="h263_encoder"
+                                   （flvdec.o flvenc.o h263.o h263dec.o 
+                                   mpeg4video.o mpeg4videodec.o mpeg4videoenc.o 
+                                   intelh263dec.o ituh263dec.o ituh263enc.o）
+OBJS-$(CONFIG_H263_DECODER)            += h263dec.o h263.o ituh263dec.o mpeg4video.o mpeg4videodec.o flvdec.o intelh263dec.o
+OBJS-$(CONFIG_H263_ENCODER)            += mpeg4videoenc.o mpeg4video.o h263.o ituh263enc.o flvenc.o
+【不需要别的源文件了】CONFIG_H263I_DECODER 
+
+mpeg4_decoder_select="h263_decoder mpeg4video_parser"
+mpeg4_encoder_select="h263_encoder"
+OBJS-$(CONFIG_MPEG4_DECODER)           += xvididct.o
+OBJS-$(CONFIG_MPEG4_DECODER)           += x86/xvididct_init.o
+MMX-OBJS-$(CONFIG_MPEG4_DECODER)       += x86/idct_mmx_xvid.o x86/idct_sse2_xvid.o
+【不需要别的源文件了】CONFIG_MPEG4_ENCODER
+
+flv_decoder_select="h263_decoder"
+flv_encoder_select="h263_encoder"
+【不需要别的源文件了】CONFIG_FLV_DECODER 1 
+【不需要别的源文件了】CONFIG_FLV_ENCODER 1
+
+4)rv10,rv20,mpeg1video,mpeg2video,jpegls,mjpeg
+
+mpeg2video_decoder_select="error_resilience mpeg_er mpegvideo"
+mpeg2video_encoder_select="aandcttables mpegvideoenc"
+mpeg12.o mpeg12dec.o mpeg12data.o mpeg12enc.o
+OBJS-$(CONFIG_MPEG1VIDEO_DECODER)      += mpeg12dec.o mpeg12.o mpeg12data.o
+OBJS-$(CONFIG_MPEG1VIDEO_ENCODER)      += mpeg12enc.o mpeg12.o
+OBJS-$(CONFIG_MPEG2VIDEO_DECODER)      += mpeg12dec.o mpeg12.o mpeg12data.o
+OBJS-$(CONFIG_MPEG2VIDEO_ENCODER)      += mpeg12enc.o mpeg12.o
+
+rv10,rv10enc,rv20enc 由configure脚本可知：RV1020编译器，需要h263_encoder
+rv10_decoder_select="error_resilience h263_decoder h263dsp mpeg_er"
+rv10_encoder_select="h263_encoder"
+OBJS-$(CONFIG_RV10_DECODER)            += rv10.o
+OBJS-$(CONFIG_RV10_ENCODER)            += rv10enc.o
+OBJS-$(CONFIG_RV20_DECODER)            += rv10.o
+OBJS-$(CONFIG_RV20_ENCODER)            += rv20enc.o
+
+mjpeg_decoder_select="blockdsp hpeldsp idctdsp"
+mjpeg_encoder_select="aandcttables mpegvideoenc"
+jpegls_decoder_select="golomb mjpeg_decoder"
+jpegls_encoder_select="golomb"
+Motion JPEG（M-JPEG 或 MJPEG，Motion Joint Photographic Experts Group,FourCC:MJPG）是一种视频压缩格式，其中每一帧图像都分别使用JPEG编码
+OBJS-$(CONFIG_MJPEG_DECODER)           += mjpegdec.o mjpeg.o
+OBJS-$(CONFIG_MJPEG_ENCODER)           += mjpegenc.o mjpeg.o mjpegenc_common.o
+OBJS-$(CONFIG_JPEGLS_DECODER)          += jpeglsdec.o jpegls.o
+OBJS-$(CONFIG_JPEGLS_ENCODER)          += jpeglsenc.o jpegls.o
+
+5) msmpeg4v1 msmpeg4v2 msmpeg4v3
+msmpeg4v1_decoder_select="h263_decoder"
+msmpeg4v2_decoder_select="h263_decoder"
+msmpeg4v2_encoder_select="h263_encoder"
+msmpeg4v3_decoder_select="h263_decoder"
+msmpeg4v3_encoder_select="h263_encoder"
+//msmpeg4.o msmpeg4data.o msmpeg4dec msmpeg4enc
+OBJS-$(CONFIG_MSMPEG4V1_DECODER)       += msmpeg4dec.o msmpeg4.o msmpeg4data.o
+OBJS-$(CONFIG_MSMPEG4V2_DECODER)       += msmpeg4dec.o msmpeg4.o msmpeg4data.o
+OBJS-$(CONFIG_MSMPEG4V2_ENCODER)       += msmpeg4enc.o msmpeg4.o msmpeg4data.o
+OBJS-$(CONFIG_MSMPEG4V3_DECODER)       += msmpeg4dec.o msmpeg4.o msmpeg4data.o
+OBJS-$(CONFIG_MSMPEG4V3_ENCODER)       += msmpeg4enc.o msmpeg4.o msmpeg4data.o
+
+wmapro_decoder_select="mdct sinewin"
+wmav1_decoder_select="mdct sinewin"
+wmav1_encoder_select="mdct sinewin"
+wmav2_decoder_select="mdct sinewin"
+wmav2_encoder_select="mdct sinewin"
+wmavoice_decoder_select="lsp rdft dct mdct sinewin"
+wmv1_decoder_select="h263_decoder"
+wmv1_encoder_select="h263_encoder"
+wmv2_decoder_select="blockdsp h263_decoder idctdsp intrax8 videodsp"
+wmv2_encoder_select="h263_encoder"
+wmv3_decoder_select="vc1_decoder"
+wmv3image_decoder_select="wmv3_decoder"
+// wmv2.o wmv2dsp.o wmv2dec.o wmv2enc.o
+OBJS-$(CONFIG_WMV2_DECODER)            += wmv2dec.o wmv2.o wmv2dsp.o msmpeg4dec.o msmpeg4.o msmpeg4data.o
+OBJS-$(CONFIG_WMV2_ENCODER)            += wmv2enc.o wmv2.o wmv2dsp.o msmpeg4.o msmpeg4enc.o msmpeg4data.o
+
+6) svq3 h264
+h264_decoder_select="cabac golomb h264chroma h264dsp h264pred h264qpel startcode videodsp"
+h264_decoder_suggest="error_resilience"
+svq3_decoder_select="h264_decoder hpeldsp tpeldsp"
+svq3_decoder_suggest="zlib"
+
+OBJS-$(CONFIG_H264_DECODER)            += h264.o h264_cabac.o h264_cavlc.o h264_direct.o h264_loopfilter.o 
+                                          h264_mb.o h264_picture.o h264_ps.o h264_refs.o h264_sei.o h264_slice.o
+Sorenson提供了H.264实现方式（Sorenson Video Quantizer）
+OBJS-$(CONFIG_SVQ3_DECODER)            += svq3.o svq13.o mpegutils.o
+
+第四步：avformatDependencies # libavformat dependencies
+OBJS-$(CONFIG_MOV_DEMUXER)             += mpeg4audio.o mpegaudiodata.o ac3tab.o
+OBJS-$(CONFIG_MOV_MUXER)               += mpeg4audio.o mpegaudiodata.o(注意，不是mpegaudio.c)
+
+第五部分: # parsers
+OBJS-$(CONFIG_H263_PARSER)             += h263_parser.o
+
+mpeg4video_parser_select="error_resilience h263dsp mpeg_er mpegvideo qpeldsp"
+OBJS-$(CONFIG_MPEG4VIDEO_PARSER)       += mpeg4video_parser.o h263.o mpeg4videodec.o mpeg4video.o ituh263dec.o h263dec.o
+
+
+---------------------------------------------------------------------------------------------------------
+最重要的是找到，每个CONFIG对应的源文件列表，其次是分类理解。
+在工程里分类管理不同的源文件：按libavcodec\makefile分类，再分子类
+第一组，(share)共享组：parts needed for many different codecs
+        分类：算法（）、DSP（）、硬件加速（）
+第二组，(decoders-encoders)编码器组：decoders/encoders
+第三组，(PCM)(AD)PCM decoders/encoders
+第四组：(hardware-accelerators)hardware accelerators
+第五组：(libavformat-dependencies)libavformat dependencies
+第六组：(external-libraries)external codec libraries
+第七组：(parsers)parsers
+第八组：(bitstream-filters)bitstream filters
+第九组：(thread)thread libraries
+
+
+与config.h对比，确定需要编译那些源文件
+# parts needed for many different codecs
+OBJS-$(CONFIG_AANDCTTABLES)            += aandcttab.o
+OBJS-$(CONFIG_AUDIO_FRAME_QUEUE)       += audio_frame_queue.o
+OBJS-$(CONFIG_DXVA2)                   += dxva2.o
+OBJS-$(CONFIG_DSPUTIL)                 += dsputil.o faanidct.o simple_idct.o jrevdct.o
+OBJS-$(CONFIG_ENCODERS)                += faandct.o jfdctfst.o jfdctint.o
+OBJS-$(CONFIG_ERROR_RESILIENCE)        += error_resilience.o
+OBJS-$(CONFIG_FFT)                     += avfft.o fft_fixed.o fft_float.o $(FFT-OBJS-yes)
+OBJS-$(CONFIG_GOLOMB)                  += golomb.o
+OBJS-$(CONFIG_H263DSP)                 += h263dsp.o
+OBJS-$(CONFIG_H264CHROMA)              += h264chroma.o
+OBJS-$(CONFIG_H264DSP)                 += h264dsp.o h264idct.o
+OBJS-$(CONFIG_H264PRED)                += h264pred.o
+OBJS-$(CONFIG_H264QPEL)                += h264qpel.o
+OBJS-$(CONFIG_HPELDSP)                 += hpeldsp.o
+OBJS-$(CONFIG_INTRAX8)                 += intrax8.o intrax8dsp.o
+OBJS-$(CONFIG_MDCT)                    += mdct_fixed.o mdct_float.o
+OBJS-$(CONFIG_MPEGVIDEO)               += mpegvideo.o mpegvideo_motion.o
+OBJS-$(CONFIG_MPEGVIDEOENC)            += mpegvideo_enc.o mpeg12data.o motion_est.o ratecontrol.o
+OBJS-$(CONFIG_SINEWIN)                 += sinewin.o
+OBJS-$(CONFIG_VIDEODSP)                += videodsp.o
+
+//重要的是总结，编码器的分类，源文件依赖关系紧密程序，在工程中的归类
+# decoders/encoders （分类：包含AVCodec结构体的源文件，及，其它源文件）
+#define CONFIG_H261_DECODER 1 += h261dec.o h261data.o h261.o
+#define CONFIG_H261_ENCODER 1 += h261enc.o h261data.o h261.o
+#define CONFIG_H263_DECODER 1 += h263dec.o h263.o ituh263dec.o mpeg4video.o mpeg4videodec.o flvdec.o intelh263dec.o
+#define CONFIG_H263_ENCODER 1 += mpeg4videoenc.o mpeg4video.o h263.o ituh263enc.o flvenc.o
+#define CONFIG_H263I_DECODER 1
+#define CONFIG_MPEG4_DECODER 1
+#define CONFIG_MPEG4_ENCODER 1
+#define CONFIG_FLV_DECODER 1 
+#define CONFIG_FLV_ENCODER 1
+
+Sorenson提供了H.264实现方式（Sorenson Video Quantizer）
+#define CONFIG_SVQ3_DECODER 1 += svq3.o svq13.o h263.o h264.o h264_loopfilter.o h264_direct.o h264_sei.o h264_ps.o h264_refs.o h264_cavlc.o h264_cabac.o cabac.o
+#define CONFIG_H264_DECODER 1 += h264.o h264_loopfilter.o h264_direct.o cabac.o h264_sei.o h264_ps.o h264_refs.o h264_cavlc.o h264_cabac.o
+
+//msmpeg4.o msmpeg4data.o msmpeg4dec msmpeg4enc wmv2.o wmv2dsp.o wmv2dec.o wmv2enc.o
+#define CONFIG_MSMPEG4V1_DECODER 1 += msmpeg4dec.o msmpeg4.o msmpeg4data.o
+#define CONFIG_MSMPEG4V2_DECODER 1 += msmpeg4dec.o msmpeg4.o msmpeg4data.o h263dec.o h263.o ituh263dec.o mpeg4videodec.o
+#define CONFIG_MSMPEG4V2_ENCODER 1 += msmpeg4.o msmpeg4enc.o msmpeg4data.o h263.o
+#define CONFIG_MSMPEG4V3_DECODER 1 += msmpeg4dec.o msmpeg4.o msmpeg4data.o h263dec.o h263.o ituh263dec.o mpeg4videodec.o
+#define CONFIG_MSMPEG4V3_ENCODER 1 += msmpeg4.o msmpeg4enc.o msmpeg4data.o h263.o
+#define CONFIG_WMV2_DECODER 1 += wmv2dec.o wmv2.o wmv2dsp.o msmpeg4dec.o msmpeg4.o msmpeg4data.o
+#define CONFIG_WMV2_ENCODER 1 += wmv2enc.o wmv2.o wmv2dsp.o msmpeg4.o msmpeg4enc.o msmpeg4data.o
+
+#define CONFIG_AAC_DECODER 1 += aacdec.o aactab.o aacsbr.o aacps.o aacadtsdec.o mpeg4audio.o kbdwin.o sbrdsp.o aacpsdsp.o
+#define CONFIG_AAC_ENCODER 1 += aacenc.o aaccoder.o aacpsy.o aactab.o psymodel.o iirfilter.o mpeg4audio.o kbdwin.o
+
+JPEG-LS是一个“几乎”无损压缩格式
+JPEG-LS是ISO/ITU在1998年正式发布的无损/近无损连续色调静止图像压缩标准
+#define CONFIG_JPEGLS_DECODER 1 += jpeglsdec.o jpegls.o mjpegdec.o mjpeg.o
+#define CONFIG_JPEGLS_ENCODER 1 += jpeglsenc.o jpegls.o
+Motion JPEG（M-JPEG 或 MJPEG，Motion Joint Photographic Experts Group,FourCC:MJPG）是一种视频压缩格式，其中每一帧图像都分别使用JPEG编码
+#define CONFIG_MJPEG_DECODER 1 += mjpegdec.o mjpeg.o
+#define CONFIG_MJPEG_ENCODER 1 += mjpegenc.o mjpeg.o
+
+#define CONFIG_MPEG1VIDEO_DECODER 1 += mpeg12dec.o mpeg12.o mpeg12data.o
+#define CONFIG_MPEG1VIDEO_ENCODER 1 += mpeg12enc.o mpeg12.o
+#define CONFIG_MPEG2VIDEO_DECODER 1 += mpeg12dec.o mpeg12.o mpeg12data.o
+#define CONFIG_MPEG2VIDEO_ENCODER 1 += mpeg12enc.o mpeg12.o
+
+#define CONFIG_RV10_ENCODER 1 += rv10enc.o
+#define CONFIG_RV10_DECODER 1 += rv10.o
+#define CONFIG_RV20_ENCODER 1 += rv20enc.o
+#define CONFIG_RV20_DECODER 1 += rv10.o
+
+//# parsers
+#define CONFIG_H263_PARSER 1 += h263_parser.o
+#define CONFIG_MPEG4VIDEO_PARSER 1 += mpeg4video_parser.o [后面这些都已经在编码器里包含了：h263.o mpeg4videodec.o mpeg4video.o ituh263dec.o h263dec.o]
+
+//# libavformat dependencies
+#define CONFIG_MOV_DEMUXER 1 += mpeg4audio.o mpegaudiodata.o ac3tab.o
+#define CONFIG_MOV_MUXER 1 += mpeg4audio.o mpegaudiodata.o
+#define CONFIG_MP4_MUXER 1
+
+//# thread libraries
+OBJS-$(HAVE_LIBC_MSVCRT)               += file_open.o
+OBJS-$(HAVE_THREADS)                   += pthread.o pthread_slice.o pthread_frame.o
+
+I:\libav\libavcodec\x86\Makefile 文件分析（）
+分成C和ASM两种文件
+
+--OBJS-$(CONFIG_DCT)                     += x86/dct_init.o
+OBJS-$(CONFIG_FFT)                     += x86/fft_init.o
+--OBJS-$(CONFIG_LPC)                     += x86/lpc.o
+OBJS-$(CONFIG_MPEGVIDEO)               += x86/mpegvideo.o
+OBJS-$(CONFIG_MPEGVIDEOENC)            += x86/mpegvideoenc.o
+--OBJS-$(CONFIG_DNXHD_ENCODER)           += x86/dnxhdenc.o
+--OBJS-$(CONFIG_XMM_CLOBBER_TEST)        += x86/w64xmmtest.o
+                                          
+OBJS-$(CONFIG_ENCODERS)                += x86/dsputilenc_mmx.o x86/fdct.o x86/motion_est.o
+OBJS-$(CONFIG_DSPUTIL)                 += x86/dsputil_init.o x86/dsputil_x86.o
+OBJS-$(CONFIG_AAC_DECODER)             += x86/sbrdsp_init.o
+--OBJS-$(CONFIG_AC3DSP)                  += x86/ac3dsp_init.o
+--OBJS-$(CONFIG_CAVS_DECODER)            += x86/cavsdsp.o
+--OBJS-$(CONFIG_DCA_DECODER)             += x86/dcadsp_init.o
+OBJS-$(CONFIG_H263DSP)                 += x86/h263dsp_init.o
+OBJS-$(CONFIG_H264CHROMA)              += x86/h264chroma_init.o
+OBJS-$(CONFIG_H264DSP)                 += x86/h264dsp_init.o
+OBJS-$(CONFIG_H264PRED)                += x86/h264_intrapred_init.o
+OBJS-$(CONFIG_H264QPEL)                += x86/h264_qpel.o
+OBJS-$(CONFIG_HPELDSP)                 += x86/hpeldsp_init.o
+--OBJS-$(CONFIG_MLP_DECODER)             += x86/mlpdsp.o
+--OBJS-$(CONFIG_MPEGAUDIODSP)            += x86/mpegaudiodsp.o
+--OBJS-$(CONFIG_PNG_DECODER)             += x86/pngdsp_init.o
+--OBJS-$(CONFIG_PRORES_DECODER)          += x86/proresdsp_init.o
+--OBJS-$(CONFIG_RV30_DECODER)            += x86/rv34dsp_init.o
+--OBJS-$(CONFIG_RV40_DECODER)            += x86/rv34dsp_init.o x86/rv40dsp_init.o
+--OBJS-$(CONFIG_TRUEHD_DECODER)          += x86/mlpdsp.o
+--OBJS-$(CONFIG_VC1_DECODER)             += x86/vc1dsp_init.o
+OBJS-$(CONFIG_VIDEODSP)                += x86/videodsp_init.o
+--OBJS-$(CONFIG_VORBIS_DECODER)          += x86/vorbisdsp_init.o
+--OBJS-$(CONFIG_VP3DSP)                  += x86/vp3dsp_init.o
+--OBJS-$(CONFIG_VP6_DECODER)             += x86/vp6dsp_init.o
+--OBJS-$(CONFIG_VP8_DECODER)             += x86/vp8dsp_init.o
+--OBJS-$(CONFIG_VP9_DECODER)             += x86/vp9dsp_init.o
+
+MMX-OBJS-$(CONFIG_DSPUTIL) += x86/dsputil_mmx.o x86/fpel_mmx.o x86/idct_mmx_xvid.o x86/idct_sse2_xvid.o x86/rnd_mmx.o x86/simple_idct.o
+MMX-OBJS-$(CONFIG_HPELDSP) += x86/fpel_mmx.o x86/hpeldsp_mmx.o x86/rnd_mmx.o
+--MMX-OBJS-$(CONFIG_VC1_DECODER) += x86/vc1dsp_mmx.o
+
+--YASM-OBJS-$(CONFIG_DCT)                += x86/dct32.o
+YASM-OBJS-$(CONFIG_FFT)                += x86/fft.o
+
+YASM-OBJS-$(CONFIG_AAC_DECODER)        += x86/sbrdsp.o
+--YASM-OBJS-$(CONFIG_AC3DSP)             += x86/ac3dsp.o
+--YASM-OBJS-$(CONFIG_DCA_DECODER)        += x86/dcadsp.o
+YASM-OBJS-$(CONFIG_DSPUTIL)            += x86/dsputil.o x86/fpel.o x86/mpeg4qpel.o x86/qpel.o
+YASM-OBJS-$(CONFIG_ENCODERS)           += x86/dsputilenc.o
+YASM-OBJS-$(CONFIG_H263DSP)            += x86/h263_loopfilter.o
+YASM-OBJS-$(CONFIG_H264CHROMA)         += x86/h264_chromamc.o x86/h264_chromamc_10bit.o
+YASM-OBJS-$(CONFIG_H264DSP) += x86/h264_deblock.o x86/h264_deblock_10bit.o x86/h264_idct.o x86/h264_idct_10bit.o x86/h264_weight.o x86/h264_weight_10bit.o
+YASM-OBJS-$(CONFIG_H264PRED)           += x86/h264_intrapred.o x86/h264_intrapred_10bit.o
+YASM-OBJS-$(CONFIG_H264QPEL)           += x86/h264_qpel_8bit.o x86/h264_qpel_10bit.o x86/fpel.o x86/qpel.o
+YASM-OBJS-$(CONFIG_HPELDSP)            += x86/fpel.o x86/hpeldsp.o
+--YASM-OBJS-$(CONFIG_MPEGAUDIODSP)       += x86/imdct36.o
+--YASM-OBJS-$(CONFIG_PNG_DECODER)        += x86/pngdsp.o
+--YASM-OBJS-$(CONFIG_PRORES_DECODER)     += x86/proresdsp.o
+--YASM-OBJS-$(CONFIG_RV30_DECODER)       += x86/rv34dsp.o
+--YASM-OBJS-$(CONFIG_RV40_DECODER)       += x86/rv34dsp.o x86/rv40dsp.o
+--YASM-OBJS-$(CONFIG_VC1_DECODER)        += x86/vc1dsp.o
+YASM-OBJS-$(CONFIG_VIDEODSP)           += x86/videodsp.o
+--YASM-OBJS-$(CONFIG_VORBIS_DECODER)     += x86/vorbisdsp.o
+--YASM-OBJS-$(CONFIG_VP3DSP)             += x86/vp3dsp.o
+--YASM-OBJS-$(CONFIG_VP6_DECODER)        += x86/vp6dsp.o
+--YASM-OBJS-$(CONFIG_VP8_DECODER)        += x86/vp8dsp.o x86/vp8dsp_loopfilter.o
+--YASM-OBJS-$(CONFIG_VP9_DECODER)        += x86/vp9dsp.o

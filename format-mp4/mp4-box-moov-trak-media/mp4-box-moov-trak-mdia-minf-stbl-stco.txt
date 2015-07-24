@@ -1,0 +1,90 @@
+
+Box Type:  ‘stco’, ‘co64’ 
+Container:  Sample Table Box (‘stbl’) 
+Mandatory: Yes 
+Quantity:  Exactly one variant must be present 
+
+The chunk offset table gives the index of each chunk into the containing file. 
+There are two variants, permitting the use of 32-bit or 64-bit offsets. 
+The latter is useful when managing very large presentations. 
+At most one of these variants will occur in any single instance of a sample table. 
+Offsets are file offsets, not the offset into any box within the file (e.g. Media Data Box). 
+This permits referring to media data in files without any box structure. 
+It does also mean that care must be taken when constructing a self-contained ISO file with its metadata (Movie Box) at the front, 
+as the size of the Movie Box will affect the chunk offsets to the media data.
+
+aligned(8) class ChunkOffsetBox  
+  extends FullBox(‘stco’, version = 0, 0) { 
+ unsigned int(32) entry_count; 
+  for (i=1; i u entry_count; i++) { 
+    unsigned int(32)  chunk_offset; 
+ } 
+}
+
+aligned(8) class ChunkLargeOffsetBox  
+  extends FullBox(‘co64’, version = 0, 0) { 
+ unsigned int(32) entry_count; 
+  for (i=1; i u entry_count; i++) { 
+    unsigned int(64)  chunk_offset; 
+ } 
+}
+
+version 
+is an integer that specifies the version of this box 
+
+entry_count 
+is an integer that gives the number of entries in the following table chunk_offset is a 32 or 64 bit integer 
+that gives the offset of the start of a chunk into its containing media file.
+
+-----------------------------------
+E:\libav\libavformat\isom.h
+-----------------------------------
+
+    unsigned int chunk_count;
+    int64_t *chunk_offsets;
+
+-------------------------
+mov.c 里面的相关代码
+-------------------------
+static int mov_read_stco(MOVContext *c, AVIOContext *pb, MOVAtom atom)
+{
+    AVStream *st;
+    MOVStreamContext *sc;
+    unsigned int i, entries;
+
+    if (c->fc->nb_streams < 1)
+        return 0;
+    st = c->fc->streams[c->fc->nb_streams-1];
+    sc = st->priv_data;
+
+    avio_r8(pb); /* version */
+    avio_rb24(pb); /* flags */
+
+    entries = avio_rb32(pb);
+
+    if (!entries)
+        return 0;
+    if (entries >= UINT_MAX/sizeof(int64_t))
+        return AVERROR_INVALIDDATA;
+
+    sc->chunk_offsets = av_malloc(entries * sizeof(int64_t));
+    if (!sc->chunk_offsets)
+        return AVERROR(ENOMEM);
+    sc->chunk_count = entries;
+
+    if      (atom.type == MKTAG('s','t','c','o'))
+        for (i = 0; i < entries && !pb->eof_reached; i++)
+            sc->chunk_offsets[i] = avio_rb32(pb);
+    else if (atom.type == MKTAG('c','o','6','4'))
+        for (i = 0; i < entries && !pb->eof_reached; i++)
+            sc->chunk_offsets[i] = avio_rb64(pb);
+    else
+        return AVERROR_INVALIDDATA;
+
+    sc->chunk_count = i;
+
+    if (pb->eof_reached)
+        return AVERROR_EOF;
+
+    return 0;
+}

@@ -1,0 +1,39 @@
+源文件
+libavformat/avio.h
+libavformat/aviobuf.c
+
+avio_open 调用 avio_alloc_context
+avio_close 调用 av_free
+
+/**
+ * Close the resource accessed by the AVIOContext s and free it.
+ * This function can only be used if s was opened by avio_open().
+ *
+ * The internal buffer is automatically flushed before closing the
+ * resource.
+ *
+ * @return 0 on success, an AVERROR < 0 on error.
+ * @see avio_closep
+ */
+int avio_close(AVIOContext *s);
+
+int avio_close(AVIOContext *s)
+{
+    URLContext *h;
+
+    if (!s)
+        return 0;
+
+    avio_flush(s);
+    h = s->opaque;
+    av_freep(&s->buffer);
+    av_free(s);
+    return ffurl_close(h);
+}
+
+int avio_closep(AVIOContext **s)
+{
+    int ret = avio_close(*s);
+    *s = NULL;
+    return ret;
+}

@@ -1,0 +1,18 @@
+http://dsp.stackexchange.com/questions/3581/algorithms-to-mix-audio-signals-without-clipping
+http://stackoverflow.com/questions/376036/algorithm-to-mix-sound
+
+A more "natural" clipping function which works on a sample-per-sample basis, is the tanh function - it actually matches the soft-limiting behavior of some analog elements.
+最基本的双曲函数是
+双曲正弦函数sinh和
+双曲余弦函数cosh，从它们可以导出
+双曲正切函数tanh
+
+Mixed sample = tanh(sample1 + sample2) 这个算法太复杂，一般用下面的简化算法
+
+其它常用方法：
+ms = s1+s2 – s1*s2 is often claimed to work. Obviously it won’t. Take for instance the following.
+ms = -1 + 1 – (-1*1) = 1
+http://www.vttoth.com/CMS/index.php/technical-notes/68 解释了上面的公式来历
+
+0 < < 
+Z = A + B - A*B

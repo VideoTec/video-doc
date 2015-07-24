@@ -1,0 +1,19 @@
+参考：
+
+ffmpeg-struct-AVOutputFormat-priv_data_size
+
+    /**
+     * Format private data. This is an AVOptions-enabled struct
+     * if and only if iformat/oformat.priv_class is not NULL.
+     *
+     * - muxing: set by avformat_write_header()
+     * - demuxing: set by avformat_open_input()
+     */
+    void *priv_data;
+
+AVFormatContext priv_data 什么时候分配？
+
+1. 根据 ffmpeg 的 avformat_alloc_output_context2 接口：需要用户自己分配
+
+2. 根据文档 avformat_write_header 时分配
+   avformat_write_header -> init_muxer -> s->priv_data = av_mallocz(of->priv_data_size);

@@ -1,0 +1,22 @@
+Fraunhofer FDK AAC (Full title Fraunhofer FDK AAC Codec Library for Android) is an open-source[4] software library for 
+encoding and decoding Advanced Audio Coding (AAC) format audio, developed by Fraunhofer IIS, and included as part of Android.
+
+A cross-platform source distribution is maintained by Martin Storsjö as fdk-aac. 
+The latest fdk-aac release is 0.1.3 (2013-11-25), based on FDK version 3.4.12/2.5.5 (encoder/decoder).[9] 
+The code compiles into a shared library, libfdk-aac
+
+Fraunhofer FDK AAC Codec Library for Android 可以实现 AAC 编解码器部署时的低资源占用，
+因此可用于ARM、MIPS 和 x86 处理器上的安卓操作系统。FDK 软件包可以从 Android 4.1 代码树中获得
+
+https://github.com/mstorsjo/fdk-aac
+https://android.googlesource.com/platform/external/aac/+/master/
+https://trac.ffmpeg.org/wiki/Encode/AAC#fdk_aac
+
+----------------------------------------------------------
+源文件分析
+----------------------------------------------------------
+
+
+----------------------------------------------------------
+Windows 编译
+----------------------------------------------------------

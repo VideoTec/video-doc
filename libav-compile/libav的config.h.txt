@@ -1,0 +1,560 @@
+
+定义了一组宏，主要用于：编译时的宏开关。
+
+分成三类《ARCH_*》《HAVE_*》《CONFIG_*》
+ARCH_*：CPU类型
+HAVE_*：CPU特性（扩展指令集）
+CONFIG_*：
+
+其它：
+#define LIBAV_CONFIGURATION "--toolchain=msvc ..."
+#define LIBAV_LICENSE "LGPL version 2.1 or later"
+#define AVCONV_DATADIR "/usr/local/share/avconv"
+#define CC_IDENT "Microsoft (R) C/C++ Optimizing Compiler Version 18.00.21005.1 for x86"
+#define restrict __restrict
+#define EXTERN_PREFIX "_"
+#define EXTERN_ASM _
+#define SLIBSUF ".dll"
+
+//2010年ARM发布Cortex-15，其具备足够性能进入桌面和服务器领域，开始挑战Intel。 
+#define ARCH_ARM 0
+#define ARCH_AARCH64 0  //ARM ARCH64: ARMv8 架构中引入新的 AArch64 执行状态
+
+//Alpha处理器最早由DEC公司(迪吉多公司)设计制造
+//1998年，随着DEC被一起卖给了康柏。2001年，被康柏卖给Intel。同年，惠普收购康柏，继续开发基于Alpha处理器的产品到2004年
+//Microsoft Windows支持这款处理器，直到Windows NT 4.0 SP6，但是从Windows 2000 beta3开始放弃了对Alpha的支援
+#define ARCH_ALPHA 0     
+                         
+						 
+//Atmel AVR系列是一种基于改进的哈佛结构、精简指令集（Reduced Instruction Set Computing， RISC）的微控制器，由Atmel公司于1996年研发
+//2006年，爱特梅尔推出了 AVR32的新型专利32位架构处理器
+//AVR处理器发展了六个系列，分别是：tinyAVR，ATtiny系列；megaAVR，ATmega系列；XMEGA，ATxmega系列
+#define ARCH_AVR32 0    //a 32-bit RISC microprocessor architecture designed by Atmel
+#define ARCH_AVR32_AP 0  //On April 10, 2012 Atmel announced the End of Life of AP7 Core devices on 4/4/2013
+#define ARCH_AVR32_UC 0  //UC3 Core
+
+//Blackfin® 16/32位嵌入式处理器提供软件灵活性和扩展能力，适合融合应用：多格式音频、视频、语音和图像处理、多模式基带和分组处理、控制处理以及实时安全
+// Analog Devices, Inc. 全球领先的高性能信号处理解决方案供应商，
+//为了满足开发人员对低成本、快速、高效视频技术软件工具日益迫切的需求，
+//最近推出一款用于实时视频分析应用的免费综合视频原件库。
+//这些软件模块针对 Blackfin 处理器 系列做了充分优化，内含图像处理任务级原件，因而能够加快视频分析应用的开发速度
+//IntelliVision 公司的产品一贯受益于 Blackfin 处理器系列的高性能视频处理、压缩和视频流形成功能
+//Blackfin处理器基于由ADI和Intel公司联合开发的微信号架构（MSA），
+//它将一个32位RISC型指令集和双16位乘法累加（MAC）信号处理功能与通用型微控制器所具有的易用性组合在了一起
+//Blackfin处理器是一类专为满足当今嵌入式音频、视频和通信应用的计算要求和功耗约束条件而设计的新型16～32位嵌入式处理器
+#define ARCH_BFIN 0
+
+//IA-64 (also called Intel Itanium architecture) is the architecture of the Itanium family of 64-bit Intel microprocessors.
+//ia64是一种崭新的系统，和x86架构完全没有相似性
+//ia64则是原生的纯64位计算处理器，并且与x86指令不兼容。如果想要执行x86指令需要硬件虚拟化支持，而且效率不高
+//ia64由于架构的改变，性能比起x64的64位兼容模式更高更强。
+//ia64架构处理器也不能够使用x64操作系统
+//x64处理器则可以自由选择x86或是x64操作系统
+#define ARCH_IA64 0
+
+//MC68000: 摩托罗拉公司（Motorola）的半导体部门（现已独立成为飞思卡尔公司（Freescale））出品的一款16/32位CISC（复杂指令集）微处理器
+//The Motorola 68000 ("'sixty-eight-thousand'"; also called the m68k or Motorola 68k, "sixty-eight-k") is a 16/32-bit[1] CISC microprocessor core 
+//Introduced in 1979 with HMOS technology as the first member of the successful 32-bit m68k family of microprocessors
+#define ARCH_M68K 0
+
+//MIPS是世界上很流行的一种RISC处理器
+//MIPS的意思是“无内部互锁流水级的微处理器”(Microprocessor without interlocked piped stages)，其机制是尽量利用软件办法避免流水线中的数据相关问题
+//最早是在80年代初期由斯坦福(Stanford)大学Hennessy教授领导的研究小组研制出来的
+//1984年，MIPS计算机公司成立。1992年，SGI收购了MIPS计算机公司。1998年，MIPS脱离SGI，成为MIPS技术公司
+//MIPS公司设计RISC处理器始于二十世纪八十年代初，1986年推出R2000处理器，1988年推R3000处理器，1991年推出第一款64位商用微处器R4000。
+//之后又陆续推出R8000（于1994年）、R10000（于1996年）和R12000（于1997年）等型号
+//1999年，MIPS公司发布MIPS32和MIPS64架构标准，为未来MIPS处理器的开发奠定了基础
+//服务器RISC处理器来说，主要是IBM 的POWER和SUN 的UltraSPARC 两大处理器之间的竞争
+//2009年6月，龙芯曾经从MIPS公司获得MIPS 32与64架构处理器授权，主要原因是龙芯的处理器架构与MIPS的架构过于相似（95%），龙芯产品涉嫌侵权
+//早期ARM的优势就是面积小，其第二大股东是苹果，第一个客户是苹果的PDA牛顿。
+//牛顿失败后，被苹果无情抛弃的ARM苦苦挣扎了很多年，被TI、LSI等公司小规模采用完全是因为比MIPS便宜。
+//90年代手机开始兴起，为了击败空前强大的摩托罗拉，诺基亚和TI合作，希望开发出首款适用2G网络的通讯芯片。
+//TI先后介绍了自家的MCU核心、标准的MIPS核心、以及标准的ARM核心。
+//诺基亚的思路是选择一款不被大佬掌控的CPU，这样便于在未来的改进上施加影响，显然只有苦逼的ARM符合要求。
+//于是傍着诺基亚的巨型航母，ARM就赶上了移动市场的大潮。
+//之后ARM不断在低功耗、Java加速、单指令多数据、代码压缩等方面发力，彻底满足了诺基亚的需求，也拉开了和MIPS的距离。
+//MIPS在网络路由等领域有统治地位，看看BRCM，Cisco的产品，连x86都很难比，更不要说ARM了，这些领域都是对速度，吞吐量，外设支持等性能要求极其苛刻的领域
+#define ARCH_MIPS 0
+#define ARCH_MIPS64 0
+
+//HP（惠普）公司的RISC芯片PA-RISC于1986年问世
+//它之后被惠普公司与英特尔联合开发的Itanium架构所取代
+#define ARCH_PARISC 0
+
+//POWER是1991年，Apple（苹果电脑）、IBM、Motorola（摩托罗拉）组成的AIM联盟所发展出的微处理器架构
+//是一种精简指令集（RISC）架构的中央处理器（CPU）
+//PowerPC是整个AIM联盟平台的一部分，并且是到目前为止唯一的一部分
+#define ARCH_PPC 0
+#define ARCH_PPC64 0
+
+//ESA/390 (Enterprise Systems Architecture/390) was introduced in September 1990[1] and 
+//was IBM's last 31-bit-address/32-bit-data mainframe computing design, copied by Amdahl, Hitachi, and Fujitsu among other competitors.
+#define ARCH_S390 0
+
+//SuperH（或称SH）是可靠单片机与微处理器架构的品牌名称。SuperH 是以 32 位元存取的精简指令集架构，多用在嵌入式系统
+//SuperH 处理器核心家族在九零年代早期由日立开始开发。许多单片机与微处理器都在这个架构下。其中最有名可能是 惠普 Jornada PDA 用的 SH7709
+#define ARCH_SH4 0
+
+//SPARC，名称源自于可扩充处理器架构（Scalable Processor ARChitecture）的缩写，是一种RISC指令集架构，
+//最早于1985年由太阳微系统所设计，也是SPARC国际公司的注册商标之一
+#define ARCH_SPARC 0
+#define ARCH_SPARC64 0
+
+//TILE-Gx is a multicore processor family by Tilera.
+#define ARCH_TILEGX 0
+#define ARCH_TILEPRO 0
+
+//CPU性能瓶颈包括内存墙（CPU和DRAM时钟速度差距）,指令级并行性墙和能耗墙。
+//Venray的TOMI(Thread Optimized Multiprocessor)试图通过建造不同类型的微处理器重新定义这些问题
+#define ARCH_TOMI 0
+
+#define ARCH_X86 1
+#define ARCH_X86_32 1
+#define ARCH_X86_64 0
+
+
+
+#define HAVE_ARMV5TE 0
+#define HAVE_ARMV6 0
+#define HAVE_ARMV6T2 0
+#define HAVE_NEON 0
+#define HAVE_VFP 0
+#define HAVE_VFPV3 0
+#define HAVE_ARMV5TE_EXTERNAL 0
+#define HAVE_ARMV6_EXTERNAL 0
+#define HAVE_ARMV6T2_EXTERNAL 0
+//ARM® NEON™ 通用 SIMD 引擎可有效处理当前和将来的多媒体格式，从而改善用户体验
+//NEON 技术可加速多媒体和信号处理算法（如视频编码/解码、2D/3D 图形、游戏、音频和语音处理、图像处理技术、电话和声音合成），
+//其性能至少为 ARMv5 性能的 3 倍，为 ARMv6 SIMD 性能的 2 倍
+#define HAVE_NEON_EXTERNAL 0
+//VFP（矢量浮点）是在协同处理器针对ARM架构的派生技术。
+//它提供低成本的单精度和倍精度浮点运算能力，并完全兼容于ANSI/IEEE Std 754-1985二进制浮点算数标准
+#define HAVE_VFP_EXTERNAL 0
+#define HAVE_VFPV3_EXTERNAL 0
+#define HAVE_ARMV5TE_INLINE 0
+#define HAVE_ARMV6_INLINE 0
+#define HAVE_ARMV6T2_INLINE 0
+#define HAVE_NEON_INLINE 0
+#define HAVE_VFP_INLINE 0
+#define HAVE_VFPV3_INLINE 0
+#define HAVE_VFP_ARGS 0 //E:\libav\libavutil\arm\asm.S
+
+#define HAVE_AMD3DNOW 1
+#define HAVE_AMD3DNOWEXT 1
+#define HAVE_AVX 1
+#define HAVE_AVX2 1
+#define HAVE_FMA4 1
+#define HAVE_I686 1
+#define HAVE_MMX 1
+#define HAVE_MMXEXT 1
+#define HAVE_SSE 1
+#define HAVE_SSE2 1
+#define HAVE_SSE3 1
+#define HAVE_SSE4 1
+#define HAVE_SSE42 1
+#define HAVE_SSSE3 1
+#define HAVE_AMD3DNOW_EXTERNAL 1
+#define HAVE_AMD3DNOWEXT_EXTERNAL 1
+#define HAVE_AVX_EXTERNAL 1
+#define HAVE_AVX2_EXTERNAL 1
+#define HAVE_FMA4_EXTERNAL 1
+#define HAVE_I686_EXTERNAL 0
+#define HAVE_MMX_EXTERNAL 1
+#define HAVE_MMXEXT_EXTERNAL 1
+#define HAVE_SSE_EXTERNAL 1
+#define HAVE_SSE2_EXTERNAL 1
+#define HAVE_SSE3_EXTERNAL 1
+#define HAVE_SSE4_EXTERNAL 1
+#define HAVE_SSE42_EXTERNAL 1
+#define HAVE_SSSE3_EXTERNAL 1
+#define HAVE_AMD3DNOW_INLINE 0
+#define HAVE_AMD3DNOWEXT_INLINE 0
+#define HAVE_AVX_INLINE 0
+#define HAVE_AVX2_INLINE 0
+#define HAVE_FMA4_INLINE 0
+#define HAVE_I686_INLINE 0
+#define HAVE_MMX_INLINE 0
+#define HAVE_MMXEXT_INLINE 0
+#define HAVE_SSE_INLINE 0
+#define HAVE_SSE2_INLINE 0
+#define HAVE_SSE3_INLINE 0
+#define HAVE_SSE4_INLINE 0
+#define HAVE_SSE42_INLINE 0
+#define HAVE_SSSE3_INLINE 0
+
+//AltiVec是一个浮点和整型单指令流多数据流（SIMD）指令集
+#define HAVE_ALTIVEC 0
+//PowerPC Series (1992) 6xx 4xx 7xx 74xx 970 A2
+#define HAVE_PPC4XX 0
+#define HAVE_ALTIVEC_EXTERNAL 0
+#define HAVE_PPC4XX_EXTERNAL 0
+#define HAVE_ALTIVEC_INLINE 0
+#define HAVE_PPC4XX_INLINE 0
+
+//Visual Instruction Set, or VIS，是一个用于SPARC处理器的SIMD多媒体指令集扩展。VIS在所有的UltraSPARC以及较新的SPARC64处理器上都有实现
+#define HAVE_VIS 0
+#define HAVE_VIS_EXTERNAL 0
+#define HAVE_VIS_INLINE 0
+
+#define HAVE_INLINE_ASM 0
+
+//.symver汇编宏指令
+#define HAVE_SYMVER 0
+#define HAVE_SYMVER_ASM_LABEL 0
+#define HAVE_SYMVER_GNU_ASM 0
+
+#define HAVE_YASM 1
+
+#define HAVE_BIGENDIAN 0
+
+//On ARM-based systems you cannot address a 32-bit word that is not aligned to a 4-byte boundary (as your error is telling you). 
+//On x86 you can access non-aligned data, however there is a huge hit on performance.
+//allow unaligned memory accesses
+#define HAVE_FAST_UNALIGNED 1  
+#define HAVE_FAST_64BIT 0
+#define HAVE_FAST_CLZ 1  //#define ff_ctz(v) __builtin_ctz(v)
+#define HAVE_FAST_CMOV 0  //x86 CMOV instruction
+
+#define HAVE_PTHREADS 0
+#define HAVE_W32THREADS 1
+
+//atomic[英][əˈtɒmɪk] [美][əˈtɑ:mɪk] 原子的
+//E:\libav\libavutil\atomic.h
+#define HAVE_ATOMICS_GCC 0
+#define HAVE_ATOMICS_SUNCC 0
+#define HAVE_ATOMICS_WIN32 1
+#define HAVE_ATOMIC_CAS_PTR 0
+#define HAVE_ATOMICS_NATIVE 1
+
+//数学函数
+//E:\libav\libavutil\libm.h
+//http://www.cplusplus.com/reference/cmath/cbrt/
+#define HAVE_ATANF 1   //atan( ) 函数 返回数值表达式的反正切弧度值
+#define HAVE_ATAN2F 1
+#define HAVE_CBRTF 1   //cbrt() 函数返回任意数字的立方根
+#define HAVE_COSF 1
+#define HAVE_EXP2 1
+#define HAVE_EXP2F 1
+#define HAVE_EXPF 1
+#define HAVE_ISINF 1
+#define HAVE_ISNAN 1
+#define HAVE_LDEXPF 1
+#define HAVE_LLRINT 1
+#define HAVE_LLRINTF 1
+#define HAVE_LOG2 0
+#define HAVE_LOG2F 1
+#define HAVE_LOG10F 1
+#define HAVE_LRINT 1
+#define HAVE_LRINTF 1
+#define HAVE_POWF 1
+#define HAVE_RINT 1
+#define HAVE_ROUND 1
+#define HAVE_ROUNDF 1
+#define HAVE_SINF 1
+#define HAVE_TRUNC 1  //其工作机制与ROUND函数极为类似
+#define HAVE_TRUNCF 1
+
+//E:\libav\libavutil\mem.c     //CONFIG_MEMALIGN_HACK不知道这个在那里定义的？
+#define HAVE_ALIGNED_MALLOC 1  //_aligned_malloc(size, 32); _aligned_realloc(ptr, size, 32); _aligned_free(ptr);
+#define HAVE_ALIGNED_STACK 0
+#define HAVE_POSIX_MEMALIGN 0
+#define HAVE_MEMALIGN 0
+
+#define HAVE_ALSA_ASOUNDLIB_H 0  //http://www.alsa-project.org/alsa-doc/alsa-lib/files.html
+                                 //alsa是Advanced Linux Sound Architecture 的缩写，目前已经成为了linux的主流音频体系结构
+								 
+#define HAVE_ALTIVEC_H 0     //#include <altivec.h>
+#define HAVE_ARPA_INET_H 0   //#include <arpa/inet.h>
+
+//E:\libav\libavutil\arm\intmath.h
+//E:\libav\libavcodec\arm\dca.h
+#define HAVE_ASM_MOD_Q 0  //av_clipl_int32_arm
+#define HAVE_ASM_MOD_Y 0  //int8x8_fmul_int32
+
+//GNU C的一大特色（却不被初学者所知）就是__attribute__机制
+#define HAVE_ATTRIBUTE_MAY_ALIAS 0
+#define HAVE_ATTRIBUTE_PACKED 0
+
+//E:\libav\libavdevice\libcdio.c
+#define HAVE_CDIO_PARANOIA_H 0              //#include <cdio/cdda.h>  <cdio/paranoia.h>
+#define HAVE_CDIO_PARANOIA_PARANOIA_H 0     //#include <cdio/paranoia/cdda.h>  <cdio/paranoia/paranoia.h>
+
+//#if !HAVE_CLOSESOCKET
+//#define closesocket close
+//#endif
+#define HAVE_CLOSESOCKET 0
+
+//E:\libav\cmdutils.c
+/* _WIN32 means using the windows libc - cygwin doesn't define that
+ * by default. HAVE_COMMANDLINETOARGVW is true on cygwin, while
+ * it doesn't provide the actual command line via GetCommandLineW(). */
+#define HAVE_COMMANDLINETOARGVW 1
+
+//E:\libav\libavutil\x86\x86inc.asm
+%macro CPUNOP 1
+    %if HAVE_CPUNOP
+        CPU %1
+    %endif
+%endmacro
+#define HAVE_CPUNOP 1
+计算机科学中，NOP或NOOP（No Operation或No Operation Performed的缩写，意为无操作）是汇编语言的一个指令，一系列编程语句，或网络传输协议中的表示不做任何有效操作的命令。
+
+//E:\libav\libavutil\random_seed.c
+微软公司在NT4.0以上版本中提供了一套完整的Crypto API的函数，
+支持密钥交换，数据加密解密，数字签名，
+给程序员带来了很大方便，用户在对软件进行保护的时候可以直接利用Crypto API来完成这些工作，
+比如计算注册码，检查程序的完整性等
+#define HAVE_CRYPTGENRANDOM 1   //#include <wincrypt.h>  CryptAcquireContext
+
+//E:\libav\libavcodec\ppc\dsputil_ppc.c
+#define HAVE_DCBZL 0  //replace dcbz by dcbzl
+
+//E:\libav\libavdevice\bktr.c
+//bktr -- Brooktree Bt848/849/878/879 and Pinnacle PCTV video capture driver
+#if HAVE_DEV_BKTR_IOCTL_METEOR_H && HAVE_DEV_BKTR_IOCTL_BT848_H
+# include <dev/bktr/ioctl_meteor.h>
+# include <dev/bktr/ioctl_bt848.h>
+#elif HAVE_MACHINE_IOCTL_METEOR_H && HAVE_MACHINE_IOCTL_BT848_H
+# include <machine/ioctl_meteor.h>
+# include <machine/ioctl_bt848.h>
+#elif HAVE_DEV_VIDEO_METEOR_IOCTL_METEOR_H && HAVE_DEV_VIDEO_BKTR_IOCTL_BT848_H
+# include <dev/video/meteor/ioctl_meteor.h>
+# include <dev/video/bktr/ioctl_bt848.h>
+#elif HAVE_DEV_IC_BT8XX_H
+# include <dev/ic/bt8xx.h>
+#endif
+#define HAVE_DEV_BKTR_IOCTL_BT848_H 0
+#define HAVE_DEV_BKTR_IOCTL_METEOR_H 0
+#define HAVE_DEV_IC_BT8XX_H 0
+#define HAVE_DEV_VIDEO_BKTR_IOCTL_BT848_H 0
+#define HAVE_DEV_VIDEO_METEOR_IOCTL_METEOR_H 0
+#define HAVE_MACHINE_IOCTL_BT848_H 0
+#define HAVE_MACHINE_IOCTL_METEOR_H 0
+#define HAVE_MACHINE_RW_BARRIER 0
+
+//E:\libav\libavformat\os_support.h
+#ifdef _WIN32
+#if HAVE_DIRECT_H
+#include <direct.h>
+#elif HAVE_IO_H
+#include <io.h>
+#endif
+#define mkdir(a, b) _mkdir(a)
+#else
+#include <sys/stat.h>
+#endif
+#define HAVE_DIRECT_H 1
+#define HAVE_IO_H 1      //#include <io.h>
+
+#define HAVE_DLFCN_H 0
+#define HAVE_DLOPEN 0
+
+#define HAVE_DOS_PATHS 1 //E:\libav\libavutil\avstring.c
+
+//DirectX Video Acceleration (DXVA)是一种在Microsoft Windows和Xbox 360平台的Microsoft API规范，能让视频解码器使用硬件解码。
+#define HAVE_DXVA_H 1  //E:\libav\libavcodec\dxva2_internal.h  #include <dxva.h>
+
+//E:\libav\libavutil\x86\asm.h 
+//eax,ebx,ecx,edx,esi,edi,ebp,esp 寄存器的作用分类
+//#define HAVE_7REGS (ARCH_X86_64 || (HAVE_EBX_AVAILABLE && HAVE_EBP_AVAILABLE))
+//#define HAVE_6REGS (ARCH_X86_64 || (HAVE_EBX_AVAILABLE || HAVE_EBP_AVAILABLE))
+#define HAVE_EBP_AVAILABLE 0
+#define HAVE_EBX_AVAILABLE 0
+
+#define HAVE_FCNTL 0 //fcntl(fd, F_SETFD, FD_CLOEXEC) 函数
+#define HAVE_FORK 0
+
+#define HAVE_GETADDRINFO 0  //if (getaddrinfo(hostname, NULL, &hints, &ai))
+#define HAVE_WINDOWS_H 1
+#define HAVE_WINSOCK2_H 0
+
+#define HAVE_GETHRTIME 0 //gethrtime 函数
+#define HAVE_GETOPT 0    //#include "compat/getopt.c"
+
+//Retrieves the process affinity mask for the specified process and the system affinity mask for the system.
+//E:\libav\libavutil\cpu.c  int av_cpu_count(void)
+#define HAVE_GETPROCESSAFFINITYMASK 1  //#include <windows.h>
+
+//E:\libav\avconv.c 下面一些用于avconv.c文件，计算进程运行信息的函数
+//GetProcessMemoryInfo
+//PROCESS_MEMORY_COUNTERS memcounters;
+//return memcounters.PeakPagefileUsage
+//The peak(最大值的) value in bytes of the Commit Charge during the lifetime of this process.
+#define HAVE_GETPROCESSMEMORYINFO 1
+
+#define HAVE_GETPROCESSTIMES 1 //GetProcessTimes 获取与一个进程的经过时间有关的信息
+#define HAVE_GETSYSTEMTIMEASFILETIME 1 //GetSystemTimeAsFileTime
+#define HAVE_GETRUSAGE 0               //getrusage(RUSAGE_SELF, &rusage);
+#define HAVE_GETSERVBYPORT 0           //getservbyport(sin->sin_port, flags & NI_DGRAM ? "udp" : "tcp");
+#define HAVE_GETTIMEOFDAY 0            //gettimeofday(&tv, NULL);
+
+#define HAVE_GNU_AS 1
+
+//E:\libav\libavcodec\libgsm.c
+//#if HAVE_GSM_H
+//#include <gsm.h>
+//#else
+//#include <gsm/gsm.h>
+//#endif
+#define HAVE_GSM_H 0
+
+//E:\libav\libavcodec\ppc\asm.S
+#define HAVE_IBM_ASM 0
+
+#define HAVE_INET_ATON 0 //inet_aton  inet_aton()是一个改进的方法来将一个字符串IP地址转换为一个32位的网络序列IP地址
+
+//E:\libav\libavutil\ppc\timer.h
+//uint64_t read_time(void)
+// /* from section 2.2.1 of the 32-bit PowerPC PEM */
+#define HAVE_INLINE_ASM_LABELS 0
+
+#define HAVE_ISATTY 1  // int isatty(int desc); 函数：如果参数desc所代表的文件描述词为一终端机则返回1，否则返回0
+
+//E:\libav\libavdevice\jack_audio.c
+//jack_port_get_latency_range(self->ports[i], JackCaptureLatency, &range);
+#define HAVE_JACK_PORT_GET_LATENCY_RANGE 0
+
+//__asm__ ("ldbrx   %0, %y1" : "=r"(v) : "Z"(*(const uint64_t*)p));
+//ldbrx
+#define HAVE_LDBRX 0
+
+#define HAVE_LIBC_MSVCRT 1
+
+//E:\libav\libavdevice\libdc1394.c
+#define HAVE_LIBDC1394_1 0
+#define HAVE_LIBDC1394_2 0
+
+//E:\libav\libavutil\internal.h
+#define HAVE_LOCAL_ALIGNED_16 1
+#define HAVE_LOCAL_ALIGNED_8 1
+
+#define HAVE_LOCALTIME_R 0  //strftime(buf, buf_size, s->text, &ltime)
+
+//E:\libav\libavcodec\mips\mathops.h
+#define HAVE_LOONGSON 0
+
+#define HAVE_MALLOC_H 1  //#include <malloc.h>
+
+//E:\libav\libavutil\file.c
+//CreateFileMapping(fh, NULL, PAGE_READONLY, 0, 0, NULL);
+//ptr = MapViewOfFile(mh, FILE_MAP_READ, 0, 0, *size);
+//UnmapViewOfFile(bufptr);
+#define HAVE_MAPVIEWOFFILE 1
+#define HAVE_MMAP 0
+
+#define HAVE_MEMORYBARRIER 1
+
+//#include <fcntl.h>
+//fd = mkstemp(*filename);
+#define HAVE_MKSTEMP 0
+
+#define HAVE_MM_EMPTY 1 //#include <mmintrin.h>  #define emms_c _mm_empty
+
+//E:\libav\libswscale\utils.c
+#define HAVE_MPROTECT 0 //#define USE_MMAP (HAVE_MMAP && HAVE_MPROTECT && defined MAP_ANONYMOUS)
+
+#define HAVE_NANOSLEEP 0  //nanosleep(&ts, &ts)
+
+#define HAVE_POLL_H 0  //#include <poll.h>
+
+//#        define FF_DISABLE_DEPRECATION_WARNINGS __pragma(warning(push)) __pragma(warning(disable:4996))
+//#        define FF_ENABLE_DEPRECATION_WARNINGS  __pragma(warning(pop))
+#define HAVE_PRAGMA_DEPRECATED 1 //E:\libav\libavutil\internal.h
+
+//E:\libav\libavutil\x86\timer.h static inline uint64_t read_time(void)
+//#include <intrin.h>
+//#define AV_READ_TIME __rdtsc
+#define HAVE_RDTSC 1
+
+//#include <sched.h>
+//GetProcessAffinityMask
+#define HAVE_SCHED_GETAFFINITY 0
+#define HAVE_SYSCONF 0 //nb_cpus = sysconf(_SC_NPROC_ONLN);
+#define HAVE_SYSCTL 0  //sysctl(mib, 2, &nb_cpus, &len, NULL, 0)
+
+#define HAVE_SDL 0
+
+#define HAVE_SETCONSOLETEXTATTRIBUTE 1 //SetConsoleTextAttribute
+
+#define HAVE_SETMODE 1  //setmode(fd, O_BINARY);
+#define HAVE_SETRLIMIT 0 //setrlimit(RLIMIT_CPU, &rl
+#define HAVE_SLEEP 1   //Sleep(usec / 1000);
+
+#define HAVE_SNDIO_H 0
+
+#define HAVE_SOCKLEN_T 0
+
+#define HAVE_SOUNDCARD_H 0 //#include <soundcard.h>
+
+#define HAVE_STRERROR_R 0  //ret = strerror_r(AVUNERROR(errnum), errbuf, errbuf_size);
+#define HAVE_STRPTIME 0 //ret1 = strptime(datestr, "%Y - %m - %d %T", &time1);
+#define HAVE_STRUCT_ADDRINFO 0 //E:\libav\libavformat\network.h
+
+
+
+#define HAVE_STRUCT_GROUP_SOURCE_REQ 0 //E:\libav\libavformat\udp.c
+                                       //#if HAVE_STRUCT_GROUP_SOURCE_REQ && defined(MCAST_BLOCK_SOURCE) && !defined(_WIN32)
+#define HAVE_STRUCT_IP_MREQ_SOURCE 0 //#elif HAVE_STRUCT_IP_MREQ_SOURCE && defined(IP_BLOCK_SOURCE)
+
+#define HAVE_STRUCT_IPV6_MREQ 0 //#if HAVE_STRUCT_IPV6_MREQ && defined(IPPROTO_IPV6)
+#define HAVE_STRUCT_POLLFD 0 // ==0 需要定义 struct pollfd
+#define HAVE_STRUCT_RUSAGE_RU_MAXRSS 0 //struct rusage rusage;
+#define HAVE_STRUCT_SOCKADDR_IN6 0 //支持IPv6 a->ss_family == AF_INET6
+#define HAVE_STRUCT_SOCKADDR_SA_LEN 0 //uint8_t ss_len; + uint8_t ss_family;  == uint16_t ss_family;
+#define HAVE_STRUCT_SOCKADDR_STORAGE 0 //==0 需要定义 struct sockaddr_storage
+
+//E:\libav\libavdevice\v4l2.c
+//list_framesizes(ctx, fd, vfd.pixelformat);
+#define HAVE_STRUCT_V4L2_FRMIVALENUM_DISCRETE 0
+
+#define HAVE_SYNC_VAL_COMPARE_AND_SWAP 0
+
+#define HAVE_SYS_MMAN_H 0  //#include <sys/mman.h>
+#define HAVE_SYS_PARAM_H 0  //#include <sys/param.h>
+#define HAVE_SYS_RESOURCE_H 0 //#include <sys/time.h> #include <sys/resource.h>
+#define HAVE_SYS_SELECT_H 0  //#include <sys/select.h>
+#define HAVE_SYS_TIME_H 0  //#include <sys/time.h>
+#define HAVE_SYS_UN_H 0
+#define HAVE_SYS_VIDEOIO_H 0 //#include <sys/videoio.h>
+#define HAVE_THREADS 1
+#define HAVE_UNISTD_H 0  //#include <unistd.h>
+
+#define HAVE_USLEEP 0  //usleep(usec);
+
+//E:\libav\avconv_opt.c
+//const HWAccel hwaccels[] = {
+//#if HAVE_VDPAU_X11
+//    { "vdpau", vdpau_init, HWACCEL_VDPAU, AV_PIX_FMT_VDPAU },
+//#endif
+//    { 0 },
+//};
+#define HAVE_VDPAU_X11 0
+
+
+
+#define HAVE_VIRTUALALLOC 1 //VirtualAlloc
+
+#define HAVE_XFORM_ASM 0 //E:\libav\libavutil\ppc\intreadwrite.h
+//一些指令：lhbrx，sthbrx，lwbrx，stwbrx，ldbrx，stdbrx，lwbrx，stwbrx
+
+
+//E:\libav\libavutil\x86\asm.h
+//#    define XMM_CLOBBERS(...)        __VA_ARGS__
+//#    define XMM_CLOBBERS_ONLY(...) : __VA_ARGS__
+#define HAVE_XMM_CLOBBERS 0
+
+//源码中没有使用的宏
+#define HAVE_XLIB 0
+#define HAVE_SYS_SOUNDCARD_H 0
+
+
+#define CONFIG_BSFS 0
+#define CONFIG_DECODERS 1
+#define CONFIG_DEMUXERS 1
+#define CONFIG_ENCODERS 1
+#define CONFIG_FILTERS 0
+#define CONFIG_HWACCELS 0
+#define CONFIG_INDEVS 0
+#define CONFIG_MUXERS 1
+#define CONFIG_OUTDEVS 0
+#define CONFIG_PARSERS 1

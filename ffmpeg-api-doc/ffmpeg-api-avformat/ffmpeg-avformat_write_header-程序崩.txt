@@ -1,0 +1,6 @@
+2015.4.20
+造成的原因是: 没有给 AVFormatContext 的 oformat 字段赋值
+  AVOutputFormat *output_fmt = av_guess_format(0, filename, 0);
+  AVFormatContext *fmctx = avformat_alloc_context();
+  fmctx->oformat = output_fmt;
+

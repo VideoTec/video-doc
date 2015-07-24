@@ -1,0 +1,6 @@
+http://www.ypass.net/blog/2010/01/pcm-audio-part-2-what-does-a-pcm-stream-look-like/ 
+http://www.ypass.net/blog/2010/01/pcm-audio-part-1-what-is-pcm/
+
+For example: signed 16-bit little-endian mono @ 44.1kHz
+
+signed 和 unsigned 的区别是，静音值不一样

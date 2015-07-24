@@ -1,0 +1,19 @@
+av_register_all();
+
+必要要把编译时的，搜索路径加上，因为libav头文件的相互引用
+#include <libavformat/avformat.h>
+#include <libswscale/swscale.h>
+#include <libavutil/pixfmt.h>
+#include <libavresample/avresample.h>
+#include <libavutil/opt.h>
+
+下面的代码, test.c
+#include <libavformat/avformat.h>
+int test() {
+  av_register_all();
+  return 0;
+}
+在 android-ndk 工具链中，编译成功，链接成功，但是运行时，提示，
+java.lang.UnsatisfiedLinkError: Cannot load library: reloc_library[1290]:   122 cannot locate 'av_register_all'...
+
+造成这个错误的原因是: 链接时没有添加 -Wl,--no-undefined 检查: error: undefined reference to 'xxx'

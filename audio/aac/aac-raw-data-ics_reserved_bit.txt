@@ -1,0 +1,1 @@
+一定为‘0’  位宽为 1  ics_reserved_bit

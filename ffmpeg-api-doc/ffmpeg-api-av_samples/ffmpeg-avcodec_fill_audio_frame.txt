@@ -1,0 +1,74 @@
+libavcodec/avcodec.h
+libavcodec\utils.c
+
+audio_frame_ = av_frame_alloc();
+audio_frame_->nb_samples = nb_samples;
+avcodec_fill_audio_frame(audio_frame_,
+                         audio_channels_,
+                         audio_sample_fmt_,
+                         audio_buffer,
+                         nb_samples * av_get_bytes_per_sample(audio_sample_fmt_) * audio_channels_, 1);
+
+/**
+ * Fill AVFrame audio data and linesize pointers.
+ *
+ * The buffer buf must be a preallocated buffer with a size big enough
+ * to contain the specified samples amount. The filled AVFrame data
+ * pointers will point to this buffer.
+ *
+ * AVFrame extended_data channel pointers are allocated if necessary for
+ * planar audio.
+ *
+ * @param frame       the AVFrame
+ *                    frame->nb_samples must be set prior to calling the
+ *                    function. This function fills in frame->data,
+ *                    frame->extended_data, frame->linesize[0].
+ * @param nb_channels channel count
+ * @param sample_fmt  sample format
+ * @param buf         buffer to use for frame data
+ * @param buf_size    size of buffer
+ * @param align       plane size sample alignment (0 = default)
+ * @return            >=0 on success, negative error code on failure
+ * @todo return the size in bytes required to store the samples in
+ * case of success, at the next libavutil bump
+ */
+int avcodec_fill_audio_frame(AVFrame *frame, int nb_channels,
+                             enum AVSampleFormat sample_fmt, const uint8_t *buf,
+                             int buf_size, int align);
+
+源码：
+int avcodec_fill_audio_frame(AVFrame *frame, int nb_channels,
+                             enum AVSampleFormat sample_fmt, const uint8_t *buf,
+                             int buf_size, int align)
+{
+    int ch, planar, needed_size, ret = 0;
+
+    needed_size = av_samples_get_buffer_size(NULL, nb_channels,
+                                             frame->nb_samples, sample_fmt,
+                                             align);
+    if (buf_size < needed_size)
+        return AVERROR(EINVAL);
+
+    planar = av_sample_fmt_is_planar(sample_fmt);
+    if (planar && nb_channels > AV_NUM_DATA_POINTERS) {
+        if (!(frame->extended_data = av_mallocz(nb_channels *
+                                                sizeof(*frame->extended_data))))
+            return AVERROR(ENOMEM);
+    } else {
+        frame->extended_data = frame->data;
+    }
+
+    if ((ret = av_samples_fill_arrays(frame->extended_data, &frame->linesize[0],
+                                      buf, nb_channels, frame->nb_samples,
+                                      sample_fmt, align)) < 0) {
+        if (frame->extended_data != frame->data)
+            av_free(frame->extended_data);
+        return ret;
+    }
+    if (frame->extended_data != frame->data) {
+        for (ch = 0; ch < AV_NUM_DATA_POINTERS; ch++)
+            frame->data[ch] = frame->extended_data[ch];
+    }
+
+    return ret;
+}

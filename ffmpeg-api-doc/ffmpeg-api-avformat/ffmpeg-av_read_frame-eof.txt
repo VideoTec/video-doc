@@ -1,0 +1,8 @@
+2015.4.22
+av_read_frame 读到文件结束符时，会返回错误代码：-1606004923
+
+cannt read more avpkt: maybe eof: -1606004923
+error messgae:End of file
+
+H:\doc\Computer software\音视频技术\ffmpeg-api-doc\ffmpeg-AVERROR\ffmpeg-AVERROR-string.txt
+{ ERROR_TAG(EOF),                "End of file"                                    },

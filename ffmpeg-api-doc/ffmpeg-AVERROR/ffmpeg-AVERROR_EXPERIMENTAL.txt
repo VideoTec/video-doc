@@ -1,0 +1,19 @@
+experimental [美][ɪkˌspɛrəˈmɛntl]
+adj.实验的；根据实验的；试验性的
+n.试验性的东西
+#define AVERROR_EXPERIMENTAL       (-0x2bb2afa8) 
+///< Requested feature is flagged experimental. Set strict_std_compliance if you really want to use it.
+
+{ ERROR_TAG(EXPERIMENTAL),       "Experimental feature"                           }
+
+通过添加下面代码解决这个问题
+output_audio_stream->codec->strict_std_compliance = FF_COMPLIANCE_EXPERIMENTAL;
+
+  output_audio_stream->codec->sample_fmt = AV_SAMPLE_FMT_S16P;
+  output_audio_stream->codec->channels = 2;
+  output_audio_stream->codec->channel_layout = AV_CH_LAYOUT_STEREO;
+  output_audio_stream->codec->sample_rate = 44100;
+  if (output_context->oformat->flags & AVFMT_GLOBALHEADER)
+      output_audio_stream->codec->flags |= CODEC_FLAG_GLOBAL_HEADER;
+  ret = avcodec_open2(output_audio_stream->codec, audio_codec, NULL);
+  LOGI("avcodec_open2 error-msg: %s", av_err2str(ret));

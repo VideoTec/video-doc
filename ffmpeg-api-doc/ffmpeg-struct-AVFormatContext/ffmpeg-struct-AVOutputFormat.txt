@@ -1,0 +1,93 @@
+libavformat/avformat.h 定义
+typedef struct AVOutputFormat {
+    const char *name;
+    const char *long_name;
+    const char *mime_type;
+    const char *extensions; /**< comma-separated filename extensions */
+    enum AVCodecID audio_codec;    /**< default audio codec */
+    enum AVCodecID video_codec;    /**< default video codec */
+    enum AVCodecID subtitle_codec; /**< default subtitle codec */
+    int flags;
+    const struct AVCodecTag * const *codec_tag;
+    const AVClass *priv_class; ///< AVClass for the private context
+
+    /*****************************************************************
+     * No fields below this line are part of the public API.
+     *****************************************************************
+    struct AVOutputFormat *next;
+    int priv_data_size;
+    int (*write_header)(struct AVFormatContext *);
+    int (*write_packet)(struct AVFormatContext *, AVPacket *pkt);
+    int (*write_trailer)(struct AVFormatContext *);
+    int (*interleave_packet)(struct AVFormatContext *, AVPacket *out,
+                             AVPacket *in, int flush);
+    int (*query_codec)(enum AVCodecID id, int std_compliance);
+} AVOutputFormat;
+
+typedef struct AVOutputFormat {
+    const char *name;
+    /**
+     * Descriptive name for the format, meant to be more human-readable
+     * than name. You should use the NULL_IF_CONFIG_SMALL() macro
+     * to define it.
+     */
+    const char *long_name;
+    const char *mime_type;
+    const char *extensions; /**< comma-separated filename extensions */
+    /* output support */
+    enum AVCodecID audio_codec;    /**< default audio codec */
+    enum AVCodecID video_codec;    /**< default video codec */
+    enum AVCodecID subtitle_codec; /**< default subtitle codec */
+    /**
+     * can use flags: AVFMT_NOFILE, AVFMT_NEEDNUMBER, AVFMT_RAWPICTURE,
+     * AVFMT_GLOBALHEADER, AVFMT_NOTIMESTAMPS, AVFMT_VARIABLE_FPS,
+     * AVFMT_NODIMENSIONS, AVFMT_NOSTREAMS, AVFMT_ALLOW_FLUSH,
+     * AVFMT_TS_NONSTRICT
+     */
+    int flags;
+
+    /**
+     * List of supported codec_id-codec_tag pairs, ordered by "better
+     * choice first". The arrays are all terminated by AV_CODEC_ID_NONE.
+     */
+    const struct AVCodecTag * const *codec_tag;
+
+
+    const AVClass *priv_class; ///< AVClass for the private context
+
+    /*****************************************************************
+     * No fields below this line are part of the public API. They
+     * may not be used outside of libavformat and can be changed and
+     * removed at will.
+     * New public fields should be added right above.
+     *****************************************************************
+     */
+    struct AVOutputFormat *next;
+    /**
+     * size of private data so that it can be allocated in the wrapper
+     */
+    int priv_data_size;
+
+    int (*write_header)(struct AVFormatContext *);
+    /**
+     * Write a packet. If AVFMT_ALLOW_FLUSH is set in flags,
+     * pkt can be NULL in order to flush data buffered in the muxer.
+     * When flushing, return 0 if there still is more data to flush,
+     * or 1 if everything was flushed and there is no more buffered
+     * data.
+     */
+    int (*write_packet)(struct AVFormatContext *, AVPacket *pkt);
+    int (*write_trailer)(struct AVFormatContext *);
+    /**
+     * Currently only used to set pixel format if not YUV420P.
+     */
+    int (*interleave_packet)(struct AVFormatContext *, AVPacket *out,
+                             AVPacket *in, int flush);
+    /**
+     * Test if the given codec can be stored in this container.
+     *
+     * @return 1 if the codec is supported, 0 if it is not.
+     *         A negative number if unknown.
+     */
+    int (*query_codec)(enum AVCodecID id, int std_compliance);
+} AVOutputFormat;

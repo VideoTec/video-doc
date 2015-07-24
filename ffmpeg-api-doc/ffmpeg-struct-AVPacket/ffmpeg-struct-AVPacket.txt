@@ -1,0 +1,154 @@
+libavcodec/avcodec.h
+
+/**
+ * This structure stores compressed data. It is typically exported by demuxers
+ * and then passed as input to decoders, or received as output from encoders and
+ * then passed to muxers.
+ *
+ * For video, it should typically contain one compressed frame. For audio it may
+ * contain several compressed frames.
+ *
+ * AVPacket is one of the few structs in FFmpeg, whose size is a part of public
+ * ABI. Thus it may be allocated on stack and no new fields can be added to it
+ * without libavcodec and libavformat major bump.
+ *
+ * The semantics of data ownership depends on the buf or destruct (deprecated)
+ * fields. If either is set, the packet data is dynamically allocated and is
+ * valid indefinitely until av_free_packet() is called (which in turn calls
+ * av_buffer_unref()/the destruct callback to free the data). If neither is set,
+ * the packet data is typically backed by some static buffer somewhere and is
+ * only valid for a limited time (e.g. until the next read call when demuxing).
+ *
+ * The side data is always allocated with av_malloc() and is freed in
+ * av_free_packet().
+ */
+typedef struct AVPacket {
+    /**
+     * A reference to the reference-counted buffer where the packet data is
+     * stored.
+     * May be NULL, then the packet data is not reference-counted.
+     */
+    AVBufferRef *buf;
+    /**
+     * Presentation timestamp in AVStream->time_base units; the time at which
+     * the decompressed packet will be presented to the user.
+     * Can be AV_NOPTS_VALUE if it is not stored in the file.
+     * pts MUST be larger or equal to dts as presentation cannot happen before
+     * decompression, unless one wants to view hex dumps. Some formats misuse
+     * the terms dts and pts/cts to mean something different. Such timestamps
+     * must be converted to true pts/dts before they are stored in AVPacket.
+     */
+    int64_t pts;
+    /**
+     * Decompression timestamp in AVStream->time_base units; the time at which
+     * the packet is decompressed.
+     * Can be AV_NOPTS_VALUE if it is not stored in the file.
+     */
+    int64_t dts;
+    uint8_t *data;
+    int   size;
+    int   stream_index;
+    /**
+     * A combination of AV_PKT_FLAG values
+     */
+    int   flags;
+    /**
+     * Additional packet data that can be provided by the container.
+     * Packet can contain several types of side information.
+     */
+    AVPacketSideData *side_data;
+    int side_data_elems;
+
+    /**
+     * Duration of this packet in AVStream->time_base units, 0 if unknown.
+     * Equals next_pts - this_pts in presentation order.
+     */
+    int   duration;
+#if FF_API_DESTRUCT_PACKET
+    attribute_deprecated
+    void  (*destruct)(struct AVPacket *);
+    attribute_deprecated
+    void  *priv;
+#endif
+    int64_t pos;                            ///< byte position in stream, -1 if unknown
+
+    /**
+     * Time difference in AVStream->time_base units from the pts of this
+     * packet to the point at which the output from the decoder has converged
+     * independent from the availability of previous frames. That is, the
+     * frames are virtually identical no matter if decoding started from
+     * the very first frame or from this keyframe.
+     * Is AV_NOPTS_VALUE if unknown.
+     * This field is not the display duration of the current packet.
+     * This field has no meaning if the packet does not have AV_PKT_FLAG_KEY
+     * set.
+     *
+     * The purpose of this field is to allow seeking in streams that have no
+     * keyframes in the conventional sense. It corresponds to the
+     * recovery point SEI in H.264 and match_time_delta in NUT. It is also
+     * essential for some types of subtitle streams to ensure that all
+     * subtitles are correctly displayed after seeking.
+     */
+    int64_t convergence_duration;
+} AVPacket;
+#define AV_PKT_FLAG_KEY     0x0001 ///< The packet contains a keyframe
+#define AV_PKT_FLAG_CORRUPT 0x0002 ///< The packet content is corrupted
+
+
+---------------------------------------------------------
+应用实例：
+---------------------------------------------------------
+从MP4读取FRAME，然后封闭成AVPacket用于解码：
+把数据读入缓存buf，然后赋值，pkt.data = buf, pkt.size = size。
+可以正常解码
+
+---------------------------------------------------------
+重要字段
+---------------------------------------------------------
+int   size;
+uint8_t *data;
+int   stream_index;
+
+---------------------------------------------------------
+AVPacket 相关的 API libavcodec\avpacket.c
+---------------------------------------------------------
+void av_free_packet(AVPacket *pkt);
+void av_init_packet(AVPacket *pkt);
+int av_new_packet(AVPacket *pkt, int size);
+void av_shrink_packet(AVPacket *pkt, int size);
+int av_grow_packet(AVPacket *pkt, int grow_by);
+int av_packet_from_data(AVPacket *pkt, uint8_t *data, int size);
+int av_dup_packet(AVPacket *pkt);
+
+//side_data
+uint8_t* av_packet_new_side_data(AVPacket *pkt, enum AVPacketSideDataType type,
+                                 int size);
+int av_packet_shrink_side_data(AVPacket *pkt, enum AVPacketSideDataType type,
+                               int size);
+uint8_t* av_packet_get_side_data(AVPacket *pkt, enum AVPacketSideDataType type,
+                                 int *size);
+void av_packet_free_side_data(AVPacket *pkt);
+
+//refrence 引用计数
+int av_packet_ref(AVPacket *dst, AVPacket *src);
+void av_packet_unref(AVPacket *pkt);
+void av_packet_move_ref(AVPacket *dst, AVPacket *src);
+
+int av_packet_copy_props(AVPacket *dst, const AVPacket *src);
+void av_packet_rescale_ts(AVPacket *pkt, AVRational tb_src, AVRational tb_dst);
+
+---------------------------------------------------------
+相关函数
+---------------------------------------------------------
+av_read_frame          获取的 pkt 不再使用后，必须调用 av_free_packet
+
+avcodec_decode_audio4  对一个 PKT 调用多次解码，需要修改 size data 字段。
+avpkt.data += ret;
+avpkt.size -= ret;
+修改后，重新调用 avcodec_decode_audio4
+
+flush packet 用于 flush 编码器或者解码器 剩余数据
+flush 意思是 冲刷 把缓存中的数据全部 冲出
+        av_init_packet(&avpkt);
+        avpkt.data = NULL;
+        avpkt.size = 0;

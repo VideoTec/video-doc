@@ -1,0 +1,12 @@
+文档
+ * @return 0 on success, a negative AVERROR on error. Libavformat will always
+ *         take care of freeing the packet, even if this function fails.
+ 
+ -------------------------------
+ libav 里处理方式
+ -------------------------------
+    ret = av_interleaved_write_frame(s, pkt);
+    if (ret < 0) {
+        print_error("av_interleaved_write_frame()", ret);
+        exit_program(1);
+    }

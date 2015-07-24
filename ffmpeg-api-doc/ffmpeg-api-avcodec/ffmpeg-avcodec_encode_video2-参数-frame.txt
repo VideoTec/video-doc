@@ -1,0 +1,7 @@
+参数
+ @param[in] frame AVFrame containing the raw video data to be encoded.
+ May be NULL when flushing an encoder that has the CODEC_CAP_DELAY capability set.
+ 
+ 必须指定 width height
+ 必须指定 pts，用于计算输出的 avpkt 的时间信息
+ 18:02 2015/5/22 ios-ffmpeg-libx264 需要指定 pix_fmt，否则 libx264会有警告，未指定 pix_fmt

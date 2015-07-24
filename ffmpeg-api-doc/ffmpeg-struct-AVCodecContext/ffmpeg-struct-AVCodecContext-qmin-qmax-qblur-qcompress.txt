@@ -1,0 +1,43 @@
+    /* - encoding parameters */
+    float qcompress;  ///< amount of qscale change between easy & hard scenes (0.0-1.0)
+    float qblur;      ///< amount of qscale smoothing over time (0.0-1.0)
+                      //因为我们的量化系数q是在qmin和qmax之间浮动的，  
+                      //qblur表示这种浮动变化的变化程度，取值范围0.0～1.0，取0表示不削减
+
+    /**
+     * minimum quantizer
+     * - encoding: Set by user.
+     * - decoding: unused
+     */
+    int qmin;
+
+    /**
+     * maximum quantizer
+     * - encoding: Set by user.
+     * - decoding: unused
+     */
+    int qmax;
+
+    /**
+     * maximum quantizer difference between frames
+     * - encoding: Set by user.
+     * - decoding: unused
+     */
+    int max_qdiff;
+
+只有在设置下面 flags 后，qmin/qmax 才有效
+    AVDictionary *dict = NULL;
+    av_dict_set(&dict, "flags", "+qscale", 0);
+    av_dict_set(&dict, "qmin", "8", 0);
+    av_dict_set(&dict, "qmin", "5", 0);
+    ret = avcodec_open2(avctx, codec, &dict);
+    av_dict_free(&dict);
+或者
+    avctx->flags |= CODEC_FLAG_QSCALE;
+    avctx->qmin = 8;
+    avctx->qmax = 5;
+
+--------------------------
+qscale - 没有这个字段
+--------------------------
+qscale parameter vary depending on the codec

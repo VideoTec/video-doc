@@ -1,0 +1,61 @@
+libavutil/rational.h
+rational[英][ˈræʃnəl] [美][ˈræʃənəl] [数]有理数
+分数都是有理数的。 无限不循环小数是无理数，包括π、e和大部分的平方根，无理数不能写作两整数之比。
+有理数是整数和分数构成的。
+
+#define AV_TIME_BASE            1000000
+#define AV_TIME_BASE_Q          (AVRational){1, AV_TIME_BASE}
+
+/**
+ * rational number numerator/denominator
+ */
+typedef struct AVRational{
+    int num; ///< numerator
+    int den; ///< denominator
+} AVRational;
+
+常用的有理数函数(可以理解为分数函数)
+static inline AVRational av_make_q(int num, int den)
+static inline int av_cmp_q(AVRational a, AVRational b)
+static inline double av_q2d(AVRational a)
+int av_reduce(int *dst_num, int *dst_den, int64_t num, int64_t den, int64_t max);
+AVRational av_mul_q(AVRational b, AVRational c) av_const;        @return b*c
+AVRational av_div_q(AVRational b, AVRational c) av_const;        @return b/c
+AVRational av_add_q(AVRational b, AVRational c) av_const;        @return b+c
+AVRational av_sub_q(AVRational b, AVRational c) av_const;        @return b-c
+static av_always_inline AVRational av_inv_q(AVRational q)        @return 1 / q
+AVRational av_d2q(double d, int max) av_const;
+int av_nearer_q(AVRational q, AVRational q1, AVRational q2);
+int av_find_nearest_q_idx(AVRational q, const AVRational* q_list);
+
+libavutil\mathematics.h
+enum AVRounding {            [英][ˈraʊndɪŋ] [美]['raʊndɪŋ]n.制圆，舍入，凑整
+    AV_ROUND_ZERO     = 0, ///< Round toward zero.
+    AV_ROUND_INF      = 1, ///< Round away from zero.
+    AV_ROUND_DOWN     = 2, ///< Round toward -infinity.
+    AV_ROUND_UP       = 3, ///< Round toward +infinity.
+    AV_ROUND_NEAR_INF = 5, ///< Round to nearest and halfway cases away from zero.
+    AV_ROUND_PASS_MINMAX = 8192, ///< Flag to pass INT64_MIN/MAX through instead of rescaling, this avoids special cases for AV_NOPTS_VALUE
+};
+
+/**
+ * Rescale a 64-bit integer by 2 rational numbers.
+   把时间戳从一个时基(bq) 变为 另外一个时基(cq) 时候用的函数。它基本的动作是计算a*b/c
+   直接计算会有溢出的情况发生
+   AV_TIME_BASE * time_in_seconds = avcodec_timestamp
+   AV_TIME_BASE_Q * avcodec_timestamp = time_in_seconds
+ */
+ <libavutil/mathematics.h>
+int64_t av_rescale_q(int64_t a, AVRational bq, AVRational cq) av_const;  
+
+/**
+ * Rescale a 64-bit integer with specified rounding.
+ * A simple a*b/c isn't possible as it can overflow.
+ *
+ * @return rescaled value a, or if AV_ROUND_PASS_MINMAX is set and a is
+ *         INT64_MIN or INT64_MAX then a is passed through unchanged.
+ round[英][raʊnd] [美][raʊnd] vt.& vi.使成圆形；绕行；拐过，绕过；把…四舍五入
+ */
+int64_t av_rescale_rnd(int64_t a, int64_t b, int64_t c, enum AVRounding) av_const;
+示例：48000Hz 转成 多少44100Hz样？ 进一取整
+int out_samples = av_rescale_rnd(swr_get_delay(swr, 48000) + in_samples, 44100, 48000, AV_ROUND_UP);

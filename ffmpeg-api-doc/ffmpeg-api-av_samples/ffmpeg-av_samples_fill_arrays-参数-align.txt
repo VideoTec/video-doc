@@ -1,0 +1,11 @@
+文档
+ * @param align            buffer size alignment (0 = default, 1 = no alignment)
+ 
+int av_samples_fill_arrays(uint8_t **audio_data, int *linesize,
+                           const uint8_t *buf,
+                           int nb_channels, int nb_samples,
+                           enum AVSampleFormat sample_fmt, int align);
+ 
+代码中的作用: 参见 av_samples_get_buffer_size
+    buf_size = av_samples_get_buffer_size(&line_size, nb_channels, nb_samples,
+                                          sample_fmt, align);

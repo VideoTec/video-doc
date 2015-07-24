@@ -1,0 +1,95 @@
+int64_t nb_frames;                 ///< number of frames in this stream if known or 0
+
+-------------------------------------
+输入文件的 AVStream nb_frames 表示流中 帧的数量
+-------------------------------------
+14:38 2015/4/23
+mov mp4 格式，在打开后，可以获得正确值
+
+-------------------------------------
+mov muxer 时，这个值会增加吗？什么时候增加？
+-------------------------------------
+libavformat/mux.c
+在 write_packet 成功后,才加一, 代码在那里？ 
+
+14:38 2015/4/23
+为什么得到的 nb_frames 总是零呢？
+return target->fmctx->streams[target->v_index]->nb_frames;
+不知道为什么没有增加，最后自己来计数
+
+int av_write_frame(AVFormatContext *s, AVPacket *pkt)
+{
+    int ret;
+
+    ret = check_packet(s, pkt);
+    if (ret < 0)
+        return ret;
+
+    if (!pkt) {
+        if (s->oformat->flags & AVFMT_ALLOW_FLUSH)
+            return s->oformat->write_packet(s, pkt);
+        return 1;
+    }
+
+    ret = compute_pkt_fields2(s, s->streams[pkt->stream_index], pkt);
+
+    if (ret < 0 && !(s->oformat->flags & AVFMT_NOTIMESTAMPS))
+        return ret;
+
+    ret = write_packet(s, pkt);
+
+    if (ret >= 0)
+        s->streams[pkt->stream_index]->nb_frames++;
+    return ret;
+}
+
+int av_interleaved_write_frame(AVFormatContext *s, AVPacket *pkt)
+{
+    int ret, flush = 0;
+
+    ret = check_packet(s, pkt);
+    if (ret < 0)
+        goto fail;
+
+    if (pkt) {
+        AVStream *st = s->streams[pkt->stream_index];
+
+        av_dlog(s, "av_interleaved_write_frame size:%d dts:%" PRId64 " pts:%" PRId64 "\n",
+                pkt->size, pkt->dts, pkt->pts);
+        if ((ret = compute_pkt_fields2(s, st, pkt)) < 0 && !(s->oformat->flags & AVFMT_NOTIMESTAMPS))
+            goto fail;
+
+        if (pkt->dts == AV_NOPTS_VALUE && !(s->oformat->flags & AVFMT_NOTIMESTAMPS)) {
+            av_log(s, AV_LOG_ERROR, "pkt->dts == AV_NOPTS_VALUE && !(s->oformat->flags & AVFMT_NOTIMESTAMPS)\n" );
+            ret = AVERROR(EINVAL);
+            goto fail;
+        }
+    } else {
+        av_dlog(s, "av_interleaved_write_frame FLUSH\n");
+        flush = 1;
+    }
+
+    for (;; ) {
+        AVPacket opkt;
+        int ret = interleave_packet(s, &opkt, pkt, flush);
+        if (pkt) {
+            memset(pkt, 0, sizeof(*pkt));
+            av_init_packet(pkt);
+            pkt = NULL;
+        }
+        if (ret <= 0) //FIXME cleanup needed for ret<0 ?
+            return ret;
+
+        ret = write_packet(s, &opkt);
+        if (ret >= 0)
+            s->streams[opkt.stream_index]->nb_frames++;
+
+        av_free_packet(&opkt);
+
+        if (ret < 0)
+            return ret;
+    }
+fail:
+    av_packet_unref(pkt);
+    return ret;
+}

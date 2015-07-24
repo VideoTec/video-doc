@@ -1,0 +1,13 @@
+引用计数的缓存
+
+AVPacket
+
+    /**
+     * A reference to the reference-counted buffer where the packet data is
+     * stored.
+     * May be NULL, then the packet data is not reference-counted.
+     */
+    AVBufferRef *buf;
+
+1. 由非引用计数的 AVPacket 转为引用计数的？
+   好像没有办法，只能 av_new_packet，然后把数据复制到 packet.data 里去

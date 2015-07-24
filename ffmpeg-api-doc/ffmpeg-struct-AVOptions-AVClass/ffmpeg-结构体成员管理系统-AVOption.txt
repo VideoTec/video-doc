@@ -1,0 +1,22 @@
+http://blog.csdn.net/leixiaohua1020/article/details/44268323
+
+AVClass中存储了AVOption类型的数组option，用于存储选项信息。
+AVClass有一个特点就是它必须位于其支持的结构体的第一个位置。
+
+例如，
+AVFormatContext和AVCodecContext都支持AVClass，
+观察它们结构体的定义可以发现他们结构体的第一个变量都是AVClass。
+截取一小段AVFormatContext的定义的开头部分
+
+AVOption的特点就在于它赋值时候的灵活性。
+AVOption可以使用字符串为任何类型的变量赋值。
+传统意义上，如果变量类型为int，则需要使用整数来赋值；
+如果变量为double，则需要使用小数来赋值；
+如果变量类型为char *，才需要使用字符串来赋值。
+而AVOption将这些赋值“归一化”了，统一使用字符串赋值。
+例如给int型变量qp设定值为20，通过AVOption需要传递进去一个内容为“20”的字符串
+
+AVOption中变量的名称也使用字符串来表示。
+结合上面提到的使用字符串赋值的特性，
+我们可以发现使用AVOption之后，
+传递两个字符串（一个是变量的名称，一个是变量的值）就可以改变系统中变量的值

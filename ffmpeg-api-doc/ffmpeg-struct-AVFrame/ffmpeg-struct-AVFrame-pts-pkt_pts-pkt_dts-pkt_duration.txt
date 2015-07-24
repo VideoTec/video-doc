@@ -1,0 +1,28 @@
+AVFrame 时间字段
+
+    /**
+     * Presentation timestamp in time_base units (time when frame should be shown to user).
+     */
+    int64_t pts;  解码时不会填充这个值，需要调用者自己计算
+
+    /**
+     * PTS copied from the AVPacket that was decoded to produce this frame.
+     */
+    int64_t pkt_pts;
+
+    /**
+     * DTS copied from the AVPacket that triggered returning this frame. (if frame threading isn't used)
+     * This is also the Presentation time of this AVFrame calculated from
+     * only AVPacket.dts values without pts values.
+     */
+    int64_t pkt_dts;
+
+    /**
+     * duration of the corresponding packet, expressed in
+     * AVStream->time_base units, 0 if unknown.
+     * Code outside libavcodec should access this field using:
+     * av_frame_get_pkt_duration(frame)
+     * - encoding: unused
+     * - decoding: Read by user.
+     */
+    int64_t pkt_duration;

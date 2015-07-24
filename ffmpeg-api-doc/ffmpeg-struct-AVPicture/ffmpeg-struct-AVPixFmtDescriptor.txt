@@ -1,0 +1,81 @@
+头文件 E:\libav\libavutil\pixdesc.h
+
+
+typedef struct AVComponentDescriptor {
+    /**
+     * Which of the 4 planes contains the component.
+     */
+    uint16_t plane        : 2;     属于那个平面
+
+	consecutive[英][kənˈsekjətɪv] [美][kənˈsɛkjətɪv] adj.连续的，连贯的；[语]表示结果的
+    /**
+     * Number of elements between 2 horizontally consecutive pixels minus 1.
+     * Elements are bits for bitstream formats, bytes otherwise.
+     */
+    uint16_t step_minus1  : 3;
+
+    /**
+     * Number of elements before the component of the first pixel plus 1.
+     * Elements are bits for bitstream formats, bytes otherwise.
+     */
+    uint16_t offset_plus1 : 3;
+
+	significant[英][sɪgˈnɪfɪkənt] [美][sɪɡˈnɪfɪkənt] 有意义的事物；象征，标志
+    /**
+     * Number of least significant bits that must be shifted away
+     * to get the value.
+     */
+    uint16_t shift        : 3;
+
+    /**
+     * Number of bits in the component minus 1.
+     */
+    uint16_t depth_minus1 : 4;  每个元素，位数减1  示例：AV_PIX_FMT_RGB565BE
+} AVComponentDescriptor;
+
+/**
+ * Descriptor that unambiguously describes how the bits of a pixel are
+ * stored in the up to 4 data planes of an image. It also stores the
+ * subsampling factors and number of components.
+ *
+ * @note This is separate of the colorspace (RGB, YCbCr, YPbPr, JPEG-style YUV
+ *       and all the YUV variants) AVPixFmtDescriptor just stores how values
+ *       are stored not what these values represent.
+ */
+typedef struct AVPixFmtDescriptor {
+    const char *name;
+    uint8_t nb_components;  ///< The number of components each pixel has, (1-4)
+
+	chroma[英][ˈkrəʊmə] [美][ˈkroʊmə] （色彩的）浓度，色度
+	luminance[英][ˈlu:mɪnəns] [美][ˈlumənəns] 亮度；发光度
+    /**
+     * Amount to shift the luma width right to find the chroma width.
+     * For YV12 this is 1 for example.
+     * chroma_width = -((-luma_width) >> log2_chroma_w)
+     * The note above is needed to ensure rounding up.
+     * This value only refers to the chroma components.
+     */
+    uint8_t log2_chroma_w;  ///< chroma_width = -((-luma_width )>>log2_chroma_w)
+
+    /**
+     * Amount to shift the luma height right to find the chroma height.
+     * For YV12 this is 1 for example.
+     * chroma_height= -((-luma_height) >> log2_chroma_h)
+     * The note above is needed to ensure rounding up.
+     * This value only refers to the chroma components.
+     */
+    uint8_t log2_chroma_h;
+    uint8_t flags;
+
+    /**
+     * Parameters that describe how pixels are packed. If the format
+     * has chroma components, they must be stored in comp[1] and
+     * comp[2].
+     */
+    AVComponentDescriptor comp[4];
+
+    /**
+     * Alternative comma-separated names.
+     */
+    const char *alias;
+} AVPixFmtDescriptor;

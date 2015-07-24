@@ -1,0 +1,35 @@
+coefficient[英][ˌkəʊɪˈfɪʃnt] [美][ˌkoʊɪˈfɪʃnt] 系数；（测定某种质量或变化过程的）率；程度；协同因素
+
+参考
+http://softpixel.com/~cwright/programming/colorspace/yuv/
+http://avisynth.nl/index.php/Color_conversions
+YUV - RGB Conversion
+There are many slightly different formulas to convert between YUV and RGB. The only major difference is a few decimal places. The CCIR 601 Standard (now ITU-R 601) specifies the correct coefficients. Since I'm lazy and haven't looked up this spec, I don't know if the following coefficients are correct or not. In any event, I've used them for many conversions with no obvious discoloration.
+These formulas assume U and V are unsigned bytes.
+R = Y + 1.4075 * (V - 128)
+G = Y - 0.3455 * (U - 128) - (0.7169 * (V - 128))
+B = Y + 1.7790 * (U - 128)
+
+Y = R *  .299000 + G *  .587000 + B *  .114000
+U = R * -.168736 + G * -.331264 + B *  .500000 + 128
+V = R *  .500000 + G * -.418688 + B * -.081312 + 128
+
+These aren't perfect inverses of each other. I'll try to do some actual math and get more accurate coefficients soon.
+
+参考
+D:\CoreSDK\trunk\universal\ffmpeg\include\libswscale\swscale.h
+#define SWS_CS_ITU709         1
+#define SWS_CS_FCC            4
+#define SWS_CS_ITU601         5
+#define SWS_CS_ITU624         5
+#define SWS_CS_SMPTE170M      5
+#define SWS_CS_SMPTE240M      7
+#define SWS_CS_DEFAULT        5
+/**
+ * Return a pointer to yuv<->rgb coefficients for the given colorspace
+ * suitable for sws_setColorspaceDetails().
+ *
+ * @param colorspace One of the SWS_CS_* macros. If invalid,
+ * SWS_CS_DEFAULT is used.
+ */
+const int *sws_getCoefficients(int colorspace);

@@ -1,0 +1,38 @@
+没有正确理解造成错误：
+E:\WinApp\libav-test\msource-change-history.txt
+计算 avpkt.pts 错误的使用了用户设置的值，但是实际 stream.time_base 和用户设置的值不一致。
+于是悲剧了。
+
+    /**
+     * This is the fundamental[美][ˌfʌndəˈmɛntl]基本的 unit of time (in seconds) in terms
+     * of which frame timestamps are represented.
+     *
+     * decoding: set by libavformat
+     * encoding: May be set by the caller before avformat_write_header() to
+     *           provide a hint to the muxer about the desired timebase. In
+     *           avformat_write_header(), the muxer will overwrite this field
+     *           with the timebase that will actually be used for the timestamps
+     *           written into the file (which may or may not be related to the
+     *           user-provided one, depending on the format).
+     */
+    AVRational time_base;
+
+/**
+ * rational number numerator/denominator
+ */
+typedef struct AVRational{
+    int num; ///< numerator
+    int den; ///< denominator
+} AVRational;
+
+用法示例
+avconv.c
+
+static void do_audio_out(AVFormatContext *s, OutputStream *ost,
+                         AVFrame *frame)
+{
+    if (got_packet) {
+        av_packet_rescale_ts(&pkt, enc->time_base, ost->st->time_base);
+        write_frame(s, &pkt, ost);
+    }
+}

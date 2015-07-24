@@ -1,0 +1,34 @@
+文档
+ * @param[in] avpkt The input AVpacket containing the input buffer.
+ *            You can create such packet with av_init_packet() and by then setting
+ *            data and size, some decoders might in addition need other fields like
+ *            flags&AV_PKT_FLAG_KEY. All decoders are designed to use the least
+ *            fields possible.
+ 
+ * Decode the video frame of size avpkt->size from avpkt->data into picture.
+ * Some decoders may support multiple frames in a single AVPacket, such
+ * decoders would then just decode the first frame.
+ *
+ * @warning The input buffer must be FF_INPUT_BUFFER_PADDING_SIZE larger than
+ * the actual read bytes because some optimized bitstream readers read 32 or 64
+ * bits at once and could read over the end.
+ *
+ * @warning The end of the input buffer buf should be set to 0 to ensure that
+ * no overreading happens for damaged MPEG streams.
+ *
+ * @note Codecs which have the CODEC_CAP_DELAY capability set have a delay
+ * between input and output, these need to be fed with avpkt->data=NULL,
+ * avpkt->size=0 at the end to return the remaining frames.
+ 
+ -------------------------------
+ avpacket 的来源
+ -------------------------------
+ 1. av_read_frame
+ 2. av_init_packet() and by then setting data and size， 自定义注意缓存大小 FF_INPUT_BUFFER_PADDING_SIZE
+ 
+ -------------------------------
+ flush 解码器
+ -------------------------------
+ * @note Codecs which have the CODEC_CAP_DELAY capability set have a delay
+ * between input and output, these need to be fed with avpkt->data=NULL,
+ * avpkt->size=0 at the end to return the remaining frames.

@@ -1,0 +1,11 @@
+978 kb/s, 24 fps, 25 tbr, 25 tbn, 50 tbc
+4189 kb/s, 600 fps, 600 tbr, 600 tbn, 600 tbc
+
+分别代表什么意思？
+
+There are three different time bases for time stamps in FFmpeg. 
+The values printed are actually reciprocals of these, i.e. 1/tbr, 1/tbn and 1/tbc.
+
+tbn = the time base in AVStream that has come from the container
+tbc = the time base in AVCodecContext for the codec used for a particular stream
+tbr = tbr is guessed from the video stream and is the value users want to see when they look for the video frame rate

@@ -1,0 +1,33 @@
+libavformat 内部使用的
+
+    /**
+     * An opaque field for libavformat internal usage.
+     * Must not be accessed in any way by callers.
+     */
+    AVFormatInternal *internal;
+
+E:\libav\libavformat\internal.h
+struct AVFormatInternal {
+    /**
+     * Number of streams relevant for interleaving.
+     * Muxing only.
+     */
+    int nb_interleaved_streams;
+};
+
+avformat_alloc_context 分配 AVFormatContext实例时，会分配这个结构体 AVFormatInternal
+AVFormatContext *avformat_alloc_context(void)
+{
+    AVFormatContext *ic;
+    ic = av_malloc(sizeof(AVFormatContext));
+    if (!ic) return ic;
+    avformat_get_context_defaults(ic);
+
+    ic->internal = av_mallocz(sizeof(*ic->internal));
+    if (!ic->internal) {
+        avformat_free_context(ic);
+        return NULL;
+    }
+
+    return ic;
+}

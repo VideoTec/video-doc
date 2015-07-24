@@ -1,0 +1,28 @@
+兼容 AVFrame 头部
+源文件位置
+E:\libav\libavcodec\imgconvert.c
+E:\libav\libavcodec\avpicture.c
+
+/**
+ * four components are given, that's all.
+ * the last component is alpha
+ */
+typedef struct AVPicture {
+    uint8_t *data[AV_NUM_DATA_POINTERS];
+    int linesize[AV_NUM_DATA_POINTERS];     ///< number of bytes per line
+} AVPicture;
+
+相关 API
+int avpicture_alloc(AVPicture *picture, enum AVPixelFormat pix_fmt, int width, int height);
+void avpicture_free(AVPicture *picture);
+int avpicture_fill(AVPicture *picture, uint8_t *ptr,
+                   enum AVPixelFormat pix_fmt, int width, int height);
+int avpicture_layout(const AVPicture* src, enum AVPixelFormat pix_fmt,
+                     int width, int height,
+                     unsigned char *dest, int dest_size);
+void av_picture_copy(AVPicture *dst, const AVPicture *src,
+                     enum AVPixelFormat pix_fmt, int width, int height);
+int av_picture_crop(AVPicture *dst, const AVPicture *src,
+                    enum AVPixelFormat pix_fmt, int top_band, int left_band);
+int av_picture_pad(AVPicture *dst, const AVPicture *src, int height, int width, enum AVPixelFormat pix_fmt,
+            int padtop, int padbottom, int padleft, int padright, int *color);

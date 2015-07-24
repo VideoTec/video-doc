@@ -1,0 +1,22 @@
+aac 编码器输出的原始 aac 帧数据包
+
+In AAC raw format means it contains only the data. no header portions. 
+Sampling Rate, channels and object type have to be specified by us via application.
+
+AAC is a variable bitrate (VBR) block-based codec where each block decodes to 1024 time-domain samples. Allegedly, each frame stands alone and does not depend on previous frames (whereas many perceptual audio codecs overlap data with the previous frame)
+
+--------------------------------------------
+包装原始 aac 帧数据的方式
+ADIF: ADIF_HEADER FRAME1 FRAME2 FRAME3....
+http://www.digitalpreservation.gov/formats/fdd/fdd000112.shtml
+--------------------------------------------
+
+In ADIF the header is given only at the beginning. The rest is the frame data. If the header portion is lost we cannot decode it.
+ADIF header has a 32 bit ADIF code, 0x41444946 at the start of the header, which helps the decoder to know that it is a ADIF encoded stream. All the data required to decode the stream such as sampling rate, channels, profile etc are all given inside the header
+
+--------------------------------------------
+包装原始 aac 帧数据的方式
+ADTS : ADTS_HEADER FRAME1 ADTS_HEADER FRAME2 ADTS_HEADER FRAME3...
+--------------------------------------------
+In ADTS, each frame data is preceded by a header. So even if the header portion of any frame is lost, we can still decode the stream. It is very helpful in streaming applications. ADTS header begins with a 12 bit header sync 0xFFF, which helps the decoder to know that it is an ADTS encoded stream.
+ADTS header has a fixed and variable header. Fixed header consists of general stream information like sampling rate, channels, profile etc. which remains the same in every frame. Variable header has frame related information like encoded frame size, which varies with frames.

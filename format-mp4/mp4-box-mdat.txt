@@ -1,0 +1,21 @@
+mp4 mdat box
+
+官网解释
+http://mp4ra.org/atoms.html
+mdat	media data container
+
+Media data box which contains the actual AV frames
+Within a mdat, there are chunks and samples
+
+----------------------
+代码示例
+----------------------
+
+00 02 78 c6
+
+6d 64 61 74
+m  d  a  t
+
+21 10 05 20
+
+a4 1b ff c0

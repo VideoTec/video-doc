@@ -1,0 +1,13 @@
+AAC is a variable bitrate (VBR) block-based codec where each block decodes to 1024 time-domain samples.
+Allegedly[英][ə'ledʒɪdlɪ] [美][ə'ledʒɪdlɪ]据称, each frame stands alone and does not depend on previous frames 
+(whereas many perceptual audio codecs overlap data with the previous frame)
+
+frame length flag:
+0: Each packet contains 1024 samples
+1: Each packet contains 960 samples
+
+In an MPEG-4 file, the AAC data is broken up into a series of variable length frames
+
+AAC 编码器 设置的 frame_size
+E:\ffmpeg-src\libavcodec\libvo-aacenc.c  #define FRAME_SIZE 1024
+E:\ffmpeg-src\libavcodec\aacenc.c        avctx->frame_size = 1024;

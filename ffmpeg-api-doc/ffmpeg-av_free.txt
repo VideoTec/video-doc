@@ -1,0 +1,26 @@
+libavutil/mem.h
+
+/**
+ * Free a memory block which has been allocated with av_malloc(z)() or
+ * av_realloc().
+ * @param ptr Pointer to the memory block which should be freed.
+ * @note ptr = NULL is explicitly allowed.
+ * @note It is recommended that you use av_freep() instead.
+ * @see av_freep()
+ */
+void av_free(void *ptr);
+
+void av_free(void *ptr)
+{
+#if CONFIG_MEMALIGN_HACK
+    if (ptr) {
+        int v= ((char *)ptr)[-1];
+        av_assert0(v>0 && v<=ALIGN);
+        free((char *)ptr - v);
+    }
+#elif HAVE_ALIGNED_MALLOC
+    _aligned_free(ptr);
+#else
+    free(ptr);
+#endif
+}

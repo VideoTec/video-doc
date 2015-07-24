@@ -1,0 +1,9 @@
+Track Identifiers 
+
+The track identifiers used in an ISO file are unique within that file; no two tracks shall use the same identifier. 
+
+The next track identifier value stored in next_track_ID in the Movie Header Box 
+generally contains a value one greater than the largest track identifier value found in the file. 
+
+This enables easy generation of a track identifier under most circumstances. 
+However, if this value is equal to ones (32-bit unsigned maxint), then a search for an unused track identifier is needed for all additions.

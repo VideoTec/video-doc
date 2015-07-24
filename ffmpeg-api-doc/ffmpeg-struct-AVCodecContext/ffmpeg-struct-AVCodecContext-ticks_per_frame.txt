@@ -1,0 +1,19 @@
+    /**
+     * For some codecs, the time base is closer to the field rate than the frame rate.
+     * Most notably, H.264 and MPEG-2 specify time_base as half of frame duration
+     * if no telecine is used ...
+     *
+     * Set to time_base ticks per frame. Default 1, e.g., H.264/MPEG-2 set it to 2.
+     */
+    int ticks_per_frame;
+	
+	
+	参考代码 avconv.c 设置编码器的 time_base 时
+            /* for each output stream, we compute the right encoding parameters */
+            if (!copy_tb) {
+                enc_ctx->time_base      = dec_ctx->time_base;
+                enc_ctx->time_base.num *= dec_ctx->ticks_per_frame;
+                av_reduce(&enc_ctx->time_base.num, &enc_ctx->time_base.den,
+                          enc_ctx->time_base.num, enc_ctx->time_base.den, INT_MAX);
+            } else
+                enc_ctx->time_base = ist->st->time_base;

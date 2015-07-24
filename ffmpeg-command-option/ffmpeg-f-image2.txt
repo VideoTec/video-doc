@@ -1,0 +1,5 @@
+图片合成视频
+ffmpeg -f image2 -i d:\t-src\pic-bring-bk\%%3d.png -pix_fmt yuv420p -r 25 -s 480x480 d:\template\pic-bring-bk.mp4
+
+视频分成图片
+ffmpeg -i xx -f image2 d:\%d.png

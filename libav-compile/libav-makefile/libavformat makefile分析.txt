@@ -1,0 +1,103 @@
+《分析libavcodec\makefile》 最重要的是文件分类
+
+分组：source,format
+第一步：source：先把最基本的源文件加入工程，并编译。需要把allformats.c里的所有视频文件合成，解析器都注释了
+第二步：common：常用：见configure脚本文件：mov_muxer_select="riffenc rtpenc_chain" mov_demuxer_select="riffdec"
+OBJS-$(CONFIG_RIFFDEC)                   += riffdec.o
+OBJS-$(CONFIG_RIFFENC)                   += riffenc.o
+OBJS-$(CONFIG_RTPENC_CHAIN)              += rtpenc_chain.o rtp.o
+
+第三步：添加protocol
+OBJS-$(CONFIG_FILE_PROTOCOL)             += file.o
+
+第四步：添加format(muxer/demuxer)
+1) mov: mov.o mov_chan.o movenc.o movenchint.o avc.o hevc.o isom.o replaygain.o
+   注意，MOV格式，依赖libavcodec（makefile）的某些源文件 # libavformat dependencies
+分析configure脚本里，组件依赖关系
+mov_demuxer_select="riffdec"
+mov_demuxer_suggest="zlib"
+mov_muxer_select="riffenc rtpenc_chain"
+OBJS-$(CONFIG_MOV_DEMUXER)               += mov.o isom.o mov_chan.o replaygain.o
+OBJS-$(CONFIG_MOV_MUXER)                 += movenc.o isom.o avc.o hevc.o movenchint.o mov_chan.o
+
+----------------------------------------------------------------------------------------------------------------------
+最重要的是找到，每个CONFIG对应的源文件列表，其次是分类理解。
+在工程里分类管理不同的源文件：按libavcodec\makefile分类
+第一组，必须包含文件
+第二组：
+1）muxers/demuxers
+2）external libraries
+3）protocols I/O
+
+特殊的文件：
+riffdec.o  RIFF demuxing functions and data 
+riffenc.o  RIFF muxing functions
+资源交换档案标准（Resource Interchange File Format，RIFF）   RIFF使用小端序
+是Electronic Arts在1985提出的Interchange File Format的翻版   IFF 使用大端序
+
+rtpenc_chain.o  RTP muxer chaining code
+rtp.o           RTP input/output format
+file_open.o     #include "libavutil/file_open.c"
+
+OBJS-$(CONFIG_NETWORK)                   += network.o
+OBJS-$(CONFIG_RIFFDEC)                   += riffdec.o
+OBJS-$(CONFIG_RIFFENC)                   += riffenc.o
+OBJS-$(CONFIG_RTPDEC)                    += rdt.o                       \
+                                            rtp.o                       \
+                                            rtpdec.o                    \
+                                            rtpdec_amr.o                \
+                                            rtpdec_asf.o                \
+                                            rtpdec_g726.o               \
+                                            rtpdec_h263.o               \
+                                            rtpdec_h263_rfc2190.o       \
+                                            rtpdec_h264.o               \
+                                            rtpdec_ilbc.o               \
+                                            rtpdec_jpeg.o               \
+                                            rtpdec_latm.o               \
+                                            rtpdec_mpeg12.o             \
+                                            rtpdec_mpeg4.o              \
+                                            rtpdec_mpegts.o             \
+                                            rtpdec_qcelp.o              \
+                                            rtpdec_qdm2.o               \
+                                            rtpdec_qt.o                 \
+                                            rtpdec_svq3.o               \
+                                            rtpdec_vp8.o                \
+                                            rtpdec_xiph.o               \
+                                            srtp.o
+OBJS-$(CONFIG_RTPENC_CHAIN)              += rtpenc_chain.o rtp.o
+
+OBJS-$(HAVE_LIBC_MSVCRT)                 += file_open.o
+
+自定义添加mov,mp4格式：
+isom.o       注释：Media common code，定义了许多AVCodecTag数组
+mov_chan.o   注释：mov 'chan' tag reading/writing、Channel Layout Tag
+hevc.o       注释：High Efficiency Video Coding，简称HEVC，是一种视频压缩标准、HEVC (de)muxer utilities
+                   分析，合成 HEVC NAL units
+avc.o        注释：AVC helper functions for muxers，H.264/MPEG-4第10部分（MPEG-4第10部分也称为AVC，既Advanced Video Coding，高级视频编码）是一种视频压缩标准
+                   分析，合成 AVC NAL units
+mov.o        注释：MOV demuxer，"mov,mp4,m4a,3gp,3g2,mj2"，"QuickTime / MOV"
+movenc.o     注释：MOV, 3GP, MP4 muxer，8个AVOutputFormat结构体：
+                   ff_mov_muxer：mov，"QuickTime / MOV"
+				   ff_tgp_muxer：3gp，"3GP (3GPP file format)"
+				   ff_mp4_muxer：mp4，"MP4 (MPEG-4 Part 14)"
+				   ff_psp_muxer：mp4,psp，"PSP MP4 (MPEG-4 Part 14)"
+				   ff_tg2_muxer：3g2，"3GP2 (3GPP2 file format)"
+				   ff_ipod_muxer：m4v,m4a，"iPod H.264 MP4 (MPEG-4 Part 14)"
+				   ff_ismv_muxer：ismv,isma，"ISMV/ISMA (Smooth Streaming)"
+				   ff_f4v_muxer：f4v，"F4V Adobe Flash Video"
+movenchint.o 注释：MOV, 3GP, MP4 muxer RTP hinting
+smoothstreamingenc.o 注释：ff_smoothstreaming_muxer "Smooth Streaming Muxer" Live smooth streaming fragmenter
+用处：
+OBJS-$(CONFIG_MOV_DEMUXER)               += isom.o mov.o mov_chan.o
+OBJS-$(CONFIG_MOV_MUXER)                 += isom.o avc.o hevc.o mov_chan.o movenc.o movenchint.o
+
+OBJS-$(CONFIG_CAF_DEMUXER)               += isom.o mov.o mov_chan.o cafdec.o caf.o 
+OBJS-$(CONFIG_MATROSKA_DEMUXER)          += isom.o matroskadec.o matroska.o rmsipr.o
+OBJS-$(CONFIG_MATROSKA_MUXER)            += isom.o avc.o hevc.o matroskaenc.o matroska.o flacenc_header.o avlanguage.o wv.o
+OBJS-$(CONFIG_MPEGTS_DEMUXER)            += isom.o mpegts.o
+OBJS-$(CONFIG_SMOOTHSTREAMING_MUXER)     += isom.o smoothstreamingenc.o
+OBJS-$(CONFIG_WEBM_MUXER)                += isom.o avc.o matroskaenc.o matroska.o flacenc_header.o avlanguage.o wv.o
+OBJS-$(CONFIG_WTV_DEMUXER)               += isom.o wtv.o asfdec.o asf.o asfcrypt.o avlanguage.o mpegts.o
+OBJS-$(CONFIG_FLV_MUXER)                 += avc.o flvenc.o
+OBJS-$(CONFIG_RTP_MUXER)                 += avc.o rtp.o rtpenc_aac.o rtpenc_latm.o rtpenc_amr.o rtpenc_h263.o rtpenc_h263_rfc2190.o \
+                                            rtpenc_jpeg.o rtpenc_mpv.o rtpenc.o rtpenc_h264.o rtpenc_vp8.o rtpenc_xiph.o

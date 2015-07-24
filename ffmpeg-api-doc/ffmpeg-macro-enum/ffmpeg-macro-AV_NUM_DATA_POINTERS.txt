@@ -1,0 +1,5 @@
+libavutil/frame.h
+
+typedef struct AVFrame {
+#define AV_NUM_DATA_POINTERS 8
+

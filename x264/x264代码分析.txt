@@ -1,0 +1,15 @@
+2014.10.15 【计划】《libx264接口基本用法》
+
+x264 can not encode BGR. You must convert the image to YUV 4:2:0p. I recommend using libswscale from the ffmpeg project to perform this operation.
+
+> 1--- Open a raw (name.yuv) YUV file.
+> 2--- Encode it to H.264 CIF using basic profile.
+> 3--- Output the encoded file to (new_name.264)
+
+x264_param_t x264_param; //结构体初始化。  http://mewiki.project357.com/wiki/X264_Settings
+x264_t *x264_encoder_open( x264_param_t * ); //x264_t结构体，表示一个编码器
+
+http://stackoverflow.com/questions/2940671/how-does-one-encode-a-series-of-images-into-h264-using-the-x264-c-api
+
+Example usage of X264. We create a raw YUV pattern and encode it with x264
+https://gist.github.com/roxlu/6453908

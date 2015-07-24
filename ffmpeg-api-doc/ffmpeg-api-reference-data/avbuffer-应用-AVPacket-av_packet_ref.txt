@@ -1,0 +1,44 @@
+头文件 libavcodec/avcodec.h
+源文件 libavcodec/avpacket.c
+
+/**
+ * Setup a new reference to the data described by a given packet
+ *
+ * If src is reference-counted, setup dst as a new reference to the
+ * buffer in src. Otherwise allocate a new buffer in dst and copy the
+ * data from src into it.
+ *
+ * All the other fields are copied from src.
+ *
+ * @see av_packet_unref
+ *
+ * @param dst Destination packet
+ * @param src Source packet
+ *
+ * @return 0 on success, a negative AVERROR on error.
+ */
+int av_packet_ref(AVPacket *dst, AVPacket *src);
+
+int av_packet_ref(AVPacket *dst, AVPacket *src)
+{
+    int ret;
+
+    ret = av_packet_copy_props(dst, src);
+    if (ret < 0)
+        return ret;
+
+    if (!src->buf) {
+        ret = packet_alloc(&dst->buf, src->size);
+        if (ret < 0)
+            goto fail;
+        memcpy(dst->buf->data, src->data, src->size);
+    } else
+        dst->buf = av_buffer_ref(src->buf);
+
+    dst->size = src->size;
+    dst->data = dst->buf->data;
+    return 0;
+fail:
+    av_packet_free_side_data(dst);
+    return ret;
+}

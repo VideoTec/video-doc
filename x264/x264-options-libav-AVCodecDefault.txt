@@ -1,0 +1,10 @@
+源文件
+
+E:\libav\libavcodec\internal.h
+
+AVCodecDefault
+
+struct AVCodecDefault {
+    const uint8_t *key;
+    const uint8_t *value;
+};

@@ -1,0 +1,15 @@
+下面两个函数有区别吗？
+
+Fill AVFrame audio data and linesize pointers.
+avcodec_fill_audio_frame 
+1. 会调用 av_samples_fill_arrays
+2. 赋值：frame->extended_data 这个只是 nb_channels > AV_NUM_DATA_POINTERS 才有意义
+int avcodec_fill_audio_frame(AVFrame *frame, int nb_channels,
+                             enum AVSampleFormat sample_fmt, const uint8_t *buf,
+                             int buf_size, int align);
+
+Fill plane data pointers and linesize for samples with sample format sample_fmt.
+int av_samples_fill_arrays(uint8_t **audio_data, int *linesize,
+                           const uint8_t *buf,
+                           int nb_channels, int nb_samples,
+                           enum AVSampleFormat sample_fmt, int align);

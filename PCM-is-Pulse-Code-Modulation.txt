@@ -1,0 +1,4 @@
+PCM is Pulse Code Modulation
+
+pulse[英][pʌls] [美][pʌls] 脉搏；[无线电]（电磁波等）脉动；活力；有节奏的跳动（或拍打）
+modulation[英][ˌmɒdjʊ'leɪʃn] [美][ˌmɑdʒəˈleʃən] 调制；调幅度；移调

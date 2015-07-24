@@ -1,0 +1,24 @@
+头文件：avutil/frame.h
+源文件：avutil/frame.c
+
+/**
+ * Unreference all the buffers referenced by frame and reset the frame fields.
+ */
+void av_frame_unref(AVFrame *frame);
+
+void av_frame_unref(AVFrame *frame)
+{
+    int i;
+
+    for (i = 0; i < frame->nb_side_data; i++) {
+        free_side_data(&frame->side_data[i]);
+    }
+    av_freep(&frame->side_data);
+
+    for (i = 0; i < FF_ARRAY_ELEMS(frame->buf); i++)
+        av_buffer_unref(&frame->buf[i]);
+    for (i = 0; i < frame->nb_extended_buf; i++)
+        av_buffer_unref(&frame->extended_buf[i]);
+    av_freep(&frame->extended_buf);
+    get_frame_defaults(frame);
+}

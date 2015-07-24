@@ -1,0 +1,5 @@
+Audio sample formats
+
+The data described by the sample format is always in native-endian order.
+
+怎么理解？

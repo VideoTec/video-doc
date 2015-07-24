@@ -1,0 +1,17 @@
+   ret = av_read_frame(audio_file->file_ctx, &audio_pkt)
+  
+  if(!audio_file->flush_decoder) {
+    int bytes = avcodec_decode_audio4(audio_file->codec_ctx, &audio_frame, &got_audio_frame, &audio_pkt);
+    if(bytes < 0) {
+      LOGE("decode audio failed: %s, error-msg: %s", audio_file->file_ctx->filename, av_err2str(bytes));
+    } else {
+      LOGI("decode audio file: %s, got frame: %d", audio_file->file_ctx->filename, got_audio_frame);
+      if(bytes != audio_pkt.size) {
+        LOGE("there is more data in the audio packet: %d < %d", bytes, audio_pkt.size);
+      }
+    }
+  }
+  
+  错误：
+  01-27 19:16:27.694: E/JNILog(9420): decode audio failed: /sdcard/test11.mp4, error-msg: Invalid data found when processing input
+  原因是：没有判断读取的PAKCKET是否是需要的。文件中的视频包，也传给 avcodec_decode_audio4 所以导致错误产生

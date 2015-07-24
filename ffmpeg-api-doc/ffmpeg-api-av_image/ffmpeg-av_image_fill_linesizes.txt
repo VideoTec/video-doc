@@ -1,0 +1,11 @@
+
+E:\libav\libavutil\imgutils.h
+
+/**
+ * Fill plane linesizes for an image with pixel format pix_fmt and
+ * width width.
+ *
+ * @param linesizes array to be filled with the linesize for each plane
+ * @return >= 0 in case of success, a negative error code otherwise
+ */
+int av_image_fill_linesizes(int linesizes[4], enum AVPixelFormat pix_fmt, int width);

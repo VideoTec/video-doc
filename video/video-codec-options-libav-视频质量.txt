@@ -1,0 +1,44 @@
+video quantizer 视频量化器
+
+{"qcomp", "video quantizer scale compression (VBR). Constant of ratecontrol equation. "
+          "Recommended range for default rc_eq: 0.0-1.0",
+          OFFSET(qcompress), AV_OPT_TYPE_FLOAT, {.dbl = 0.5 }, -FLT_MAX, FLT_MAX, V|E},
+{"qblur", "video quantizer scale blur (VBR)", OFFSET(qblur), AV_OPT_TYPE_FLOAT, {.dbl = 0.5 }, -1, FLT_MAX, V|E},
+{"qmin", "minimum video quantizer scale (VBR)", OFFSET(qmin), AV_OPT_TYPE_INT, {.i64 = 2 }, -1, 69, V|E},
+{"qmax", "maximum video quantizer scale (VBR)", OFFSET(qmax), AV_OPT_TYPE_INT, {.i64 = 31 }, -1, 69, V|E},
+{"qdiff", "maximum difference between the quantizer scales (VBR)", OFFSET(max_qdiff), AV_OPT_TYPE_INT, {.i64 = 3 }, INT_MIN, INT_MAX, V|E},
+
+{"qscale", "use fixed qscale", 0, AV_OPT_TYPE_CONST, {.i64 = CODEC_FLAG_QSCALE }, INT_MIN, INT_MAX, 0, "flags"},
+
+编码质量 取代 码流
+http://slhck.info/video-encoding.html
+There are various FFmpeg encoders that support variable bit rate / constant quality encoding. 
+This gives you a much better overall quality 
+when file size or average bit rate are not constrained (e.g. in a streaming scenario). 
+Variable bit rate is usually achieved by 
+setting -q:v (or -q:a for audio) instead of -b:v (or -b:a), 
+which just sets a constant bit rate.
+
+mpeg4
+-q:v 范围：31-1  推荐值：3-5 
+2 is visually lossless. 
+Doubling the value results in half the bitrate.
+-q:v works for mpeg4, but haven't tested others.
+
+参考：
+https://trac.ffmpeg.org/wiki/Encode/MPEG-4
+E:\doc\Computer software\音视频技术\video\video-codec-mpeg4-编码参数.txt
+
+---------------------
+设置 mpeg4 编码质量
+---------------------
+   avctx->flags |= CODEC_FLAG_QSCALE;
+   avctx->qmin = 8;
+   avctx->qmax = 5;
+或者
+    AVDictionary *dict = NULL;
+    av_dict_set(&dict, "flags", "+qscale", 0);
+    av_dict_set(&dict, "qmax", "5", 0);
+    av_dict_set(&dict, "qmin", "8", 0);
+    ret = avcodec_open2(avctx, codec, &dict);
+    av_dict_free(&dict);

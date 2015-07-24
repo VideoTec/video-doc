@@ -1,0 +1,39 @@
+    /**
+     * For video, size in bytes of each picture line.
+     * For audio, size in bytes of each plane.
+     *
+     * For audio, only linesize[0] may be set. For planar audio, each channel
+     * plane must be the same size.
+     *
+     * For video the linesizes should be multiples of the CPUs alignment
+     * preference, this is 16 or 32 for modern desktop CPUs.
+     * Some code requires such alignment other code can be slower without
+     * correct alignment, for yet other it makes no difference.
+     *
+     * @note The linesize may be larger than the size of usable data -- there
+     * may be extra padding present for performance reasons.
+     */
+    int linesize[AV_NUM_DATA_POINTERS];
+	
+	问题：
+	在解 aac 时发现，解出的PCM格式是 fltp，但是 linesize 是 8192
+I have a question:
+The comments in samplefmt.h say that the linesize for a planar format is 
+in linesize[0] and the same for all used planes.
+So if i decode an audiostream and the sampleFormat is AV_SAMPLE_FMT_FLTP 
+and its stereo and the first AVFrame says
+that there are 1024 samples decoded (nb_samples). In my understanding 
+the bytes per sample is 4 and the first two planes of data are used. So 
+linesize[0] must be 1024*4 = 4096. But when i decode an AV_CODEC_ID_AAC 
+the linesize[0] is set to 8192, which would be the total size of used 
+planes in data. I tried the same with and AV_CODEC_ID_AC3 stream and 
+there the linesize[0] is correctly set to 6144 after nb_samples = 1536. 
+Both streams have AV_SAMPLE_FMT_FLTP and are stereo.
+
+	解释：
+AVFrame.linesize[0] for audio is the size of the buffer for one plane. 
+It does not necessarily mean that the whole buffer contains real audio 
+samples. For example, it could be padded to a multiple of some specific 
+size for SIMD processing, or the decoder could buffer more samples than 
+are needed because it needs the buffer before it knows exactly how many 
+samples will end up in the frame.

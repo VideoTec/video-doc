@@ -1,0 +1,2 @@
+ * @return 0 on success, a negative AVERROR on error. Libavformat will always
+ *         take care of freeing the packet, even if this function fails.

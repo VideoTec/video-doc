@@ -1,0 +1,41 @@
+http://www.ypass.net/blog/2010/01/pcm-audio-part-3-basic-audio-effects-volume-control/
+
+------------------------------------
+参考 audio filter volume 和 volumedetect
+------------------------------------
+
+typedef struct {
+    /**
+     * Number of samples at each PCM value.
+     * histogram[0x8000 + i] is the number of samples at value i. 这个值是 有符号short型
+     * The extra element is there for symmetry.[英][ˈsɪmətri] [美][ˈsɪmɪtri] 对称；对称美；整齐，匀称
+     */
+    uint64_t histogram[0x10001];  [英][ˈhɪstəgræm] [美][ˈhɪstəˌɡræm] 柱状图
+} VolDetectContext;
+
+
+这里的 logdb 意思是 log dB
+static inline double logdb(uint64_t v)
+{
+    double d = v / (double)(0x8000 * 0x8000);
+    if (!v)
+        return MAX_DB;
+    return log(d) * -4.3429448190325182765112891891660508229; /* -10/log(10) */
+}
+
+[Parsed_volumedetect_0 @ 023edaa0] n_samples: 1058688
+[Parsed_volumedetect_0 @ 023edaa0] mean_volume: -19.0 dB
+[Parsed_volumedetect_0 @ 023edaa0] max_volume: -4.2 dB
+[Parsed_volumedetect_0 @ 023edaa0] histogram_4db: 90
+[Parsed_volumedetect_0 @ 023edaa0] histogram_5db: 474
+[Parsed_volumedetect_0 @ 023edaa0] histogram_6db: 1130
+
+------------------------------------
+参考下面的概念
+常用的0dB基准有下面几种：
+------------------------------------
+ 
+　　1) dBFS，以满刻度的量值为0dB，常用于各种特性曲线上；
+　　2) dBm，在600Ω负载上产生1mW功率(或0.775V电压)为0dB，常用于交流电平测量仪表上；
+　　3) dBV，以1伏为0dB；
+　　4) dBW，以1瓦为0dB。

@@ -1,0 +1,40 @@
+enum AVOptionType{
+    AV_OPT_TYPE_FLAGS,
+    AV_OPT_TYPE_INT,
+    AV_OPT_TYPE_INT64,
+    AV_OPT_TYPE_DOUBLE,
+    AV_OPT_TYPE_FLOAT,
+    AV_OPT_TYPE_STRING,
+    AV_OPT_TYPE_RATIONAL,
+    AV_OPT_TYPE_BINARY,  ///< offset must point to a pointer immediately followed by an int for the length
+    AV_OPT_TYPE_DICT,
+    AV_OPT_TYPE_CONST = 128,
+};
+
+关于 AV_OPT_TYPE_FLAGS 值，相关的的代码
+static int set_string_number(void *obj, void *target_obj, const AVOption *o, const char *val, void *dst) {
+        if (*val == '+' || *val == '-') {
+            if (o->type == AV_OPT_TYPE_FLAGS)
+                cmd = *(val++);
+            else if (!notfirst)
+                buf[i++] = *val;
+        }
+
+        if (o->type == AV_OPT_TYPE_FLAGS) {
+            read_number(o, dst, NULL, NULL, &intnum);
+            if      (cmd == '+') d = intnum | (int64_t)d;
+            else if (cmd == '-') d = intnum &~(int64_t)d;
+        } else {
+            read_number(o, dst, &num, &den, &intnum);
+            if      (cmd == '+') d = notfirst*num*intnum/den + d;
+            else if (cmd == '-') d = notfirst*num*intnum/den - d;
+        }
+}
+
+代码举例：
+{"flags", NULL, OFFSET(flags), AV_OPT_TYPE_FLAGS, {.i64 = DEFAULT }, 0, UINT_MAX, V|A|E|D, "flags"},
+
+{"qscale", "use fixed qscale", 0, AV_OPT_TYPE_CONST, {.i64 = CODEC_FLAG_QSCALE }, INT_MIN, INT_MAX, 0, "flags"}
+
+使用说明：
+av_dict_set(&dict, "flags", "+qscale", 0); - 参考 opt.c - main 函数

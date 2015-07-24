@@ -1,0 +1,22 @@
+https://developer.apple.com/library/mac/documentation/QuickTime/QTFF/QTFFAppenG/QTFFAppenG.html
+
+Encoder delay is the delay incurred during encoding to produce properly formed, encoded audio packets. 
+It typically refers to the number of silent media samples (priming samples) added to the front of an AAC encoded bitstream.
+
+2112 priming [英]['praɪmɪŋ] [美]['praɪmɪŋ] 雷管；装填物；起爆药；底漆 
+samples at the start—Required to correctly encode the start of the audio.
+
+5389 samples of actual audio.
+
+691 remainder [英][rɪˈmeɪndə(r)] [美][rɪˈmendɚ] n.剩余物；其他人员；差数；
+samples—Required to pad out to the AAC packet size.
+
+这个参数，存入在那里？容器里？
+mp4-box-trak-edts-elst 来存储这个值？
+https://developer.apple.com/library/mac/documentation/QuickTime/QTFF/QTFFAppenG/QTFFAppenG.html
+edit list and sample group atoms are used to represent the encoder delay
+
+参考：
+AVStream start_time
+
+问题是，ffmpeg 生成的 mp4 文件的，aac 声音流的 start_time 不为零（）和这个有关系吗？

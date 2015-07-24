@@ -1,0 +1,28 @@
+wav-header.gif
+The WAV file is an instance of a Resource Interchange File Format (RIFF) defined by IBM and Microsoft
+RIFF chunks - Resource Interchange File Format (RIFF) 是分块存储的 块头+数据
+
+struct wavfile
+{
+    char        id[4];          // should always contain "RIFF"
+    int     totallength;    // total file length minus 8
+    char        wavefmt[8];     // should be "WAVEfmt "
+    int     format;         // 16 for PCM format
+    short     pcm;            // 1 for PCM format
+    short     channels;       // channels
+    int     frequency;      // sampling frequency
+    int     bytes_per_second;
+    short     bytes_by_capture;
+    short     bits_per_sample;
+    char        data[4];        // should always contain "data"
+    int     bytes_in_data;
+};
+
+注意：双声道的数据存储格式为，打包形式
+Multi-channel digital audio samples are stored as interlaced wave data 
+which simply means that the audio samples of a multi-channel (such as stereo and surround) wave file are stored by 
+cycling through the audio samples for each channel before advancing to the next sample time.
+LRLRLRLRLRLRLRLRLRLRLRLRLRLRLRLRLR
+
+示例代码：
+E:\ffmpeg-src\tests\audiogen.c

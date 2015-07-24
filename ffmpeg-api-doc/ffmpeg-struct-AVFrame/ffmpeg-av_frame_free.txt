@@ -1,0 +1,48 @@
+头文件 libavutil/frame.h
+源文件 libavutil/frame.c
+
+/**
+ * Free the frame and any dynamically allocated objects in it,
+ * e.g. extended_data. If the frame is reference counted, it will be
+ * unreferenced first.
+ *
+ * @param frame frame to be freed. The pointer will be set to NULL.
+ */
+void av_frame_free(AVFrame **frame);
+
+av_frame_free 和 avcodec_fill_audio_frame 填充的缓存，怎么处理？
+av_frame_free 用来释放AvFrame,我看到过好多例子，在这个之后还要av_free(Avframe->data[0])
+,其实完全没有必要！这个函数可以清空Avframe里面所有的动态内存！
+
+2015.4.22
+如果是，用 av_malloc + avpicture_fill 方式定义的 AVFrame，需要使用 av_free 释放缓存。
+即，如果 AVFrame 不是引用计数的，就需要， 使用 av_free 释放缓存。
+
+-----------------------------------
+源码
+-----------------------------------
+void av_frame_free(AVFrame **frame)
+{
+    if (!frame || !*frame)
+        return;
+
+    av_frame_unref(*frame);
+    av_freep(frame);
+}
+
+void av_frame_unref(AVFrame *frame)
+{
+    int i;
+
+    wipe_side_data(frame);
+
+    for (i = 0; i < FF_ARRAY_ELEMS(frame->buf); i++)
+        av_buffer_unref(&frame->buf[i]);
+    for (i = 0; i < frame->nb_extended_buf; i++)
+        av_buffer_unref(&frame->extended_buf[i]);
+    av_freep(&frame->extended_buf);
+    av_dict_free(&frame->metadata);
+    av_buffer_unref(&frame->qp_table_buf);
+
+    get_frame_defaults(frame);
+}

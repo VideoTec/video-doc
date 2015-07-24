@@ -1,0 +1,94 @@
+------------------------------------------------
+E:\ffmpeg-src\libavcodec\jpeglsenc.c
+------------------------------------------------
+AVCodec ff_jpegls_encoder = {
+    .name           = "jpegls",
+    .long_name      = NULL_IF_CONFIG_SMALL("JPEG-LS"),
+    .type           = AVMEDIA_TYPE_VIDEO,
+    .id             = AV_CODEC_ID_JPEGLS,
+    .init           = encode_init_ls,
+    .close          = encode_close,
+    .capabilities   = CODEC_CAP_FRAME_THREADS | CODEC_CAP_INTRA_ONLY,
+    .encode2        = encode_picture_ls,
+    .pix_fmts       = (const enum AVPixelFormat[]) {
+        AV_PIX_FMT_BGR24, AV_PIX_FMT_RGB24,
+        AV_PIX_FMT_GRAY8, AV_PIX_FMT_GRAY16,
+        AV_PIX_FMT_NONE
+    },
+};
+
+------------------------------------------------
+E:\ffmpeg-src\libavcodec\mjpegenc.c
+------------------------------------------------
+AVCodec ff_mjpeg_encoder = {
+    .name           = "mjpeg",
+    .long_name      = NULL_IF_CONFIG_SMALL("MJPEG (Motion JPEG)"),
+    .type           = AVMEDIA_TYPE_VIDEO,
+    .id             = AV_CODEC_ID_MJPEG,
+    .priv_data_size = sizeof(MpegEncContext),
+    .init           = ff_mpv_encode_init,
+    .encode2        = ff_mpv_encode_picture,
+    .close          = ff_mpv_encode_end,
+    .capabilities   = CODEC_CAP_SLICE_THREADS | CODEC_CAP_FRAME_THREADS | CODEC_CAP_INTRA_ONLY,
+    .pix_fmts       = (const enum AVPixelFormat[]){
+        AV_PIX_FMT_YUVJ420P, AV_PIX_FMT_YUVJ422P, AV_PIX_FMT_YUVJ444P, AV_PIX_FMT_NONE
+    },
+    .priv_class     = &mjpeg_class,
+};
+
+------------------------------------------------
+E:\ffmpeg-src\libavcodec\libopenjpegenc.c
+------------------------------------------------
+AVCodec ff_libopenjpeg_encoder = {
+    .name           = "libopenjpeg",
+    .long_name      = NULL_IF_CONFIG_SMALL("OpenJPEG JPEG 2000"),
+    .type           = AVMEDIA_TYPE_VIDEO,
+    .id             = AV_CODEC_ID_JPEG2000,
+    .priv_data_size = sizeof(LibOpenJPEGContext),
+    .init           = libopenjpeg_encode_init,
+    .encode2        = libopenjpeg_encode_frame,
+    .close          = libopenjpeg_encode_close,
+    .capabilities   = CODEC_CAP_FRAME_THREADS | CODEC_CAP_INTRA_ONLY,
+    .pix_fmts       = (const enum AVPixelFormat[]) {
+        AV_PIX_FMT_RGB24, AV_PIX_FMT_RGBA, AV_PIX_FMT_RGB48,
+        AV_PIX_FMT_RGBA64, AV_PIX_FMT_GBR24P,
+        AV_PIX_FMT_GBRP9, AV_PIX_FMT_GBRP10, AV_PIX_FMT_GBRP12, AV_PIX_FMT_GBRP14, AV_PIX_FMT_GBRP16,
+        AV_PIX_FMT_GRAY8, AV_PIX_FMT_YA8, AV_PIX_FMT_GRAY16,
+        AV_PIX_FMT_YUV420P, AV_PIX_FMT_YUV422P, AV_PIX_FMT_YUVA420P,
+        AV_PIX_FMT_YUV440P, AV_PIX_FMT_YUV444P, AV_PIX_FMT_YUVA422P,
+        AV_PIX_FMT_YUV411P, AV_PIX_FMT_YUV410P, AV_PIX_FMT_YUVA444P,
+        AV_PIX_FMT_YUV420P9, AV_PIX_FMT_YUV422P9, AV_PIX_FMT_YUV444P9,
+        AV_PIX_FMT_YUVA420P9, AV_PIX_FMT_YUVA422P9, AV_PIX_FMT_YUVA444P9,
+        AV_PIX_FMT_YUV420P10, AV_PIX_FMT_YUV422P10, AV_PIX_FMT_YUV444P10,
+        AV_PIX_FMT_YUVA420P10, AV_PIX_FMT_YUVA422P10, AV_PIX_FMT_YUVA444P10,
+        AV_PIX_FMT_YUV420P12, AV_PIX_FMT_YUV422P12, AV_PIX_FMT_YUV444P12,
+        AV_PIX_FMT_YUV420P14, AV_PIX_FMT_YUV422P14, AV_PIX_FMT_YUV444P14,
+        AV_PIX_FMT_YUV420P16, AV_PIX_FMT_YUV422P16, AV_PIX_FMT_YUV444P16,
+        AV_PIX_FMT_YUVA420P16, AV_PIX_FMT_YUVA422P16, AV_PIX_FMT_YUVA444P16,
+        AV_PIX_FMT_XYZ12,
+        AV_PIX_FMT_NONE
+    },
+    .priv_class     = &openjpeg_class,
+};
+
+------------------------------------------------
+E:\ffmpeg-src\libavcodec\j2kenc.c
+------------------------------------------------
+AVCodec ff_jpeg2000_encoder = {
+    .name           = "jpeg2000",
+    .long_name      = NULL_IF_CONFIG_SMALL("JPEG 2000"),
+    .type           = AVMEDIA_TYPE_VIDEO,
+    .id             = AV_CODEC_ID_JPEG2000,
+    .priv_data_size = sizeof(Jpeg2000EncoderContext),
+    .init           = j2kenc_init,
+    .encode2        = encode_frame,
+    .close          = j2kenc_destroy,
+    .capabilities   = CODEC_CAP_EXPERIMENTAL,
+    .pix_fmts       = (const enum AVPixelFormat[]) {
+        AV_PIX_FMT_RGB24, AV_PIX_FMT_YUV444P, AV_PIX_FMT_GRAY8,
+/*      AV_PIX_FMT_YUV420P,
+        AV_PIX_FMT_YUV422P, AV_PIX_FMT_YUV444P,
+        AV_PIX_FMT_YUV410P, AV_PIX_FMT_YUV411P,*/
+        AV_PIX_FMT_NONE
+    }
+};

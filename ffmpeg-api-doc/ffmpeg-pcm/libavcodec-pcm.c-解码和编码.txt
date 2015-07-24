@@ -1,0 +1,58 @@
+/**
+ * Read PCM samples macro
+ * @param size   Data size of native machine format
+ * @param endian bytestream_get_xxx() endian suffix
+ * @param src    Source pointer (variable name)
+ * @param dst    Destination pointer (variable name)
+ * @param n      Total number of samples (variable name)
+ * @param shift  Bitshift (bits)
+ * @param offset Sample value offset
+ */
+#define DECODE(size, endian, src, dst, n, shift, offset)                \
+    for (; n > 0; n--) {                                                \
+        uint ## size ## _t v = bytestream_get_ ## endian(&src);         \
+        AV_WN ## size ## A(dst, (v - offset) << shift);                 \
+        dst += size / 8;                                                \
+    }
+
+#if HAVE_BIGENDIAN
+#define DECODE_PLANAR(size, endian, src, dst, n, shift, offset)         \
+    {                                                                   \
+        int n2;                                                         \
+        n /= avctx->channels;                                           \
+        for (c = 0; c < avctx->channels; c++) {                         \
+            samples = frame->extended_data[c];                          \
+            n2 = n;                                                     \
+            DECODE(size, endian, src, samples, n2, 0, 0)                \
+        }                                                               \
+    }
+#else
+#define DECODE_PLANAR(size, endian, src, dst, n, shift, offset)         \
+    {                                                                   \
+        n /= avctx->channels;                                           \
+        for (c = 0; c < avctx->channels; c++) {                         \
+            samples = frame->extended_data[c];                          \
+            memcpy(samples, src, n * size / 8);                         \
+            src += n * size / 8;                                        \
+        }                                                               \
+    }
+#endif /* HAVE_BIGENDIAN */
+
+
+
+/**
+ * Write PCM samples macro
+ * @param type   Datatype of native machine format
+ * @param endian bytestream_put_xxx() suffix
+ * @param src    Source pointer (variable name)
+ * @param dst    Destination pointer (variable name)
+ * @param n      Total number of samples (variable name)
+ * @param shift  Bitshift (bits)
+ * @param offset Sample value offset
+ */
+#define ENCODE(type, endian, src, dst, n, shift, offset)                \
+    samples_ ## type = (const type *) src;                              \
+    for (; n > 0; n--) {                                                \
+        register type v = (*samples_ ## type++ >> shift) + offset;      \
+        bytestream_put_ ## endian(&dst, v);                             \
+    }

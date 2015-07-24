@@ -1,0 +1,104 @@
+libavutil/samplefmt.h
+
+----------------------------------------------------------------
+libav 的 av_samples_alloc 返回值不是分配的内存的大小
+----------------------------------------------------------------
+怎么得到这个分配的缓存的大小呢？
+根据 返回的 linesize 和 声道数 及 sample_fmt 来自己计算？
+
+或者
+int size = av_samples_get_buffer_size(NULL, nb_channels, nb_samples,
+                                          sample_fmt, align);
+
+----------------------------------------------------------------
+----------------------------------------------------------------
+linesize 相关的参数有 #define FFALIGN(x, a) (((x)+(a)-1)&~((a)-1))
+
+line_size = planar ? FFALIGN(nb_samples * sample_size,               align) :
+                         FFALIGN(nb_samples * sample_size * nb_channels, align);
+
+----------------------------------------------------------------
+怎么释放？avcodec_fill_audio_frame 填充到 frame 后，frame 释放时，能不能释放掉？
+----------------------------------------------------------------
+好像需要手动释放掉
+// free buffers
+av_freep(&destinationData[0]);
+av_freep(&destinationData);
+av_frame_free(&pOutputAudioFrame);
+
+/**
+ * Allocate a samples buffer for nb_samples samples, and fill data pointers and
+ * linesize accordingly.
+ * The allocated samples buffer can be freed by using av_freep(&audio_data[0])
+ * Allocated data will be initialized to silence.
+ *
+ * @see enum AVSampleFormat
+ * The documentation for AVSampleFormat describes the data layout.
+ *
+ * @param[out] audio_data  array to be filled with the pointer for each channel
+ * @param[out] linesize    aligned size for audio buffer(s), may be NULL
+ * @param nb_channels      number of audio channels
+ * @param nb_samples       number of samples per channel
+ * @param align            buffer size alignment (0 = default, 1 = no alignment)
+ * @return                 >=0 on success or a negative error code on failure
+ * @todo return the size of the allocated buffer in case of success at the next bump
+ * @see av_samples_fill_arrays()
+ * @see av_samples_alloc_array_and_samples()
+ */
+int av_samples_alloc(uint8_t **audio_data, int *linesize, int nb_channels,
+                     int nb_samples, enum AVSampleFormat sample_fmt, int align);
+示例：
+ uint8_t *new_data[AVRESAMPLE_MAX_CHANNELS] = { NULL };
+ ret = av_samples_alloc(new_data, &plane_size, a->allocated_channels,
+                               nb_samples, a->sample_fmt, 0);
+
+源码
+int av_samples_alloc(uint8_t **audio_data, int *linesize, int nb_channels,
+                     int nb_samples, enum AVSampleFormat sample_fmt, int align)
+{
+    uint8_t *buf;
+    int size = av_samples_get_buffer_size(NULL, nb_channels, nb_samples,
+                                          sample_fmt, align);
+    if (size < 0)
+        return size;
+
+    buf = av_malloc(size);
+    if (!buf)
+        return AVERROR(ENOMEM);
+
+    size = av_samples_fill_arrays(audio_data, linesize, buf, nb_channels,
+                                  nb_samples, sample_fmt, align);
+    if (size < 0) {
+        av_free(buf);
+        return size;
+    }
+
+    av_samples_set_silence(audio_data, 0, nb_samples, nb_channels, sample_fmt);
+
+    return size;
+}
+
+错误：   出错 av_freep 和 av_free 的区别？
+1. 创建
+  uint8_t **sample_data = NULL;
+  ret = av_samples_alloc_array_and_samples(
+          &sample_data, &linesize, 
+          g_out_audio_nb_channels,
+          g_out_audio_frame_size + 512,
+          g_out_audio_format,
+          0);
+
+2. 释放
+    if(af->sample_data) {
+      LOGI("free sample data buffer for file: %s", af->file_ctx->filename);
+      if(af->sample_data[0]) av_freep(af->sample_data[0]);                        出错 av_freep 和 av_free 的区别？
+      LOGI("free sample data array for file: %s", af->file_ctx->filename);
+      av_freep(af->sample_data);
+    }
+
+造成下面的错误
+01-26 16:35:38.899 14655 14655 I JNILog  : free sample data buffer for file: /sdcard/dream.m4a
+
+01-26 16:35:38.899 14655 14655 F libc    : @@@ ABORTING: INVALID HEAP ADDRESS IN dlfree
+
+01-26 16:35:38.899 14655 14655 F libc    : Fatal signal 11 (SIGSEGV) at 0xdeadbaad (code=1)

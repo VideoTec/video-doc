@@ -1,0 +1,42 @@
+头文件：avutil/buffer.h
+源文件：avutil/buffer.c
+
+/**
+ * Allocate an AVBuffer of the given size using av_malloc().
+ *
+ * @return an AVBufferRef of given size or NULL when out of memory
+ */
+AVBufferRef *av_buffer_alloc(int size);
+
+/**
+ * Same as av_buffer_alloc(), except the returned buffer will be initialized
+ * to zero.
+ */
+AVBufferRef *av_buffer_allocz(int size);
+
+
+AVBufferRef *av_buffer_alloc(int size)
+{
+    AVBufferRef *ret = NULL;
+    uint8_t    *data = NULL;
+
+    data = av_malloc(size);
+    if (!data)
+        return NULL;
+
+    ret = av_buffer_create(data, size, av_buffer_default_free, NULL, 0);
+    if (!ret)
+        av_freep(&data);
+
+    return ret;
+}
+
+AVBufferRef *av_buffer_allocz(int size)
+{
+    AVBufferRef *ret = av_buffer_alloc(size);
+    if (!ret)
+        return NULL;
+
+    memset(ret->data, 0, size);
+    return ret;
+}

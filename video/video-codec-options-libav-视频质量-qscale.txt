@@ -1,0 +1,72 @@
+{"qscale", "use fixed qscale", 0, AV_OPT_TYPE_CONST, {.i64 = CODEC_FLAG_QSCALE }, INT_MIN, INT_MAX, 0, "flags"},
+
+和它呼应的是
+{"flags", NULL, OFFSET(flags), AV_OPT_TYPE_FLAGS, {.i64 = DEFAULT }, 0, UINT_MAX, V|A|E|D, "flags"},
+
+---------------------------------------------------
+https://trac.ffmpeg.org/wiki/Encode/MPEG-4
+---------------------------------------------------
+You can select a video quality level with -qscale:v n (or the alias -q:v n), where n is a number from 1-31, with 1 being highest quality/largest filesize and 31 being the lowest quality/smallest filesize. 
+This is a variable bit rate mode, roughly analogous to using -qp (constant QP [quantization parameter]) with x264. 
+Most of the time this should be the preferred method.
+
+ffmpeg -i input.avi -c:v mpeg4 -vtag xvid -qscale:v 3 -c:a libmp3lame -qscale:a 4 output.avi
+
+10:07 2015/7/11
+根据 AVOption 中，qscale，的定义，-qscale:v 3，是没有意义的。
+"qscale" 只是设置 flags 标志的。
+AVCodecContext 结构体中没有 qscale 字段
+
+----------------------------------------------
+拥有 qscale 的编码器结构体
+----------------------------------------------
+E:\libav\libavcodec\mpegvideo.h
+typedef struct MpegEncContext {
+  int qscale;                 ///< QP
+}
+
+E:\libav\libavcodec\ratecontrol.h
+typedef struct RateControlEntry{
+    float qscale;
+}RateControlEntry;
+
+E:\libav\libavcodec\libxvid.c
+struct xvid_context {
+    int qscale;                    /**< Do we use constant scale? */
+};
+
+---------------------------------------------------
+设置 mpeg4 编码质量
+---------------------------------------------------
+   avctx->flags |= CODEC_FLAG_QSCALE;
+   avctx->qmin = 8;
+   avctx->qmax = 5;
+或者
+    AVDictionary *dict = NULL;
+    av_dict_set(&dict, "flags", "+qscale", 0);
+    av_dict_set(&dict, "qmax", "5", 0);
+    av_dict_set(&dict, "qmin", "8", 0);
+    ret = avcodec_open2(avctx, codec, &dict);
+    av_dict_free(&dict);
+
+---------------------------------------------------
+libtheora encoder
+---------------------------------------------------
+https://ffmpeg.org/pipermail/ffmpeg-user/2013-October/018237.html
+Are you using an older/outdated/buggy version of ffmpeg? I cannot
+reproduce this. -qscale and -q both return the same file sizes for me.
+
+Actually, the libtheora encoder source makes it clear that values
+outside of 0–10 are clipped and then scaled to the range of 0–63,
+which is what the libtheora encoder uses:
+http://www.theora.org/doc/libtheora-1.0/structth__info.html#a4cdcf96cb46b256821993e9a830ee02
+
+    if (avc_context->flags & CODEC_FLAG_QSCALE) {
+        /* Clip global_quality in QP units to the [0 - 10] range
+           to be consistent with the libvorbis implementation.
+           Theora accepts a quality parameter which is an int value in
+           the [0 - 63] range.
+        */
+        t_info.quality        = av_clipf(avc_context->global_quality /
+(float)FF_QP2LAMBDA, 0, 10) * 6.3;
+        t_info.target_bitrate = 0;

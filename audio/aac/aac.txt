@@ -1,0 +1,8 @@
+高级音频编码（英语：Advanced Audio Coding，AAC），
+出现于1997年，基于MPEG-2的音频编码技术。
+由Fraunhofer IIS、杜比实验室、AT&T、Sony等公司共同开发，目的是取代MP3格式。
+2000年，MPEG-4标准出现后，AAC重新集成了其特性，加入了SBR技术和PS技术，为了区别于传统的MPEG-2 AAC又称为MPEG-4 AAC
+
+相关的标准有:
+ISO/IEC 13818-7  MPEG-2标准目前分为9个部分，统称为ISO/IEC13818国际标准
+ISO/IEC 14496-3  ISO/IEC 14496是MPEG专家组制定的MPEG-4标准于1998年10月公布第1版

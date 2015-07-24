@@ -1,0 +1,7 @@
+16:26 2015/5/8
+
+ * @return the size in bytes required for the image buffer, a negative
+ * error code in case of failure
+ 
+ 错误认为返回零是正确的，造成程序运行错误
+ 造成这个认识的原因是， avpicture_alloc 返回零是正确的

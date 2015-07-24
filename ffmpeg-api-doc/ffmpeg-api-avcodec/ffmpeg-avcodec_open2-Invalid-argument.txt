@@ -1,0 +1,38 @@
+01-27 10:08:03.823: E/JNILog(32128): failed to open file: /sdcard/test11.mp4, error-msg: Invalid argument
+01-27 10:47:48.339: E/JNILog(1577): failed to open audio decoder context: /sdcard/test11.mp4, error-msg: Invalid argument
+下面的代码出错了
+  AVCodec *audio_codec = NULL;
+  if(ret = av_find_best_stream(
+           file_ctx, 
+           AVMEDIA_TYPE_AUDIO, -1, -1, 
+           &audio_codec, 0) < 0) {                   错误出在这里， = 和 < 操作符的优先级搞错了
+    LOGE("failed to find audio stream: %s, error-msg: %s", file_name, av_err2str(ret));
+    goto fail;
+  }
+  LOGI("find an audio stream success for: %s", file_name);
+  codec_ctx = file_ctx->streams[ret]->codec;
+  if(audio_codec == NULL) {
+    ret = AVERROR_UNKNOWN;
+    LOGE("codec context of audio stream is NULL: %s, error-msg: %s", file_name, av_err2str(ret));
+    goto fail;
+  }
+  LOGI("audio decoder is:%s for: %s", audio_codec->long_name, file_name);
+  AVDictionary *dict = NULL;
+  if(ret = avcodec_open2(codec_ctx, audio_codec, NULL)) {
+    LOGE("failed to open audio decoder context: %s, error-msg: %s", file_name, av_err2str(ret));
+    goto fail;
+  }
+  
+  通过打印LOG知道，可能出现下面的错误：
+    avctx->codec = codec;
+    if ((avctx->codec_type == AVMEDIA_TYPE_UNKNOWN || avctx->codec_type == codec->type) &&
+        avctx->codec_id == AV_CODEC_ID_NONE) {
+        avctx->codec_type = codec->type;
+        avctx->codec_id   = codec->id;
+    }
+    if (avctx->codec_id != codec->id || (avctx->codec_type != codec->type
+                                         && avctx->codec_type != AVMEDIA_TYPE_ATTACHMENT)) {
+        av_log(avctx, AV_LOG_ERROR, "Codec type or id mismatches\n");
+        ret = AVERROR(EINVAL);
+        goto free_and_end;
+    }

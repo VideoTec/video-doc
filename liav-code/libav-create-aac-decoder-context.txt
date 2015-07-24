@@ -1,0 +1,25 @@
+创建 AAC 解码器上下文件
+
+AVCodec *aac_decoder = avcodec_find_decoder(AV_CODEC_ID_AAC);
+这个函数返回空，为什么？
+因为没有调用 av_register_all();
+
+  int ret = 0;
+  char error_msg[1024] = {0};
+  av_register_all();
+  AVCodec *aac_decoder = avcodec_find_decoder(AV_CODEC_ID_AAC);
+  AVCodecContext *aac_decoder_ctx = avcodec_alloc_context3(aac_decoder);
+
+  aac_decoder_ctx->sample_fmt = AV_SAMPLE_FMT_FLTP;
+  aac_decoder_ctx->sample_rate = 44100;
+  aac_decoder_ctx->channels = 2;  
+ 
+  if((ret = avcodec_open2(aac_decoder_ctx, aac_decoder, 0)) < 0) {
+    av_strerror(ret, error_msg, 1024);
+    printf("avcodec open failed: %s\n", error_msg);
+    return 0;
+
+  } else {
+    printf("avcodec open success\n");
+    return aac_decoder_ctx;
+  }

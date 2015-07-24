@@ -1,0 +1,256 @@
+
+//和CPU指令相关的宏：
+#define HAVE_ARMV5TE 0
+#define HAVE_ARMV5TE_INLINE 0
+#define HAVE_ARMV5TE_EXTERNAL 0
+#define HAVE_ARMV6 0
+#define HAVE_ARMV6_INLINE 0
+#define HAVE_ARMV6_EXTERNAL 0
+#define HAVE_ARMV6T2 0
+#define HAVE_ARMV6T2_INLINE 0
+#define HAVE_ARMV6T2_EXTERNAL 0
+#define HAVE_NEON 0               //ARM? NEON? 
+#define HAVE_NEON_EXTERNAL 0
+#define HAVE_NEON_INLINE 0
+#define HAVE_VFP 0                //VFP（矢量浮点）提供低成本的单精度和倍精度浮点运算能力
+#define HAVE_VFP_ARGS 0           //E:\libav\libavutil\arm\asm.S
+#define HAVE_VFP_EXTERNAL 0
+#define HAVE_VFP_INLINE 0
+#define HAVE_VFPV3 0
+#define HAVE_VFPV3_EXTERNAL 0
+#define HAVE_VFPV3_INLINE 0
+#define HAVE_ASM_MOD_Q 0          //libavutil\arm\intmath.h av_clipl_int32_arm
+#define HAVE_ASM_MOD_Y 0          //libavcodec\arm\dca.h    int8x8_fmul_int32
+
+#define HAVE_MMX 1
+#define HAVE_MMX_EXTERNAL 1
+#define HAVE_MMX_INLINE 0
+#define HAVE_MMXEXT 1
+#define HAVE_MMXEXT_EXTERNAL 1
+#define HAVE_MMXEXT_INLINE 0
+#define HAVE_AMD3DNOW 1
+#define HAVE_AMD3DNOW_EXTERNAL 1
+#define HAVE_AMD3DNOW_INLINE 0
+#define HAVE_AMD3DNOWEXT 1
+#define HAVE_AMD3DNOWEXT_EXTERNAL 1
+#define HAVE_AMD3DNOWEXT_INLINE 0
+#define HAVE_SSE 1
+#define HAVE_SSE_EXTERNAL 1
+#define HAVE_SSE_INLINE 0
+#define HAVE_SSE2 1
+#define HAVE_SSE2_EXTERNAL 1
+#define HAVE_SSE2_INLINE 0
+#define HAVE_SSE3 1
+#define HAVE_SSE3_EXTERNAL 1
+#define HAVE_SSE3_INLINE 0
+#define HAVE_SSSE3 1
+#define HAVE_SSSE3_EXTERNAL 1
+#define HAVE_SSSE3_INLINE 0
+#define HAVE_SSE4 1
+#define HAVE_SSE4_EXTERNAL 1
+#define HAVE_SSE4_INLINE 0
+#define HAVE_SSE42 1
+#define HAVE_SSE42_EXTERNAL 1
+#define HAVE_SSE42_INLINE 0
+#define HAVE_AVX 1
+#define HAVE_AVX_EXTERNAL 1
+#define HAVE_AVX_INLINE 0
+#define HAVE_AVX2 1
+#define HAVE_AVX2_EXTERNAL 1
+#define HAVE_AVX2_INLINE 0
+#define HAVE_FMA4 1
+#define HAVE_FMA4_EXTERNAL 1
+#define HAVE_FMA4_INLINE 0
+#define HAVE_I686 1
+#define HAVE_I686_EXTERNAL 0
+#define HAVE_I686_INLINE 0
+
+#define HAVE_ALTIVEC 0              //AltiVec是一个浮点和整型单指令流多数据流（SIMD）指令集
+#define HAVE_ALTIVEC_EXTERNAL 0
+#define HAVE_ALTIVEC_INLINE 0
+#define HAVE_ALTIVEC_H 0            //#include <altivec.h> PowerPC AltiVec include file
+#define HAVE_PPC4XX 0               //PowerPC Series (1992) 6xx 4xx 7xx 74xx 970 A2
+#define HAVE_PPC4XX_EXTERNAL 0
+#define HAVE_PPC4XX_INLINE 0
+#define HAVE_DCBZL 0                //libavcodec\ppc\dsputil_ppc.c replace dcbz by dcbzl
+
+#define HAVE_VIS 0                  //Visual Instruction Set, or VIS，是一个用于SPARC处理器的SIMD多媒体指令集扩展
+#define HAVE_VIS_EXTERNAL 0
+#define HAVE_VIS_INLINE 0
+
+#define HAVE_LOONGSON 0             //libavcodec\mips\mathops.h
+
+//数学函数定义：libavutil\libm.h
+#define HAVE_ATANF 1
+#define HAVE_ATAN2F 1
+#define HAVE_CBRTF 1
+#define HAVE_COSF 1
+#define HAVE_EXP2 1
+#define HAVE_EXP2F 1
+#define HAVE_EXPF 1
+#define HAVE_ISINF 1
+#define HAVE_ISNAN 1
+#define HAVE_LDEXPF 1
+#define HAVE_LLRINT 1
+#define HAVE_LLRINTF 1
+#define HAVE_LOG2 0
+#define HAVE_LOG2F 1
+#define HAVE_LOG10F 1
+#define HAVE_LRINT 1
+#define HAVE_LRINTF 1
+#define HAVE_POWF 1
+#define HAVE_RINT 1
+#define HAVE_ROUND 1
+#define HAVE_ROUNDF 1
+#define HAVE_SINF 1
+#define HAVE_TRUNC 1
+#define HAVE_TRUNCF 1
+
+//第三方库：
+#define HAVE_GSM_H 0        //libgsm.c
+#define HAVE_LIBDC1394_1 0  //libavdevice\libdc1394.c control and capture streams from IEEE 1394 based cameras
+#define HAVE_LIBDC1394_2 0
+#define HAVE_SDL 0
+
+//Windows系统API
+#define HAVE_LIBC_MSVCRT 1
+#define HAVE_COMMANDLINETOARGVW 1         //GetCommandLineW() cmdutils.c
+#define HAVE_CRYPTGENRANDOM 1             //#include <wincrypt.h>  CryptAcquireContext
+#define HAVE_DIRECT_H 1                   //#include <direct.h>
+#define HAVE_IO_H 1                       //#include <io.h>
+#define HAVE_DXVA_H 1                     //E:\libav\libavcodec\dxva2_internal.h  #include <dxva.h>
+#define HAVE_DOS_PATHS 1                  //E:\libav\libavutil\avstring.c
+#define HAVE_GETPROCESSAFFINITYMASK 1     //Retrieves the process affinity mask for the specified process and the system affinity mask for the system
+#define HAVE_WINDOWS_H 1
+#define HAVE_WINSOCK2_H 0
+#define HAVE_GETADDRINFO 0                //if (getaddrinfo(hostname, NULL, &hints, &ai))
+#define HAVE_GETPROCESSMEMORYINFO 1       //memcounters.PeakPagefileUsage
+#define HAVE_GETPROCESSTIMES 1            //GetProcessTimes
+#define HAVE_GETSYSTEMTIMEASFILETIME 1    //GetSystemTimeAsFileTime
+#define HAVE_MAPVIEWOFFILE 1
+#define HAVE_SETCONSOLETEXTATTRIBUTE 1    //SetConsoleTextAttribute
+#define HAVE_SCHED_GETAFFINITY 0          //<sched.h> GetProcessAffinityMask
+#define HAVE_VIRTUALALLOC 1               //VirtualAlloc
+
+//UNIX系统API
+#define HAVE_ALSA_ASOUNDLIB_H 0           //linux的主流音频体系结构 www.alsa-project.org
+#define HAVE_ARPA_INET_H 0                //#include <arpa/inet.h> definitions for internet operations (UNIX)
+#define HAVE_CDIO_PARANOIA_H 0            //GNU Compact Disc Input and Control Library (libcdio)
+#define HAVE_CDIO_PARANOIA_PARANOIA_H 0   //GNU Compact Disc Input and Control Library (libcdio)
+#define HAVE_FCNTL 0                      //fcntl(fd, F_SETFD, FD_CLOEXEC) manipulate file descriptor
+#define HAVE_GETHRTIME 0                  //gethrtime, gethrvtime - get high resolution time
+#define HAVE_GETOPT 0                     //#include "compat/getopt.c" the AT&T public domain source for getopt(3)
+#define HAVE_GETRUSAGE 0                  //getrusage(RUSAGE_SELF, &rusage); get resource usage
+#define HAVE_STRUCT_RUSAGE_RU_MAXRSS 0    //struct rusage rusage;
+#define HAVE_GETSERVBYPORT 0              //getservbyport(sin->sin_port, flags & NI_DGRAM ? "udp" : "tcp");
+#define HAVE_GETTIMEOFDAY 0               //gettimeofday(&tv, NULL); gettimeofday, settimeofday - get / set time
+#define HAVE_INET_ATON 0                  //int inet_aton(const char *cp, struct in_addr *inp) 字符串IP地址转换为一个32位的网络序列IP地址
+#define HAVE_JACK_PORT_GET_LATENCY_RANGE 0  //libavdevice\jack_audio.c
+#define HAVE_SYS_MMAN_H 0                   //#include <sys/mman.h>
+#define HAVE_SYS_PARAM_H 0                  //#include <sys/param.h>
+#define HAVE_SYS_RESOURCE_H 0               //#include <sys/time.h> #include <sys/resource.h>
+#define HAVE_SYS_SELECT_H 0                 //#include <sys/select.h>
+#define HAVE_SYS_TIME_H 0                   //#include <sys/time.h>
+#define HAVE_SYS_UN_H 0                     //The <sys/un.h> header shall define the sockaddr_un structure
+#define HAVE_SYS_VIDEOIO_H 0                //#include <sys/videoio.h>
+#define HAVE_SYS_SOUNDCARD_H 0              //#include <sys/soundcard.h>
+#define HAVE_SOUNDCARD_H 0                  //#include <soundcard.h>
+#define HAVE_SNDIO_H 0                      //<sndio.h> is the software layer of the OpenBSD operating system that manages the use of sound cards and MIDI ports.
+#define HAVE_POLL_H 0                       //<poll.h> int poll(struct pollfd *fds, nfds_t nfds, int timeout); wait for some event on a file descriptor
+#define HAVE_STRUCT_POLLFD 0                //==0 def struct pollfd
+#define HAVE_DLFCN_H 0                      //<dlfcn.h> header defines at least the following macros for use in the construction of a dlopen()
+#define HAVE_DLOPEN 0
+#define HAVE_XLIB 0                         //Xlib (also known as libX11) is an X Window System protocol client library written in the C programming language.
+#define HAVE_FORK 0                         //fork - create a child process
+#define HAVE_MMAP 0                         //mmap, munmap - map or unmap files or devices into memory
+#define HAVE_MPROTECT 0                     //#define USE_MMAP (HAVE_MMAP && HAVE_MPROTECT && defined MAP_ANONYMOUS)
+#define HAVE_STRUCT_V4L2_FRMIVALENUM_DISCRETE 0 //Linux kernel: video 4 linux 2 supporting many USB webcams, TV tuners, and other devices
+#define HAVE_VDPAU_X11 0                  //const HWAccel hwaccels[]
+
+//设备驱动 libavdevice\bktr.c
+//bktr -- Brooktree Bt848 / 849 / 878 / 879 and Pinnacle PCTV video capture driver
+#define HAVE_DEV_BKTR_IOCTL_BT848_H 0
+#define HAVE_DEV_BKTR_IOCTL_METEOR_H 0
+#define HAVE_DEV_IC_BT8XX_H 0
+#define HAVE_DEV_VIDEO_BKTR_IOCTL_BT848_H 0
+#define HAVE_DEV_VIDEO_METEOR_IOCTL_METEOR_H 0
+#define HAVE_MACHINE_IOCTL_BT848_H 0
+#define HAVE_MACHINE_IOCTL_METEOR_H 0
+#define HAVE_MACHINE_RW_BARRIER 0
+
+//C Standard Library
+#define HAVE_LOCALTIME_R 0  //strftime(buf, buf_size, s->text, &ltime)
+#define HAVE_ISATTY 1       //int isatty(int desc); 函数：如果参数desc所代表的文件描述词为一终端机则返回1，否则返回0
+#define HAVE_MALLOC_H 1     //#include <malloc.h>
+#define HAVE_USLEEP 0       //usleep(usec);
+#define HAVE_SETMODE 1      //setmode(fd, O_BINARY);
+#define HAVE_SETRLIMIT 0    //setrlimit(RLIMIT_CPU, &rl
+#define HAVE_SLEEP 1        //Sleep(usec / 1000);
+#define HAVE_MKSTEMP 0      //<fcntl.h> mkstemp(*filename);
+#define HAVE_RDTSC 1        //<intrin.h> #define AV_READ_TIME __rdtsc
+#define HAVE_NANOSLEEP 0    //nanosleep(&ts, &ts)
+#define HAVE_MM_EMPTY 1     //#include <mmintrin.h>  #define emms_c _mm_empty
+#define HAVE_SYSCONF 0      //nb_cpus = sysconf(_SC_NPROC_ONLN);
+#define HAVE_SYSCTL 0       //sysctl(mib, 2, &nb_cpus, &len, NULL, 0)
+#define HAVE_STRERROR_R 0   //ret = strerror_r(AVUNERROR(errnum), errbuf, errbuf_size);
+#define HAVE_STRPTIME 0     //ret1 = strptime(datestr, "%Y - %m - %d %T", &time1);
+#define HAVE_UNISTD_H 0     //#include <unistd.h>
+#define HAVE_CLOSESOCKET 0  //== 0 #define closesocket close
+
+//IPv6支持，网络数据结构
+#define HAVE_STRUCT_IP_MREQ_SOURCE 0
+#define HAVE_STRUCT_IPV6_MREQ 0
+#define HAVE_STRUCT_SOCKADDR_IN6 0
+#define HAVE_STRUCT_SOCKADDR_SA_LEN 0  //uint8_t ss_len; + uint8_t ss_family;  == uint16_t ss_family;
+#define HAVE_STRUCT_SOCKADDR_STORAGE 0 //==0 需要定义 struct sockaddr_storage
+#define HAVE_STRUCT_GROUP_SOURCE_REQ 0 //libavformat\udp.c
+#define HAVE_SOCKLEN_T 0
+#define HAVE_STRUCT_ADDRINFO 0         //libavformat\network.h
+
+//线程，字节序，
+#define HAVE_THREADS 1
+#define HAVE_W32THREADS 1
+#define HAVE_PTHREADS 0
+#define HAVE_BIGENDIAN 0
+
+//内存对齐方式：libavutil\mem.c
+#define HAVE_ALIGNED_MALLOC 1   //_aligned_malloc(size, 32); _aligned_realloc(ptr, size, 32); _aligned_free(ptr);
+#define HAVE_ALIGNED_STACK 0
+#define HAVE_POSIX_MEMALIGN 0
+#define HAVE_MEMALIGN 0
+#define HAVE_LOCAL_ALIGNED_16 1 //libavutil\internal.h
+#define HAVE_LOCAL_ALIGNED_8 1
+
+//和汇编，指令相关的宏
+#define HAVE_GNU_AS 1
+#define HAVE_IBM_ASM 0           //ppc\asm.S
+#define HAVE_YASM 1
+#define HAVE_INLINE_ASM 0
+#define HAVE_SYMVER 0            //.symver汇编宏指令
+#define HAVE_SYMVER_ASM_LABEL 0
+#define HAVE_SYMVER_GNU_ASM 0
+#define HAVE_CPUNOP 1            //In computer science, a NOP or NOOP (short for No Operation) is an assembly language instruction
+#define HAVE_EBP_AVAILABLE 0     //libavutil\x86\asm.h 
+#define HAVE_EBX_AVAILABLE 0     //libavutil\x86\asm.h
+#define HAVE_INLINE_ASM_LABELS 0 //libavutil\ppc\timer.h read_time(void) from section 2.2.1 of the 32-bit PowerPC PEM
+#define HAVE_LDBRX 0             //ldbrx __asm__ ("ldbrx   %0, %y1" : "=r"(v) : "Z"(*(const uint64_t*)p));
+#define HAVE_XFORM_ASM 0         //libavutil\ppc\intreadwrite.h  指令：lhbrx，sthbrx，lwbrx，stwbrx，ldbrx，stdbrx，lwbrx，stwbrx
+#define HAVE_XMM_CLOBBERS 0      //mark XMM registers as clobbered  in order to tell GCC that your code is using some of the processor's registers
+#define HAVE_FAST_UNALIGNED 1    //unaligned memory accesses
+#define HAVE_FAST_64BIT 0
+#define HAVE_FAST_CLZ 1          //#define ff_ctz(v) __builtin_ctz(v)
+#define HAVE_FAST_CMOV 0         //x86 CMOV instruction
+
+//原子操作定义：libavutil\atomic.h 
+#define HAVE_ATOMICS_NATIVE 1
+#define HAVE_ATOMICS_WIN32 1
+#define HAVE_ATOMICS_GCC 0
+#define HAVE_ATOMICS_SUNCC 0
+#define HAVE_ATOMIC_CAS_PTR 0
+#define HAVE_SYNC_VAL_COMPARE_AND_SWAP 0
+#define HAVE_MEMORYBARRIER 1     //内存屏障 memory barrier 乱序执行
+
+//其它
+#define HAVE_ATTRIBUTE_MAY_ALIAS 0
+#define HAVE_ATTRIBUTE_PACKED 0
+#define HAVE_PRAGMA_DEPRECATED 1

@@ -1,0 +1,20 @@
+ÎÄµµ
+
+/**
+ * Free the given SwrContext and set the pointer to NULL.
+ *
+ * @param[in] s a pointer to a pointer to Swr context
+ */
+void swr_free(struct SwrContext **s);
+
+/**
+ * Closes the context so that swr_is_initialized() returns 0.
+ *
+ * The context can be brought back to life by running swr_init(),
+ * swr_init() can also be used without swr_close().
+ * This function is mainly provided for simplifying the usecase
+ * where one tries to support libavresample and libswresample.
+ *
+ * @param[in,out] s Swr context to be closed
+ */
+void swr_close(struct SwrContext *s);

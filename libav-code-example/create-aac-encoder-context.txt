@@ -1,0 +1,28 @@
+这个示例，是参考 avcodec_open2 文档写成的
+
+  AVCodec *aac_encoder = 0;
+  AVCodecContext *aac_encoder_ctx = 0;
+
+  av_register_all();
+  aac_encoder = avcodec_find_encoder(AV_CODEC_ID_AAC);
+  aac_encoder_ctx = avcodec_alloc_context3(aac_encoder);
+
+  aac_encoder_ctx->sample_fmt = AV_SAMPLE_FMT_FLTP;
+  aac_encoder_ctx->sample_rate = 44100;
+  aac_encoder_ctx->channels = 1;
+  //aac_encoder_ctx->bit_rate = audio_bitrate_;
+
+  //if (fmt_ctx_->oformat->flags & AVFMT_GLOBALHEADER)
+      aac_encoder_ctx->flags |= CODEC_FLAG_GLOBAL_HEADER;
+  aac_encoder_ctx->strict_std_compliance = FF_COMPLIANCE_EXPERIMENTAL;
+ 
+  char error_msg[1024] = {0};
+  int ret = 0;
+  if((ret = avcodec_open2(aac_encoder_ctx, aac_encoder, 0)) < 0) {
+    av_strerror(ret, error_msg, 1024);
+    printf("avcodec open failed: %s\n", error_msg);
+    return -1;
+
+  } else {
+    printf("avcodec open success\n");
+  }

@@ -1,0 +1,7 @@
+window shape 使用一位来表示
+
+uint8_t use_kb_window[2];   ///< If set, use Kaiser-Bessel window, otherwise use a sine window.
+
+决定使用正弦窗还是KBD窗
+
+0：正弦窗 1：KBD窗

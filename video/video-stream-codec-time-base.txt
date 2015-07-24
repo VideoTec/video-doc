@@ -1,0 +1,54 @@
+视频流 和 视频编码器的 time_base 应该怎么设置？
+
+示例一：固定帧率
+E:\libav\doc\examples\output.c
+    /* timebase: This is the fundamental unit of time (in seconds) in terms
+     * of which frame timestamps are represented. For fixed-fps content,
+     * timebase should be 1/framerate and timestamp increments should be
+     * identical to 1. */
+    ost->st->time_base = (AVRational){ 1, STREAM_FRAME_RATE };
+    c->time_base       = ost->st->time_base;
+
+示例二：
+E:\libav\libavformat\mpegts.c
+static int mpegts_set_stream_info(AVStream *st, PESContext *pes,
+                                  uint32_t stream_type, uint32_t prog_reg_desc)
+{
+    avpriv_set_pts_info(st, 33, 1, 90000);
+
+http://www.cnitblog.com/luofuchong/archive/2014/11/28/89869.html
+通过avpriv_set_pts_info(st, 33, 1, 90000)函数，设置AVStream->time_base为1/90000。
+为什么是90000？因为mpeg的pts、dts都是以90kHz来采样的，所以采样间隔为1/90000秒
+
+AVStream->time_base比AVCodecContext->time_base精度要高(数值要小)，比如AVStream->time_base为1/90000，
+AVCodecContext->time_base为1/30(假设frame_rate为30)；
+同样的pts和dts，以AVStream->time_base为单位，数值要比以AVCodecContext->time_base为单位要大
+
+这句对吗？
+根据mpeg的协议，压缩后或解压前的数据，pts和dts是90kHz时钟的采样值，时间间隔就是AVStream->time_base
+http://en.wikipedia.org/wiki/Presentation_timestamp
+Presentation time stamps have a resolution of 90kHz, suitable for the presentation synchronization task.
+
+http://stackoverflow.com/questions/13595288/understanding-pts-and-dts-in-video-frames
+I know 1/600 is a special value in mp4 spec. 这句话对吗？
+
+示例三:
+怎么理解 avconv.c
+            if (!copy_tb) {
+                enc_ctx->time_base      = dec_ctx->time_base;
+                enc_ctx->time_base.num *= dec_ctx->ticks_per_frame;
+                av_reduce(&enc_ctx->time_base.num, &enc_ctx->time_base.den,
+                          enc_ctx->time_base.num, enc_ctx->time_base.den, INT_MAX);
+            } else
+                enc_ctx->time_base = ist->st->time_base;
+
+
+示例四：查看android手机录制的视频的 time_base
+查看了几个 mp4 文件的time_base 相当于 mp4-trak-mdia-mdhd 的 timescale值
+12288  从网上下载下来的
+90000  android手机录制的
+12000  飞视频编辑后的
+15000  从网上下载下来的
+600    开源视频：bigbuckbunny
+
+可从源码，查看他是怎么设置 mp4-trak-mdia-mdhd 的 timescale 的值的？ 

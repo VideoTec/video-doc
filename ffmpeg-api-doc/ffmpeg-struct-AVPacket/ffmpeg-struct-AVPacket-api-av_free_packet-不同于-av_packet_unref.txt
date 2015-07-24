@@ -1,0 +1,29 @@
+看代码 就清楚了
+
+void av_free_packet(AVPacket *pkt)
+{
+    if (pkt) {
+FF_DISABLE_DEPRECATION_WARNINGS
+        if (pkt->buf)
+            av_buffer_unref(&pkt->buf);
+#if FF_API_DESTRUCT_PACKET
+        else if (pkt->destruct)
+            pkt->destruct(pkt);
+        pkt->destruct = NULL;
+#endif
+FF_ENABLE_DEPRECATION_WARNINGS
+        pkt->data            = NULL;
+        pkt->size            = 0;
+
+        av_packet_free_side_data(pkt);
+    }
+}
+
+void av_packet_unref(AVPacket *pkt)
+{
+    av_packet_free_side_data(pkt);
+    av_buffer_unref(&pkt->buf);
+    av_init_packet(pkt);
+    pkt->data = NULL;
+    pkt->size = 0;
+}

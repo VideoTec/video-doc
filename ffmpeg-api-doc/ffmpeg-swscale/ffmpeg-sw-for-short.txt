@@ -1,0 +1,5 @@
+SW / SH：当前过滤器处理过后的平面的宽/高度量尺度
+
+HW/SW Codesign Exemple: H.263 Video Encoder  HW/SW Co-Design
+
+SW - software 软实现 - 软件实现的某些功能

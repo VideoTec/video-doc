@@ -1,0 +1,25 @@
+创建 AVFormatContext 实例
+
+-----------------------------------------------
+根据文件名，创建输出 AVFormatContext 实例
+-----------------------------------------------
+
+ AVFormatContext *s = avformat_alloc_context();
+ AVOutputFormat *oformat = av_guess_format(NULL, filename, NULL);
+ s->oformat = oformat;
+ av_strlcpy(s->filename, filename, sizeof(s->filename));  // 把文件名复制到 filename
+ 
+ fail:
+ avformat_free_context(s);
+ 
+ 注意：应该调用那个呢？这个是输入的，不是输出的
+ avformat_close_input(&fmtctx);  // which include avformat_free_context
+ 
+ 注意：关闭时需要单独调用 avcodec_close 吗? 需要
+       avformat_free_context 调用的 ff_free_stream 做了什么？没有调用 avcodec_close
+ 
+ 注意：关闭时，codec，flush怎么处理？
+ 
+ 注意：avio_close 什么时候调用？
+ 什么时候释放 pb?
+set by the user before avformat_write_header(). The caller must take care of closing / freeing the IO context.

@@ -1,0 +1,38 @@
+2015.03.27
+最后找到原因，传递给 av_interleaved_write_frame 函数的AVPacket必须指定 pts
+
+碰到的原因是下面的情况： pkt->dts == AV_NOPTS_VALUE && !(s->oformat->flags & AVFMT_NOTIMESTAMPS)
+问题是：以前写的代码不计算时间也没有问题啊
+    if (pkt) {
+        AVStream *st = s->streams[pkt->stream_index];
+
+        av_dlog(s, "av_interleaved_write_frame size:%d dts:%s pts:%s\n",
+                pkt->size, av_ts2str(pkt->dts), av_ts2str(pkt->pts));
+        if ((ret = compute_pkt_fields2(s, st, pkt)) < 0 && !(s->oformat->flags & AVFMT_NOTIMESTAMPS))
+            goto fail;
+
+        if (pkt->dts == AV_NOPTS_VALUE && !(s->oformat->flags & AVFMT_NOTIMESTAMPS)) {
+            ret = AVERROR(EINVAL);
+            goto fail;
+        }
+    } else {
+        av_dlog(s, "av_interleaved_write_frame FLUSH\n");
+        flush = 1;
+    }
+
+造成这个错误的原因，可能是，libav 这个修改
+[mp4 @ 0059C1C0] Using AVStream.codec.time_base as a timebase hint to the muxer is deprecated. Set AVStream.time_base instead.
+
+commit 194be1f43ea391eb986732707435176e579265aa
+Author: Anton Khirnov <anton@khirnov.net>
+Date:   Sun May 18 12:12:59 2014 +0200
+
+    lavf: switch to AVStream.time_base as the hint for the muxer timebase
+
+    Previously, AVStream.codec.time_base was used for that purpose, which
+    was quite confusing for the callers. This change also opens the path for
+    removing AVStream.codec.
+
+    The change in the lavf-mkv test is due to the native timebase (1/1000)
+    being used instead of the default one (1/90000), so the packets are now
+    sent to the crc muxer in the same order in which they are demuxed

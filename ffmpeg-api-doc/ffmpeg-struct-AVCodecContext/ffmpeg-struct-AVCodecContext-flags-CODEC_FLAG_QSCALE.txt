@@ -1,0 +1,19 @@
+#define CODEC_FLAG_QSCALE 0x0002  ///< Use fixed qscale.
+
+http://www.chinavideo.org/forum.php?mod=viewthread&tid=12257&page=1
+c->flags |= CODEC_FLAG_QSCALE;
+c->global_quality= (int)(FF_QP2LAMBDA * qscale + 0.5);
+这个影响最严重
+还可以调节qmin qmax 和 bit_rate来调节画质。
+
+为 avctx->flags 添加 CODEC_FLAG_QSCALE 标志的方法
+    AVDictionary *dict = NULL;
+    av_dict_set(&dict, "flags", "+qscale", 0);
+    av_dict_set(&dict, "qmin", "8", 0);
+    av_dict_set(&dict, "qmin", "5", 0);
+    ret = avcodec_open2(avctx, codec, &dict);
+    av_dict_free(&dict);
+或者
+    avctx->flags |= CODEC_FLAG_QSCALE;
+    avctx->qmin = 8;
+    avctx->qmax = 5;

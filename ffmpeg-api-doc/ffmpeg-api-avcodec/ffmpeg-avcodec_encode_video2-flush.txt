@@ -1,0 +1,9 @@
+传空值
+
+ * @param[in] frame AVFrame containing the raw video data to be encoded.
+ *                  May be NULL when flushing an encoder that has the
+ *                  CODEC_CAP_DELAY capability set.
+ 
+ 问题， flush 出的，avpkt 的时间戳怎么计算？
+ 
+ 问题二： 2015.4.22 压缩了 236 张图片，输出的视频里，有236张图片。没有 flush。 编码器是： mpeg4

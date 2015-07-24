@@ -1,0 +1,17 @@
+av_dlog 是一个宏，定义在
+E:\libav\libavutil\log.h
+
+使用这个，必须
+1. 定义 DEBUG 宏 -DDEBUG
+2. av_log_set_level(AV_LOG_DEBUG);
+
+/**
+ * av_dlog macros
+ * Useful to print debug messages that shouldn't get compiled in normally.
+ */
+
+#ifdef DEBUG
+#    define av_dlog(pctx, ...) av_log(pctx, AV_LOG_DEBUG, __VA_ARGS__)
+#else
+#    define av_dlog(pctx, ...)
+#endif

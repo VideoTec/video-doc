@@ -1,0 +1,16 @@
+/**
+ * Reallocate a given buffer.
+ *
+ * @param buf  a buffer reference to reallocate. On success, buf will be
+ *             unreferenced and a new reference with the required size will be
+ *             written in its place. On failure buf will be left untouched. *buf
+ *             may be NULL, then a new buffer is allocated.
+ * @param size required new buffer size.
+ * @return 0 on success, a negative AVERROR on failure.
+ *
+ * @note the buffer is actually reallocated with av_realloc() only if it was
+ * initially allocated through av_buffer_realloc(NULL) and there is only one
+ * reference to it (i.e. the one passed to this function). In all other cases
+ * a new buffer is allocated and the data is copied.
+ */
+int av_buffer_realloc(AVBufferRef **buf, int size);

@@ -1,0 +1,48 @@
+头文件：avutil/buffer_internal.h
+
+---------------------------------------
+在 buffer.h 里定义了
+---------------------------------------
+/**
+ * The buffer pool. This structure is opaque and not meant to be accessed
+ * directly. It is allocated with av_buffer_pool_init() and freed with
+ * av_buffer_pool_uninit().
+ */
+typedef struct AVBufferPool AVBufferPool;
+
+---------------------------------------
+在 buffer_internal.h 里定义了
+---------------------------------------
+
+typedef struct BufferPoolEntry {
+    uint8_t *data;
+
+    /*
+     * Backups of the original opaque/free of the AVBuffer corresponding to
+     * data. They will be used to free the buffer when the pool is freed.
+     */
+    void *opaque;
+    void (*free)(void *opaque, uint8_t *data);
+
+    AVBufferPool *pool;
+    struct BufferPoolEntry *next;
+} BufferPoolEntry;
+
+struct AVBufferPool {
+    AVMutex mutex;
+    BufferPoolEntry *pool;
+
+    /*
+     * This is used to track when the pool is to be freed.
+     * The pointer to the pool itself held by the caller is considered to
+     * be one reference. Each buffer requested by the caller increases refcount
+     * by one, returning the buffer to the pool decreases it by one.
+     * refcount reaches zero when the buffer has been uninited AND all the
+     * buffers have been released, then it's safe to free the pool and all
+     * the buffers in it.
+     */
+    volatile int refcount;
+
+    int size;
+    AVBufferRef* (*alloc)(int size);
+};

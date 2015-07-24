@@ -1,0 +1,26 @@
+/**
+ * Allocate and initialize a buffer pool.
+ *
+ * @param size size of each buffer in this pool
+ * @param alloc a function that will be used to allocate new buffers when the
+ * pool is empty. May be NULL, then the default allocator will be used
+ * (av_buffer_alloc()).
+ * @return newly created buffer pool on success, NULL on error.
+ */
+AVBufferPool *av_buffer_pool_init(int size, AVBufferRef* (*alloc)(int size));
+
+AVBufferPool *av_buffer_pool_init(int size, AVBufferRef* (*alloc)(int size))
+{
+    AVBufferPool *pool = av_mallocz(sizeof(*pool));
+    if (!pool)
+        return NULL;
+
+    ff_mutex_init(&pool->mutex, NULL);
+
+    pool->size     = size;
+    pool->alloc    = alloc ? alloc : av_buffer_alloc;
+
+    avpriv_atomic_int_set(&pool->refcount, 1);
+
+    return pool;
+}

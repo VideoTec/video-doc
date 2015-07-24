@@ -1,0 +1,10 @@
+AVStream::time_base
+AVCodecContext::time_base
+
+第一点
+demuxer 时 avpkt.pts and avpkt.dts 是in AVStream->time_base units
+muxer   时 avpkt.pts 必须设置正确的时间，否则 write_frame 时会出错 -22
+
+第二点
+avframe 的 pts 需要计算，不会自动填充
+avframe pkt_pts pkt_dts

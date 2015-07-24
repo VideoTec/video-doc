@@ -1,0 +1,26 @@
+E:\libav\libavutil\opt.c
+
+int av_opt_set(void *obj, const char *name, const char *val, int search_flags)
+{
+    void *dst, *target_obj;
+    const AVOption *o = av_opt_find2(obj, name, NULL, 0, search_flags, &target_obj);
+    if (!o || !target_obj)
+        return AVERROR_OPTION_NOT_FOUND;
+    if (!val || o->flags & AV_OPT_FLAG_READONLY)
+        return AVERROR(EINVAL);
+
+    dst = ((uint8_t*)target_obj) + o->offset;
+    switch (o->type) {
+    case AV_OPT_TYPE_STRING:   return set_string(obj, o, val, dst);
+    case AV_OPT_TYPE_BINARY:   return set_string_binary(obj, o, val, dst);
+    case AV_OPT_TYPE_FLAGS:
+    case AV_OPT_TYPE_INT:
+    case AV_OPT_TYPE_INT64:
+    case AV_OPT_TYPE_FLOAT:
+    case AV_OPT_TYPE_DOUBLE:
+    case AV_OPT_TYPE_RATIONAL: return set_string_number(obj, target_obj, o, val, dst);
+    }
+
+    av_log(obj, AV_LOG_ERROR, "Invalid option type.\n");
+    return AVERROR(EINVAL);
+}

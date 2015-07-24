@@ -1,0 +1,16 @@
+头文件 E:\libav\libavutil\pixdesc.h
+源文件 E:\libav\libavutil\pixdesc.c
+
+/**
+ * @return a pixel format descriptor for provided pixel format or NULL if
+ * this pixel format is unknown.
+ */
+const AVPixFmtDescriptor *av_pix_fmt_desc_get(enum AVPixelFormat pix_fmt);
+
+const AVPixFmtDescriptor *av_pix_fmt_desc_get(enum AVPixelFormat pix_fmt)
+{
+    if (pix_fmt < 0 || pix_fmt >= AV_PIX_FMT_NB)
+        return NULL;
+    return &av_pix_fmt_descriptors[pix_fmt];
+}
+

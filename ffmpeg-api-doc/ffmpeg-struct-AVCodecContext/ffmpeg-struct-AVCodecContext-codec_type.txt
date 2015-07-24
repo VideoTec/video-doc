@@ -1,0 +1,24 @@
+enum AVMediaType codec_type; /* see AVMEDIA_TYPE_xxx */
+
+libavutil\avutil.h
+
+/**
+ * @addtogroup lavu_media Media Type
+ * @brief Media Type
+ */
+
+enum AVMediaType {
+    AVMEDIA_TYPE_UNKNOWN = -1,  ///< Usually treated as AVMEDIA_TYPE_DATA
+    AVMEDIA_TYPE_VIDEO,
+    AVMEDIA_TYPE_AUDIO,
+    AVMEDIA_TYPE_DATA,          ///< Opaque data information usually continuous
+    AVMEDIA_TYPE_SUBTITLE,
+    AVMEDIA_TYPE_ATTACHMENT,    ///< Opaque data information usually sparse
+    AVMEDIA_TYPE_NB
+};
+
+/**
+ * Return a string describing the media_type enum, NULL if media_type
+ * is unknown.
+ */
+const char *av_get_media_type_string(enum AVMediaType media_type);

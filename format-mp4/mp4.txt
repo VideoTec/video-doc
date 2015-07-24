@@ -1,0 +1,56 @@
+第十二部分（ISO/IEC 14496-12）：基于ISO的媒体文件格式：定义一个存储媒体内容的文件格式。
+第十四部分（ISO/IEC 14496-14）：MPEG-4文件格式：定义基于第十二部分的用于存储MPEG-4内容的视频文件格式。
+第十五部分（ISO/IEC 14496-15）：AVC文件格式：定义基于第十二部分的用于存储第十部分的视频内容的文件格式。
+
+--------------------------------------------------
+MPEG-4 第十二部分（ISO/IEC 14496-12）：基于ISO的媒体文件格式：定义一个存储媒体内容的文件格式。
+-------------------------------------------------- 
+又称为：ISO base media file format
+Extended from   QuickTime .mov
+Extended to     MP4, 3GP, 3G2, .mj2, .dvb, .dcf, .m21
+http://en.wikipedia.org/wiki/ISO_base_media_file_format
+基于ISO的媒体文件格式：设计成是可扩展的，所有扩展格式定义在
+www.mp4ra.org
+
+扩展
+The MP4 file format (ISO/IEC 14496-14) defined some extensions over ISO base media file format to support MPEG-4 visual/audio codecs and various MPEG-4 Systems features such as object descriptors and scene descriptions.
+
+The MPEG-4 Part 3 (MPEG-4 Audio) standard also defined storage of some audio compression formats. Storage of MPEG-1/2 Audio (MP3, MP2, MP1) in the ISO base media file format was defined in ISO/IEC 14496-3:2001/Amd 3:2005.
+
+The Advanced Video Coding (AVC) file format (ISO/IEC 14496-15) defined support for H.264/MPEG-4 AVC video compression
+
+The 3GPP file format (.3gp) specification also defined extensions to support H.263 video, AMR-NB, AMR-WB, AMR-WB+ audio and 3GPP Timed Text in files based on the ISO base media file format
+
+ The 3GPP2 file format (.3g2) defined extensions for usage of EVRC, SMV or 13K (QCELP) voice compression formats.[21] 
+ 
+ The JPEG 2000 specification (ISO/IEC 15444-3) defined usage of Motion JPEG 2000 video compression and uncompressed audio (PCM) in ISO base media file format (.mj2). 
+ 
+The "DVB File Format" (.dvb) defined by DVB Project allowed storage of DVB services in the ISO base media file format. It allows the storage of audio, video and other content in any of three main ways: encapsulated in a MPEG transport stream, stored as a reception hint track; encapsulated in an RTP stream, stored as a reception hint track or stored directly as media tracks.[26][27] 
+
+The MPEG-21 File Format (.m21, .mp21) defined the storage of an MPEG-21 Digital Item in ISO base media file format, with some or all of its ancillary data (such as movies, images or other non-XML data) within the same file.[28][29] 
+
+The OMA DRM Content Format (.dcf) specification from Open Mobile Alliance defined the content format for DRM protected encrypted media objects and associated metadata.[30][31] 
+
+There are also other extensions, such as 
+ISMA ISMACryp specification for encrypted/protected audio and video,[32][33] 
+G.719 audio compression specification,[34] 
+AC3 and E-AC-3 audio compression,[35] 
+DTS audio compression,[36] 
+Dirac video compression,[37][38] 
+VC-1 video compression specification and others, which are named on the MP4 Registration authority's website.
+
+--------------------------------------------------
+MPEG-4 第十四部分（ISO/IEC 14496-14）：MPEG-4文件格式：定义基于第十二部分的用于存储MPEG-4内容的视频文件格式。
+--------------------------------------------------
+MPEG-4 Part 14 (MP4) 是 MPEG-4 Part 12 (MP4) 的扩展
+MPEG-4 Part 14 extends over ISO Base Media File Format (MPEG-4 Part 12)
+MPEG-4 Part 14 Extended from QuickTime File Format and MPEG-4 Part 12
+http://en.wikipedia.org/wiki/MPEG-4_Part_14
+
+--------------------------------------------------
+MPEG-4 Part 12 和 MPEG-4 Part 14 的历史
+--------------------------------------------------
+The MP4 file format known as "version 1" was published in 2001 as ISO/IEC 14496-1:2001, as revision of the MPEG-4 Part 1: Systems.
+
+In 2003, the first version of MP4 file format was revised and replaced by MPEG-4 Part 14: MP4 file format (ISO/IEC 14496-14:2003), 
+commonly known as MPEG-4 file format "version 2".

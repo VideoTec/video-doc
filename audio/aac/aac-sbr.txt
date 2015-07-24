@@ -1,0 +1,7 @@
+Spectral band replication (SBR) is a technology to enhance audio or speech codecs, especially at low bit rates and is based on harmonic redundancy in the frequency domain.
+
+spectral[英][ˈspektrəl] [美][ˈspɛktrəl] adj.（似）鬼的；幽灵的；谱的；光谱的
+replication[英][ˌreplɪ'keɪʃn] [美][ˌrɛplɪˈkeʃən] n.复制，折叠；回答；反响；[植]反叠
+
+Spectral Band Replication (SBR) is a parametrical coding method developed by Coding Technologies to enhance audio quality at low bitrates.
+Guessing the non-transmitted higher frequency range of a compressed audio file by using some helper bits (transmitted with the stream) in addition to the transmitted base band. SBR allows a restoration (not reconstruction) of the upper frequency range without lots of bits. It is used by MP3Pro, aacPlus (later standardized as HE-AAC) and Digital Radio Mondiale.

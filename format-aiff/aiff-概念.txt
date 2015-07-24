@@ -1,0 +1,18 @@
+AIFF是音频交换文件格式(Audio Interchange File Format)的英文缩写，
+是Apple公司开发的一种声音文件格式，被Macintosh平台及其应用程序所支持，
+Netscape Navigator浏览器中的LiveAudio也支持AIFF格式，
+SGI及其它专业音频软件包也同样支持AIFF格式。
+
+这种格式由苹果公司于1988年在美商艺电的交换档案格式
+（Interchange File Format，缩写 IFF，广泛使用于Amiga系统）基础上开发而成，
+并且它多被用在苹果公司的OS X操作系统
+
+AIFF
+支持ACE2、ACE8、MAC3和MAC6压缩，
+支持16位44.1kHz立体声
+
+标准AIFF格式与SDII和WAV一并被认为是专业登记的视频音频编辑应用和的领导性格式，
+并且与广为人知的有损格式MP3相比，它并未经过压缩。
+
+标准AIFF文件的扩展名是.aiff'或.aif。
+压缩过的AIFF文件的扩展名应该是.aifc但是.aiff和.aif也被支持AIFF的应用程序很好地接受

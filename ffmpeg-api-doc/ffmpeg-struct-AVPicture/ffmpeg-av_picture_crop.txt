@@ -1,0 +1,32 @@
+头文件 libavcodec/avcodec.h
+源文件 E:\libav\libavcodec\imgconvert.c
+
+/**
+ * Crop image top and left side.
+ */
+int av_picture_crop(AVPicture *dst, const AVPicture *src,
+                    enum AVPixelFormat pix_fmt, int top_band, int left_band);
+					
+					
+int av_picture_crop(AVPicture *dst, const AVPicture *src,
+                    enum AVPixelFormat pix_fmt, int top_band, int left_band)
+{
+    const AVPixFmtDescriptor *desc = av_pix_fmt_desc_get(pix_fmt);
+    int y_shift;
+    int x_shift;
+
+    if (pix_fmt < 0 || pix_fmt >= AV_PIX_FMT_NB || !is_yuv_planar(desc))
+        return -1;
+
+    y_shift = desc->log2_chroma_h;
+    x_shift = desc->log2_chroma_w;
+
+    dst->data[0] = src->data[0] + (top_band * src->linesize[0]) + left_band;
+    dst->data[1] = src->data[1] + ((top_band >> y_shift) * src->linesize[1]) + (left_band >> x_shift);
+    dst->data[2] = src->data[2] + ((top_band >> y_shift) * src->linesize[2]) + (left_band >> x_shift);
+
+    dst->linesize[0] = src->linesize[0];
+    dst->linesize[1] = src->linesize[1];
+    dst->linesize[2] = src->linesize[2];
+    return 0;
+}

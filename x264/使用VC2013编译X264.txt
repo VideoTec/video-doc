@@ -1,0 +1,141 @@
+2014.10.14 【计划】《使用VC2013编译X264》
+
+
+1. 建立静态库（注意，取消SDL，先项：这个会引发类似下面的错误：error C4996: 'fileno': The POSIX name ...）
+2. MSVC2013集成YASM
+3. 需要添加三个头文件：config.h，oclobj.h，x264_config.h
+4. c源文件
+	encoder目录里：(排除：rdo.c, slicetype.c)
+	common目录里：所有源文件，包括x86子文件夹下的文件
+
+5. asm源文件
+编译汇编文件，定义宏：
+PREFIX
+STACK_ALIGNMENT=4
+HIGH_BIT_DEPTH=0
+BIT_DEPTH=8
+WIN32=1
+ARCH_X86_64=0
+
+error LNK2019: unresolved external symbol _x264_cabac_encode_terminal
+cabac-a.asm: x86 cabac  《前文参考之适应性二元算术编码（Context-based Adaptive Binary Arithmetic Coding，简称CABAC）是视讯压缩标准H.264采用的算法》
+
+error LNK2019: unresolved external symbol _x264_cpu_emms
+cpu-a.asm: x86 cpu utilities
+
+error LNK2019: unresolved external symbol _x264_nal_escape_mmx2
+bitstream-a.asm: x86 bitstream functions
+;-----------------------------------------------------------------------------
+; uint8_t *x264_nal_escape( uint8_t *dst, uint8_t *src, uint8_t *end )
+;-----------------------------------------------------------------------------
+
+error LNK2019: unresolved external symbol _x264_pixel_sad_16x16_mmx2
+sad-a.asm: x86 sad functions
+These functions evaluate sum of absolute difference (SAD) between current and predicted blocks
+;-----------------------------------------------------------------------------
+; int pixel_sad_16x16( uint8_t *, intptr_t, uint8_t *, intptr_t )
+;-----------------------------------------------------------------------------
+
+error LNK2019: unresolved external symbol _x264_pixel_ssd_16x16_mmx
+pixel-a.asm: x86 pixel metrics
+;-----------------------------------------------------------------------------
+; int pixel_ssd_16x16( uint8_t *, intptr_t, uint8_t *, intptr_t )
+;-----------------------------------------------------------------------------
+
+error LNK2019: unresolved external symbol _x264_intra_sa8d_x3_8x8_mmx2
+pixel-32.asm: x86_32 pixel metrics
+;-----------------------------------------------------------------------------
+; void intra_sa8d_x3_8x8( uint8_t *fenc, uint8_t edge[36], int *res )
+;-----------------------------------------------------------------------------
+
+error LNK2019: unresolved external symbol _x264_predict_8x16c_dc_mmx2
+predict-a.asm: x86 intra prediction
+cglobal predict_8x16c_dc, 1,3
+
+error LNK2019: unresolved external symbol _x264_deblock_v_luma_sse2
+deblock-a.asm: x86 deblocking
+;-----------------------------------------------------------------------------
+; void deblock_v_luma( uint16_t *pix, intptr_t stride, int alpha, int beta, int8_t *tc0 )
+;-----------------------------------------------------------------------------
+
+error LNK2019: unresolved external symbol _x264_sub4x4_dct_mmx
+dct-a.asm: x86 transform and zigzag
+;-----------------------------------------------------------------------------
+; void sub4x4_dct( dctcoef dct[4][4], pixel *pix1, pixel *pix2 )
+;-----------------------------------------------------------------------------
+
+error LNK2019: unresolved external symbol _x264_sub8x8_dct_sse2
+dct-32.asm: x86_32 transform and zigzag
+;-----------------------------------------------------------------------------
+; void sub8x8_dct8( int16_t dct[8][8], uint8_t *pix1, uint8_t *pix2 )
+;-----------------------------------------------------------------------------
+
+error LNK2019: unresolved external symbol _x264_quant_2x2_dc_mmx2
+quant-a.asm: x86 quantization and level-run
+
+error LNK2001: unresolved external symbol _x264_pb_3
+const-a.asm: x86 global constants
+
+error LNK2019: unresolved external symbol _x264_prefetch_ref_mmx2
+mc-a.asm: x86 motion compensation
+
+error LNK2019: unresolved external symbol _x264_plane_copy_core_mmx2
+mc-a2.asm: x86 motion compensation
+
+6. 编译，修改编译错误。主要是：
+  （c98: All block-local variables need to be declared at the beginning of your functions.）
+  （msvc2013改进了这个问题: declaring/initializing all local variables at the beginning of a code block.）
+  
+  类似下面代码：
+          if( previous_nal_size )
+            memcpy( buf, h0->nal_buffer, previous_nal_size );   加｛｝，使后面的代码，成为单独的块
+
+        intptr_t delta = buf - h0->nal_buffer;
+
+7. 解决三个重名源文件问题：解决方法，为其中一个源文件指定不同的中间文件名称（msvc-outputfile-object-file-name.png）：$(IntDir)\cabacEnc.obj
+1>C:\Program Files (x86)\MSBuild\Microsoft.Cpp\v4.0\V120\Microsoft.CppBuild.targets(935,5): warning MSB8027: 
+Two or more files with the name of cabac.c will produce outputs to the same location. 
+This can lead to an incorrect build result.  
+The files involved are ..\..\common\cabac.c, ..\..\encoder\cabac.c.
+The files involved are ..\..\common\macroblock.c, ..\..\encoder\macroblock.c.
+The files involved are ..\..\common\set.c, ..\..\encoder\set.c.
+   注意：修改完中间文件名后，要清除解决方案，再重新编译，否则会把原来生成的中间文件链接进来，造成，重复定义警告。
+         warning LNK4006: _x264_cabac_encode_init_core already defined in cabacEnc.obj
+
+8. 忽略不必要的警告
+   warning C4244: 'function' : conversion from 'uint64_t' to 'uint32_t', possible loss of data
+   warning C4996: 'fileno': The POSIX name for this item is deprecated. Instead, use the ISO C++ conformant name: _fileno. See online help for details.
+   warning C4305: '=' : truncation from 'double' to 'float'
+   warning C4018: '<' : signed/unsigned mismatch
+   
+#pragma warning (disable: 4244)将忽略warning C4244
+configuration properties --> c/c++ --> advanced
+disable specific warnings栏填入警告的编号，sprintf好像是4996。
+如果要屏蔽多个警告，就把它们编号用逗号分隔 msvc-disable-specific-warnings.png
+
+
+9. 建立测试程序
+test.cpp 
+#include "stdafx.h"
+extern "C" {
+#include "x264.h"
+}
+
+int _tmain(int argc, _TCHAR* argv[])
+{
+	x264_param_t p;
+	x264_encoder_open(&p);
+	return 0;
+}
+
+编译错误：
+uint8_t *p_payload;
+error C2143: syntax error : missing ';' before '*'
+error C4430: missing type specifier - int assumed. Note: C++ does not support default-int
+
+uint8_t p_payload;
+error C2146: syntax error : missing ';' before identifier 'p_payload'
+error C4430: missing type specifier - int assumed. Note: C++ does not support default-int
+
+解决方法：#include <stdint.h>
+C99标准的 "7.18 Integer types <stdint.h> "

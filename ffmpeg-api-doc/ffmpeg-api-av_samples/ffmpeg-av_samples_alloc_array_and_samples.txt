@@ -1,0 +1,79 @@
+/**
+ * Allocate a data pointers array, samples buffer for nb_samples
+ * samples, and fill data pointers and linesize accordingly
+ .[英][əˈkɔ:dɪŋli] [美][əˈkɔ:rdɪŋli]adv.因此，于是；依据；照着，相应地
+ *
+ * This is the same as av_samples_alloc(), but also allocates the data
+ * pointers array.
+ *
+ * @see av_samples_alloc()
+ */
+int av_samples_alloc_array_and_samples(uint8_t ***audio_data, int *linesize, int nb_channels,
+                                       int nb_samples, enum AVSampleFormat sample_fmt, int align);
+
+怎么释放？avcodec_fill_audio_frame 填充到 frame 后，frame 释放时，能不能释放掉？
+好像需要手动释放掉
+// free buffers
+av_freep(&destinationData[0]);
+av_freep(&destinationData);
+av_frame_free(&pOutputAudioFrame);
+
+-------------------------
+源码：
+-------------------------
+
+int av_samples_alloc_array_and_samples(uint8_t ***audio_data, int *linesize, int nb_channels,
+                                       int nb_samples, enum AVSampleFormat sample_fmt, int align)
+{
+    int ret, nb_planes = av_sample_fmt_is_planar(sample_fmt) ? nb_channels : 1;
+
+    *audio_data = av_calloc(nb_planes, sizeof(**audio_data));
+    if (!*audio_data)
+        return AVERROR(ENOMEM);
+    ret = av_samples_alloc(*audio_data, linesize, nb_channels,
+                           nb_samples, sample_fmt, align);
+    if (ret < 0)
+        av_freep(audio_data);
+    return ret;
+}
+
+错误：   出错 av_freep 和 av_free 的区别？
+1. 创建
+  uint8_t **sample_data = NULL;
+  ret = av_samples_alloc_array_and_samples(
+          &sample_data, &linesize, 
+          g_out_audio_nb_channels,
+          g_out_audio_frame_size + 512,
+          g_out_audio_format,
+          0);
+
+2. 释放
+    if(af->sample_data) {
+      LOGI("free sample data buffer for file: %s", af->file_ctx->filename);
+      if(af->sample_data[0]) av_freep(af->sample_data[0]);                        出错 av_freep 和 av_free 的区别？
+      LOGI("free sample data array for file: %s", af->file_ctx->filename);
+      av_freep(af->sample_data);
+    }
+
+01-26 16:35:38.899 14655 14655 I JNILog  : free sample data buffer for file: /sdcard/dream.m4a
+
+01-26 16:35:38.899 14655 14655 F libc    : @@@ ABORTING: INVALID HEAP ADDRESS IN dlfree
+
+01-26 16:35:38.899 14655 14655 F libc    : Fatal signal 11 (SIGSEGV) at 0xdeadbaad (code=1)
+
+这个 sample_data 缓存只用于，接收 swr_convert 转出的值 可能造成错误的原因是
+nb_samples = swr_convert(audio_file->swr_ctx, 
+                             audio_file->sample_data,
+                             g_out_audio_frame_size,
+                             audio_frame.data,
+                             audio_frame.nb_samples);
+swr_ctx = swr_alloc_set_opts(NULL,
+				   g_out_audio_channel_layout,
+				   g_out_audio_format,
+				   g_out_audio_sample_rate,
+				   codec_ctx->channel_layout,
+				   codec_ctx->sample_fmt,
+				   codec_ctx->sample_rate,
+				   0, NULL);
+
+注释掉 swr_convert 就不出错了 为什么？

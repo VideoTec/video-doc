@@ -1,0 +1,477 @@
+计划：
+交叉编译
+  --enable-cross-compile   assume a cross-compiler is used
+  --arch=ARCH              select architecture [$arch]
+  --cpu=CPU                select the minimum required CPU (affects
+                           instruction selection, may crash on older CPUs)
+  --sysroot=PATH           root of cross-build tree
+  --sysinclude=PATH        location of cross-build system headers
+  --target-os=OS           compiler targets OS [$target_os]						   
+ 
+ 
+2014.10.14 【计划】《VC2013编译libav基础框架》
+2014.10.14 【计划】《libav的config.h理解》
+2014.10.16 【计划】《libav的config.asm理解》:是config.h的复制
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ libav configure
+ ./configure --prefix=./output --enable-cross-compile --target-os=linux --arch=arm --sysroot=g:/android/ndk/platforms/android-8/arch-arm --cross-prefix=g:/android/ndk/toolchains/arm-linux-androideabi-4.8/prebuilt/windows-x86_64/bin/arm-linux-androideabi- --disable-programs --disable-avfilter --disable-avdevice --disable-network --disable-everything --enable-protocol=file --enable-demuxer=mov --enable-muxer=mp4 --enable-decoder=mpeg4 --enable-decoder=h264 --enable-decoder=h263 --enable-decoder=h263i --enable-decoder=aac --enable-decoder=mp3 --enable-decoder=amrnb --enable-decoder=amrwb --enable-encoder=mpeg4 --enable-encoder=aac --enable-zlib
+ 
+ 
+ library.mak:101: *** missing separator. Stop
+ 使用，10.1 版本的就没有这个问题了。
+出问题的是，GIT库中的代码。 可能的原因是：core.autocrlf false
+
+
+
+
+
+
+vcvars32.bat
+call "C:\Program Files\Microsoft Visual Studio 9.0\VC\bin\vcvars32.bat"
+
+C:\msys\msys.bat in a plain-text editor, such as notepad.exe. Add the following line to the beggining of msys.bat
+
+
+
+
+
+
+CONFIG_HARDCODED_TABLES
+libavcodec/makefile
+
+aac_tables.h(是谁生成的？)
+
+aac_tablegen.c
+aac_tablegen.h
+
+
+ffmpeg config.mak 配置
+输出静态库文件名及后缀
+FULLNAME=$(NAME)$(BUILDSUF)
+LIBPREF=lib
+LIBSUF=.a
+LIBNAME=$(LIBPREF)$(FULLNAME)$(LIBSUF)
+
+链接选项：
+LDFLAGS= 
+
+CPPFLAGS= 
+CFLAGS= 
+ASFLAGS= 
+AS汇编器的名字，缺省值是as。ASFLAGS汇编器的选项，没有定义
+
+
+
+1） audto check cpu
+2)   libsuf 后缀名称，在那里修改
+--build-suffix=SUFFIX    library name suffix
+
+3） --enable-dxva2
+4)  bzlib zlib
+5)  --enable-frei0r          enable frei0r video filtering
+
+
+关于汇编的选项
+Optimization options (experts only):
+  --disable-asm            disable all assembler optimizations
+  --disable-altivec        disable AltiVec optimizations
+  --disable-amd3dnow       disable 3DNow! optimizations
+  --disable-amd3dnowext    disable 3DNow! extended optimizations
+  --disable-mmx            disable MMX optimizations
+  --disable-mmxext         disable MMXEXT optimizations
+  --disable-sse            disable SSE optimizations
+  --disable-sse2           disable SSE2 optimizations
+  --disable-sse3           disable SSE3 optimizations
+  --disable-ssse3          disable SSSE3 optimizations
+  --disable-sse4           disable SSE4 optimizations
+  --disable-sse42          disable SSE4.2 optimizations
+  --disable-avx            disable AVX optimizations
+  --disable-fma4           disable FMA4 optimizations
+  --disable-avx2           disable AVX2 optimizations
+  --disable-armv5te        disable armv5te optimizations
+  --disable-armv6          disable armv6 optimizations
+  --disable-armv6t2        disable armv6t2 optimizations
+  --disable-vfp            disable VFP optimizations
+  --disable-neon           disable NEON optimizations
+  --disable-vis            disable VIS optimizations
+  --disable-inline-asm     disable use of inline assembler
+  --disable-yasm           disable use of yasm assembler
+  
+  
+  
+  --enable-runtime-cpudetect detect cpu capabilities at runtime (bigger binary)
+  E:\libav101\libavutil\x86\cpu.h
+E:\libav101\libavutil\x86\cpu.c
+E:\libav101\libavutil\cpu.c
+
+
+
+
+
+
+
+
+
+
+
+msvc 关闭优化 造成链接错误的原因
+I:\libav101\libavcodec\dsputil.c ff_dsputil_init 函数：
+
+   if (ARCH_ARM)
+        ff_dsputil_init_arm(c, avctx);   
+
+链接时会出错：
+error LNK2019: 无法解析的外部符号 _ff_dsputil_init_arm，该符号在函数 _ff_dsputil_init 中被引用
+
+注意：
+I:\libav101\config.h  里定义了
+#define ARCH_ARM 0  即这个函数永远不会调用到。
+-O2 会优化掉这个调用。
+
+    if (ARCH_BFIN)
+        ff_dsputil_init_bfin(c, avctx);
+    if (ARCH_PPC)
+        ff_dsputil_init_ppc(c, avctx);
+    if (ARCH_SH4)
+        ff_dsputil_init_sh4(c, avctx);
+    if (HAVE_VIS)
+        ff_dsputil_init_vis(c, avctx);
+    if (ARCH_X86)
+        ff_dsputil_init_x86(c, avctx);
+		
+		
+	
+	
+	
+	
+	
+	
+	
+	libav configure --disable-debug
+--disable-optimizations  disable compiler optimizations
+--disable-debug          disable debugging symbols
+ --enable-debug=LEVEL     set the debug level []
+ 
+  Libav 所有组件总结
+ allcodecs.c
+decoders / encoders / external libraries
+hwaccels - REGISTER_HWACCEL
+parsers - REGISTER_PARSER
+bsfs - bitstream filters - REGISTER_BSF
+
+alldevieces.c
+indevs
+outdevs
+
+allfilters.c
+filters
+
+allformats.c
+muxers / demuxers
+protocols
+
+
+
+
+Libav debug and release configure parameters
+-Od / -O2(默认值)
+--optflags=OPTFLAGS      override optimization-related compiler flags
+
+-MTd / -MT(MSVC默认链接这个库)
+-g   选项设置 时设置-MTd 
+
+-ZI /-Zi
+-g   选项设置 时设置-ZI
+disabled debug 时设置 -Zi  （比照，-Oy- 选项的设置）
+
+输出目录的设置
+--libdir=DIR             install libs in DIR [PREFIX/lib]
+（'${prefix}/lib/debug'）('${prefix}/lib/release')
+----------------------------------------------------------------------------------------------------
+debug
+-Od -ZI  -MTd
+-debug (链接选项，默认有)
+
+release
+-O2 -Zi -MT(默认就是)     
+--disable-debug 时设置-Zi
+
+
+
+
+Libav if(0) 优化问题（-Od ）
+1. demuxer 等等组件
+
+2. CPU架构，选择
+
+3. 关联性代码（尽量不要修改这部分代码）
+
+
+
+
+
+--enable-dxva2           enable DXVA2 code
+添加硬件加速，编译选项
+能自动检测吗？
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+libav CPU Arch相关代码
+libswscale/yuv2rgb.c
+libswscale/utils.c
+libswscale/swscale_unscaled.c
+libswscale/swscale.c
+libavutil/cpu.c
+libavresample/audio_convert.c
+libavcodec/videodsp.c
+libavcodec/sbrdsp.c
+libavcodec/mpegvideo.c
+libavcodec/hpeldsp.c
+libavcodec/h264qpel.c
+libavcodec/h264pred.c
+libavcodec/h264dsp.c
+libavcodec/h264chroma.c
+libavcodec/fmtconvert.c
+libavcodec/fft_template.c
+libavcodec/dsputil.c
+libavcodec/aacpsdsp.c
+
+
+
+libav (if(0) 优化问题)需要添加的组件
+CONFIG_WMV2_ENCODER           / CONFIG_WMV2_DECODER
+CONFIG_MPEG4_ENCODER          / CONFIG_MPEG4_DECODER
+CONFIG_MSMPEG4_ENCODER  / CONFIG_MSMPEG4_DECODER
+CONFIG_H261_ENCODER / CONFIG_H261_DECODER
+CONFIG_FLV_ENCODER / CONFIG_FLV_DECODER
+
+CONFIG_MJPEG_ENCODER
+CONFIG_MPEG1VIDEO_ENCODER
+CONFIG_MPEG2VIDEO_ENCODER
+
+CONFIG_H263I_DECODER
+CONFIG_H263_ENCODER
+
+CONFIG_RV20_ENCODER
+CONFIG_RV10_ENCODER
+
+CONFIG_SVQ3_DECODER
+
+libavcodec/mpegvideo.c
+？？？？CONFIG_MPEG_XVMC_DECODER？？？？
+
+(mpeg12dec.o) : error LNK2019: 无法解析的外部符号 _ff_xvmc_init_block，该符号在函数 _mpeg_decode_slice 中被引用
+(mpeg12dec.o) : error LNK2019: 无法解析的外部符号 _ff_xvmc_pack_pblocks，该符号在函数 _mpeg_decode_mb 中被引用
+(mpeg12dec.o) : error LNK2019: 无法解析的外部符号 _ff_xvmc_field_start，该符号在函数 _mpeg_field_start 中被引用
+(mpeg12dec.o) : error LNK2019: 无法解析的外部符号 _ff_xvmc_field_end，该符号在函数 _slice_end 中被引用
+
+(mpegvideo.o) : error LNK2001: 无法解析的外部符号 _ff_xvmc_field_start
+(mpegvideo.o) : error LNK2019: 无法解析的外部符号 _ff_xvmc_decode_mb，该符号在函数 _MPV_decode_mb_internal 中被引用
+(mpegvideo.o) : error LNK2001: 无法解析的外部符号 _ff_xvmc_field_end
+
+(mjpegdec.o) : error LNK2019: 无法解析的外部符号 _ff_jpegls_decode_picture，该符号在函数 _ff_mjpeg_decode_sos 中被引用
+
+--------------------------------------------------------------------------------------------
+libavcodec/mpegvideo_motion.c
+(CONFIG_WMV2_DECODER || CONFIG_WMV2_ENCODER)
+(CONFIG_H261_ENCODER || CONFIG_H261_DECODER)
+
+libavcodec/mpegvideo_enc.c
+CONFIG_MPEG1VIDEO_ENCODER || CONFIG_MPEG2VIDEO_ENCODER
+(CONFIG_H263_ENCODER)
+CONFIG_FLV_ENCODER
+CONFIG_RV20_ENCODER
+CONFIG_RV10_ENCODER
+CONFIG_MPEG4_ENCODER
+CONFIG_MSMPEG4_ENCODER
+CONFIG_WMV2_ENCODER
+CONFIG_H261_ENCODER
+CONFIG_MJPEG_ENCODER
+CONFIG_MSMPEG4_ENCODER
+CONFIG_MPEG1VIDEO_ENCODER || CONFIG_MPEG2VIDEO_ENCODER
+CONFIG_H261_ENCODER
+CONFIG_MJPEG_ENCODER
+CONFIG_MJPEG_ENCODER
+CONFIG_H263_ENCODER
+CONFIG_MSMPEG4_ENCODER
+CONFIG_MPEG1VIDEO_ENCODER || CONFIG_MPEG2VIDEO_ENCODER
+
+libavcodec/mpegvideo.c
+CONFIG_WMV2_DECODER || CONFIG_WMV2_ENCODER
+CONFIG_MPEG_XVMC_DECODER？？？？
+
+libavcodec/h264_mb_template.c
+libavcodec/h264.c
+CONFIG_SVQ3_DECODER
+
+libavcodec/h263dec.c
+CONFIG_WMV2_DECODER
+ CONFIG_H263I_DECODER
+CONFIG_MSMPEG4_DECODER
+CONFIG_MPEG4_DECODER
+CONFIG_FLV_DECODER
+
+
+
+
+
+
+
+
+
+libav paser bit-stream 组件有什么用？
+AVCodecParser  / AVCodecParserContext
+
+流过滤器
+AVBitStreamFilterContext / AVBitStreamFilter 
+
+  --enable-parser=NAME     enable parser NAME
+  --disable-parser=NAME    disable parser NAME
+  --disable-parsers        disable all parsers
+  --enable-bsf=NAME        enable bitstream filter NAME
+  --disable-bsf=NAME       disable bitstream filter NAME
+  --disable-bsfs           disable all bitstream filters
+  
+  
+    libav configure gen release-makefile and debug-makefile
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	  HAVE_VIS 是什么芯片？ARCH_SH4
+	  
+	  
+	  
+	  
+	  
+	  
+	    library.mak:92: *** missing separator.  Stop 
+  $(eval $(RULES)) 
+
+在这行前面加个TAB制表符，保存。再make就解决了
+
+很怪异的问题，同一个库里的代码，
+在笔记本上，configure后，make不出错
+在PC上，configure后，makeb出这个错。
+
+区别是：PC上用MSVC，笔记本上用ndk。
+
+
+
+
+configure 增加 --config-mak  config_mak 变量
+
+
+
+
+
+
+
+
+
+Libav configure 为MSVC订制，以及configre命令行
+1。 --config-mak 指定输出的config.mak文件名称，用于不同的Makefile文件
+2。为MSVC添加设置静态库lib前缀，后缀
+       LIBSUF=".lib"
+       LIBPREF=""
+3。release版本（--disable-debug）加-Zi参数
+4。debug版本，添加，-ZI -MTd参数
+
+
+
+
+
+
+
+
+
+
+
+libav make: error C2059: 语法错误:“sizeof"
+可能的原因：
+1, 因为添加的编码器 ,jpegls    (不是这个原因)
+2, 需要重新configure, make  (mak clean 重新 configure->make 就可以了)
+
+
+
+
+
+
+
+
+
+
+libav configure 里的
+ --disable-dct            disable DCT code
+  --disable-error-resilience disable error resilience code
+  --disable-lsp            disable LSP code
+
+  --disable-lzo            disable LZO decoder code
+E:\libav\libavutil\lzo.h  LZO 1x decompression
+
+  --disable-mdct           disable MDCT code
+  --disable-rdft           disable RDFT code
+  --disable-fft            disable FFT code
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  configure 中检测，zlib bzlib 的代码
+  disabled  zlib || check_lib   zlib.h      zlibVersion -lz   || disable  zlib
+disabled bzlib || check_lib2 bzlib.h BZ2_bzlibVersion -lbz2 || disable bzlib
+
+
+
+
+android/ndk/build/build/tool/make-standalone-toolchain.sh
+创建，交叉编译工具链，脚本。
+
+在msys控制台里执行下面的命令：
+
+./make-standalone-toolchain.sh 
+--ndk-dir=/e/android/ndk 
+--platform=android-9
+--install-dir=/c/android 
+--system=windows-x86_64
+--toolchain=arm-linux-androideabi-4.6
+
+生成的编译工具：
+C:\android\arm-linux-androideabi\bin
+C:\android\bin\arm-linux-androideabi-[xxx].exe
+生成的系统头文件及库文件路径
+C:\android\sysroot\usr\include
+C:\android\sysroot\usr\lib
+
+利用，上面生成的交叉编译工具链，编译libfreetype：
+PATH=$PATH:/c/android/bin                                                 添加PATH
+./configure --host=arm-linux-androideabi

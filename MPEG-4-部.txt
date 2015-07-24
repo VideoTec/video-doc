@@ -1,0 +1,32 @@
+MPEG-4由一系列的子标准组成，被称为部（part）（有时也译为卷），包括以下的部分：
+
+第一部分（ISO/IEC 14496-1）：系统：描述视频和音频数据流的控制、同步以及混合方式（即混流Multiplexing，简写为MUX）。
+第二部分（ISO/IEC 14496-2）：视频：定义一个对各种视觉信息（包括自然视频、静止纹理、计算机合成图形等等）的编解码器。（例如XviD编码就属于MPEG-4 Part 2）
+第三部分（ISO/IEC 14496-3）：音频：定义一个对各种音频信号进行编码的编解码器的集合。
+                             包括高级音频编码（Advanced Audio Coding，缩写为AAC）的若干变形和其他一些音频/语音编码工具。
+第四部分（ISO/IEC 14496-4）：一致性：定义对本标准其他的部分进行一致性测试的程序。
+第五部分（ISO/IEC 14496-5）：参考软件：提供用于演示功能和说明本标准其他部分功能的软件。
+第六部分（ISO/IEC 14496-6）：多媒体传输集成框架（DMIF for Delivery Multimedia Integration Framework）
+第七部分（ISO/IEC 14496-7）：优化的参考软件：提供对实现进行优化的例子（这里的实现指的是第五部分）。
+第八部分（ISO/IEC 14496-8）：在IP网络上传输：定义在IP网络上传输MPEG-4内容的方式。
+第九部分（ISO/IEC 14496-9）：参考硬件：提供用于演示怎样在硬件上实现本标准其他部分功能的硬件设计方案。
+第十部分（ISO/IEC 14496-10）：高级视频编码或称高级视频编码（Advanced Video Coding，缩写为AVC）：定义一个视频编解码器（codec）。AVC和XviD都属于MPEG-4编码，但由于AVC属于MPEG-4 Part 10，在技术特性上比属于MPEG-4 Part2的XviD要先进。另外，它和ITU-T H.264标准是一致的，故又称为H.264。
+第十二部分（ISO/IEC 14496-12）：基于ISO的媒体文件格式：定义一个存储媒体内容的文件格式。
+第十三部分（ISO/IEC 14496-13）：知识产权管理和保护（IPMP for Intellectual Property Management and Protection）拓展。
+第十四部分（ISO/IEC 14496-14）：MPEG-4文件格式：定义基于第十二部分的用于存储MPEG-4内容的视频文件格式。
+第十五部分（ISO/IEC 14496-15）：AVC文件格式：定义基于第十二部分的用于存储第十部分的视频内容的文件格式。
+第十六部分（ISO/IEC 14496-16）：动画框架扩展（AFX : Animation Framework eXtension）。
+第十七部分（ISO/IEC 14496-17）：同步文本字幕格式。
+第十八部分（ISO/IEC 14496-18）：字体压缩和流式传输（针对开放字体格式Open Font Format）。
+第十九部分（ISO/IEC 14496-19）：合成材质流（Synthesized Texture Stream）。
+第二十部分（ISO/IEC 14496-20）：简单场景表示（LASeR for Lightweight Scene Representation。
+第二十一部分（ISO/IEC 14496-21）：用于描绘（Rendering）的MPEG-J拓展。
+第二十二部分（ISO/IEC 14496-22）：开放字体格式（Open Font Format）。
+第二十三部分（ISO/IEC 14496-23）：符号化音乐表示（Symbolic Music Representation）。
+第二十四部分（ISO/IEC 14496-24）：音频与系统交互作用（Audio and systems interaction）。
+第二十五部分（ISO/IEC 14496-25）：3D图形压缩模型（3D Graphics Compression Model）。
+第二十六部分（ISO/IEC 14496-26）：音频一致性检查：定义测试音频数据与ISO/IEC 14496-3是否一致的方法（Audio conformance）。
+第二十七部分（ISO/IEC 14496-27）：3D图形一致性检查：定义测试3D图形数据与ISO/IEC 14496-11:2005, ISO/IEC 14496-16:2006, ISO/IEC 14496-21:2006,和ISO/IEC 14496-25:2009是否一致的方法（3D Graphics conformance）
+
+Profiles是在每个部分内定义的，所以对某个部分的一个实现通常不是对该部分的完整实现。
+MPEG-1、MPEG-2、MPEG-7和MPEG-21是由MPEG制定的其他MPEG标准

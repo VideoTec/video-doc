@@ -1,0 +1,3 @@
+exhausted[英][ɪgˈzɔ:stɪd] [美][ɪɡˈzɔstɪd] 耗尽的
+
+Input buffer exhausted before END element found

@@ -1,0 +1,143 @@
+怎么获取输出的LOG？
+LOG体系是怎样的？
+
+avutil/log.h
+
+/**
+ * Send the specified message to the log if the level is less than or equal
+ * to the current av_log_level. By default, all logging messages are sent to
+ * stderr. This behavior can be altered by setting a different logging callback
+ * function.
+ * @see av_log_set_callback
+ *
+ * @param avcl A pointer to an arbitrary struct of which the first field is a
+ *        pointer to an AVClass struct.
+ * @param level The importance level of the message expressed using a @ref
+ *        lavu_log_constants "Logging Constant".
+ * @param fmt The format string (printf-compatible) that specifies how
+ *        subsequent arguments are converted to output.
+ */
+void av_log(void *avcl, int level, const char *fmt, ...) av_printf_format(3, 4);
+
+示例：
+av_log(avctx, AV_LOG_ERROR, "No codec provided to avcodec_open2()\n");
+
+源码：
+
+void av_log(void* avcl, int level, const char *fmt, ...)
+{
+    AVClass* avc = avcl ? *(AVClass **) avcl : NULL;
+    va_list vl;
+    va_start(vl, fmt);
+    if (avc && avc->version >= (50 << 16 | 15 << 8 | 2) &&
+        avc->log_level_offset_offset && level >= AV_LOG_FATAL)
+        level += *(int *) (((uint8_t *) avcl) + avc->log_level_offset_offset);
+    av_vlog(avcl, level, fmt, vl);
+    va_end(vl);
+}
+
+void av_vlog(void* avcl, int level, const char *fmt, va_list vl)
+{
+    void (*log_callback)(void*, int, const char*, va_list) = av_log_callback;
+    if (log_callback)
+        log_callback(avcl, level, fmt, vl);
+}
+注意其中的全局变量 av_log_callback
+static void (*av_log_callback)(void*, int, const char*, va_list) = av_log_default_callback;
+void av_log_set_callback(void (*callback)(void*, int, const char*, va_list))
+{
+    av_log_callback = callback;
+}
+默认的LOG回调函数
+void av_log_default_callback(void* ptr, int level, const char* fmt, va_list vl)
+{
+    static int print_prefix = 1;
+    static int count;
+    static char prev[LINE_SZ];
+    AVBPrint part[4];
+    char line[LINE_SZ];
+    static int is_atty;
+    int type[2];
+    unsigned tint = 0;
+
+    if (level >= 0) {
+        tint = level & 0xff00;
+        level &= 0xff;
+    }
+
+    if (level > av_log_level)
+        return;
+#if HAVE_PTHREADS
+    pthread_mutex_lock(&mutex);
+#endif
+
+    format_line(ptr, level, fmt, vl, part, &print_prefix, type);
+    snprintf(line, sizeof(line), "%s%s%s%s", part[0].str, part[1].str, part[2].str, part[3].str);
+
+#if HAVE_ISATTY
+    if (!is_atty)
+        is_atty = isatty(2) ? 1 : -1;
+#endif
+
+    if (print_prefix && (flags & AV_LOG_SKIP_REPEATED) && !strcmp(line, prev) &&
+        *line && line[strlen(line) - 1] != '\r'){
+        count++;
+        if (is_atty == 1)
+            fprintf(stderr, "    Last message repeated %d times\r", count);
+        goto end;
+    }
+    if (count > 0) {
+        fprintf(stderr, "    Last message repeated %d times\n", count);
+        count = 0;
+    }
+    strcpy(prev, line);
+    sanitize(part[0].str);
+    colored_fputs(type[0], 0, part[0].str);
+    sanitize(part[1].str);
+    colored_fputs(type[1], 0, part[1].str);
+    sanitize(part[2].str);
+    colored_fputs(av_clip(level >> 3, 0, 6), tint >> 8, part[2].str);
+    sanitize(part[3].str);
+    colored_fputs(av_clip(level >> 3, 0, 6), tint >> 8, part[3].str);
+end:
+    av_bprint_finalize(part+3, NULL);
+#if HAVE_PTHREADS
+    pthread_mutex_unlock(&mutex);
+#endif
+}
+
+static void format_line(void *avcl, int level, const char *fmt, va_list vl,
+                        AVBPrint part[4], int *print_prefix, int type[2])
+{
+    AVClass* avc = avcl ? *(AVClass **) avcl : NULL;
+    av_bprint_init(part+0, 0, 1);
+    av_bprint_init(part+1, 0, 1);
+    av_bprint_init(part+2, 0, 1);
+    av_bprint_init(part+3, 0, 65536);
+
+    if(type) type[0] = type[1] = AV_CLASS_CATEGORY_NA + 16;
+    if (*print_prefix && avc) {
+        if (avc->parent_log_context_offset) {
+            AVClass** parent = *(AVClass ***) (((uint8_t *) avcl) +
+                                   avc->parent_log_context_offset);
+            if (parent && *parent) {
+                av_bprintf(part+0, "[%s @ %p] ",
+                         (*parent)->item_name(parent), parent);
+                if(type) type[0] = get_category(parent);
+            }
+        }
+        av_bprintf(part+1, "[%s @ %p] ",
+                 avc->item_name(avcl), avcl);
+        if(type) type[1] = get_category(avcl);
+
+        if (flags & AV_LOG_PRINT_LEVEL)
+            av_bprintf(part+2, "[%s] ", get_level_str(level));
+    }
+
+    av_vbprintf(part+3, fmt, vl);
+
+    if(*part[0].str || *part[1].str || *part[2].str || *part[3].str) {
+        char lastc = part[3].len && part[3].len <= part[3].size ? part[3].str[part[3].len - 1] : 0;
+        *print_prefix = lastc == '\n' || lastc == '\r';
+    }
+}

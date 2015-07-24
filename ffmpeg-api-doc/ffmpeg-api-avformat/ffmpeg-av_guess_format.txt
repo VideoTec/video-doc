@@ -1,0 +1,59 @@
+libavformat/avformat.h
+libavformat/format.c
+
+AVOutputFormat *fmt = av_guess_format("mp4", NULL, NULL);
+用于输出 AVFormatContext 的
+fmt_ctx_ = avformat_alloc_context();
+fmt_ctx_->oformat = fmt;
+
+/**
+ * Return the output format in the list of registered output formats
+ * which best matches the provided parameters, or return NULL if
+ * there is no match.
+ *
+ * @param short_name if non-NULL checks if short_name matches with the
+ * names of the registered formats
+ * @param filename if non-NULL checks if filename terminates with the
+ * extensions of the registered formats
+ * @param mime_type if non-NULL checks if mime_type matches with the
+ * MIME type of the registered formats
+ */
+AVOutputFormat *av_guess_format(const char *short_name,
+                                const char *filename,
+                                const char *mime_type);
+
+源代码
+AVOutputFormat *av_guess_format(const char *short_name, const char *filename,
+                                const char *mime_type)
+{
+    AVOutputFormat *fmt = NULL, *fmt_found;
+    int score_max, score;
+
+    /* specific test for image sequences */
+#if CONFIG_IMAGE2_MUXER
+    if (!short_name && filename &&
+        av_filename_number_test(filename) &&
+        ff_guess_image2_codec(filename) != AV_CODEC_ID_NONE) {
+        return av_guess_format("image2", NULL, NULL);
+    }
+#endif
+    /* Find the proper file type. */
+    fmt_found = NULL;
+    score_max = 0;
+    while ((fmt = av_oformat_next(fmt))) {
+        score = 0;
+        if (fmt->name && short_name && !av_strcasecmp(fmt->name, short_name))
+            score += 100;
+        if (fmt->mime_type && mime_type && !strcmp(fmt->mime_type, mime_type))
+            score += 10;
+        if (filename && fmt->extensions &&
+            av_match_ext(filename, fmt->extensions)) {
+            score += 5;
+        }
+        if (score > score_max) {
+            score_max = score;
+            fmt_found = fmt;
+        }
+    }
+    return fmt_found;
+}

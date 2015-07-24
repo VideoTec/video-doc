@@ -1,0 +1,5 @@
+AudioTrack::setPlaybackRate
+Sets the playback sample rate for this track. 
+This sets the sampling rate at which the audio data will be consumed and played back (as set by the sampleRateInHz parameter in the AudioTrack(int, int, int, int, int, int) constructor), not the original sampling rate of the content. 
+For example, setting it to half the sample rate of the content will cause the playback to last twice as long, but will also result in a pitch shift down by one octave. 
+The valid sample rate range is from 1 Hz to twice the value returned by getNativeOutputSampleRate(int).

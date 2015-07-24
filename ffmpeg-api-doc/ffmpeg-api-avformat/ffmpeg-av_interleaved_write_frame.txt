@@ -1,0 +1,152 @@
+libavformat/avformat.h
+libavformat/mux.c
+
+-----------------------------------------------
+传递给这个函数的 pkt 必须要填充的数据
+-----------------------------------------------
+pkt.pts
+pkt.stream_index
+pkt.duration        对于声音：一般 encode 会计算出这个值来
+
+如果不是直接从 encode 得到的PAKCT, 还需要填充自定义数据
+pkt.size
+pkt.data
+
+15:03 2015/4/24 av_interleaved_write_frame 会调用 av_packet_unref(pkt);
+av_packet_unref(pkt); 的作用：
+第一：释放引用计数的 缓存数据
+第二：重置 pkt
+    av_init_packet(pkt);
+    pkt->data = NULL;
+    pkt->size = 0;
+
+2015.03.27
+直接从 mp4 文件里得到 audio-sample 直接创建 AVPacket 再 av_interleaved_write_frame 程序崩溃
+这个问题可以转成：the packet is not reference-counted，av_interleaved_write_frame会崩。
+需要创建 引用计数的packet，再把数据复制到packet里去，才行。
+
+/**
+ * Write a packet to an output media file ensuring correct interleaving.
+ *
+ * This function will buffer the packets internally as needed to make sure the
+ * packets in the output file are properly interleaved in the order of
+ * increasing dts. Callers doing their own interleaving should call
+ * av_write_frame() instead of this function.
+ *
+ * @param s media file handle
+ * @param pkt The packet containing the data to be written.
+ *            <br>
+ *            If the packet is reference-counted, this function will take
+ *            ownership of this reference and unreference it later when it sees
+ *            fit.
+ *            The caller must not access the data through this reference after
+ *            this function returns. If the packet is not reference-counted,
+ *            libavformat will make a copy.
+ *            <br>
+ *            This parameter can be NULL (at any time, not just at the end), to
+ *            flush the interleaving queues.
+ *            <br>
+ *            Packet's @ref AVPacket.stream_index "stream_index" field must be
+ *            set to the index of the corresponding stream in @ref
+ *            AVFormatContext.streams "s->streams". It is very strongly
+ *            recommended that timing information (@ref AVPacket.pts "pts", @ref
+ *            AVPacket.dts "dts", @ref AVPacket.duration "duration") is set to
+ *            correct values.
+ *
+ * @return 0 on success, a negative AVERROR on error. Libavformat will always
+ *         take care of freeing the packet, even if this function fails.
+ *
+ * @see av_write_frame(), AVFormatContext.max_interleave_delta
+ */
+int av_interleaved_write_frame(AVFormatContext *s, AVPacket *pkt);
+
+-----------------------------------------------------
+源码
+-----------------------------------------------------
+int av_interleaved_write_frame(AVFormatContext *s, AVPacket *pkt)
+{
+    int ret, flush = 0;
+
+    ret = check_packet(s, pkt);
+    if (ret < 0)
+        goto fail;
+
+    if (pkt) {
+        AVStream *st = s->streams[pkt->stream_index];
+
+        av_dlog(s, "av_interleaved_write_frame size:%d dts:%s pts:%s\n",
+                pkt->size, av_ts2str(pkt->dts), av_ts2str(pkt->pts));
+        if ((ret = compute_pkt_fields2(s, st, pkt)) < 0 && !(s->oformat->flags & AVFMT_NOTIMESTAMPS))
+            goto fail;
+
+        if (pkt->dts == AV_NOPTS_VALUE && !(s->oformat->flags & AVFMT_NOTIMESTAMPS)) {
+            ret = AVERROR(EINVAL);
+            goto fail;
+        }
+    } else {
+        av_dlog(s, "av_interleaved_write_frame FLUSH\n");
+        flush = 1;
+    }
+
+    for (;; ) {
+        AVPacket opkt;
+        int ret = interleave_packet(s, &opkt, pkt, flush);
+        if (pkt) {
+            memset(pkt, 0, sizeof(*pkt));
+            av_init_packet(pkt);
+            pkt = NULL;
+        }
+        if (ret <= 0) //FIXME cleanup needed for ret<0 ?
+            return ret;
+
+        ret = write_packet(s, &opkt);
+        if (ret >= 0)
+            s->streams[opkt.stream_index]->nb_frames++;
+
+        av_free_packet(&opkt);
+
+        if (ret < 0)
+            return ret;
+        if(s->pb && s->pb->error)
+            return s->pb->error;
+    }
+fail:
+    av_packet_unref(pkt);
+    return ret;
+}
+
+/**
+ * Interleave an AVPacket correctly so it can be muxed.
+ * @param out the interleaved packet will be output here
+ * @param in the input packet
+ * @param flush 1 if no further packets are available as input and all
+ *              remaining packets should be output
+ * @return 1 if a packet was output, 0 if no packet could be output,
+ *         < 0 if an error occurred
+ */
+static int interleave_packet(AVFormatContext *s, AVPacket *out, AVPacket *in, int flush)
+{
+    if (s->oformat->interleave_packet) {
+        int ret = s->oformat->interleave_packet(s, out, in, flush);
+        if (in)
+            av_free_packet(in);
+        return ret;
+    } else
+        return ff_interleave_packet_per_dts(s, out, in, flush);
+}
+
+-----------------------------------------------
+写完后，这个 pkt 需要立刻调用 av_free_packet ?
+-----------------------------------------------
+1) 立即调用不会出错
+2) 不调用的话，是否会造成内在溢出？不会
+If the packet is reference-counted, 
+this function will take ownership of this reference and unreference it later when it sees fit.
+
+Libavformat will always take care of freeing the packet, even if this function fails.
+
+-----------------------------------------------
+传递给这个函数的 pkt 的 pts 必须要有效
+-----------------------------------------------
+It is very strongly recommended that timing information is set to correct values.
+(@ref AVPacket.pts "pts", @ref AVPacket.dts "dts", @ref AVPacket.duration "duration") 

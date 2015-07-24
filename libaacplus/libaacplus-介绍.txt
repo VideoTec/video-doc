@@ -1,0 +1,15 @@
+NOTE: libaacplus is a non-free library, so you won't be able to build GPL alike FFmpeg with this library, i.e. your FFmpeg will not be redistributable.
+
+源文件地址
+http://ffmpeg.gusari.org/uploads/libaacplus-2.0.2.tar.gz
+
+----------------------------------------------------------
+源文件分析
+----------------------------------------------------------
+
+
+----------------------------------------------------------
+Windows 编译
+----------------------------------------------------------
+./autogen.sh --enable-shared --enable-static
+make

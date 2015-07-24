@@ -1,0 +1,19 @@
+    /**
+     * minimum Lagrange multipler
+     * - encoding: Set by user.
+     * - decoding: unused
+     */
+    int lmin;
+
+    /**
+     * maximum Lagrange multipler
+     * - encoding: Set by user.
+     * - decoding: unused
+     */
+    int lmax;
+
+http://blog.csdn.net/chance_yin/article/details/16335625
+//设置最小和最大 拉格朗日乘数  
+//拉格朗日乘数 是统计学用来检测瞬间平均值的一种方法  
+pCodecCtxEnc->lmin = 1;  
+pCodecCtxEnc->lmax = 5; 

@@ -1,0 +1,13 @@
+    { "crf",           "Select the quality for constant quality mode",    OFFSET(crf),           AV_OPT_TYPE_FLOAT,  {.dbl = -1 }, -1, FLT_MAX, VE },
+    { "crf_max",       "In CRF mode, prevents VBV from lowering quality beyond this point.",OFFSET(crf_max), AV_OPT_TYPE_FLOAT, {.dbl = -1 }, -1, FLT_MAX, VE },
+
+http://slhck.info/video-encoding.html
+
+libx264 -crf
+最大值    51
+最小值    0
+推荐值    23
+建议范围  18–28
+
+Values of ±6 result in double/half avg. bitrate. 0 is lossless.
+Specifying -profile:v lets you adjust coding efficiency. See H.264 Encoding Guide.

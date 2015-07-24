@@ -1,0 +1,44 @@
+avformat_close_input(&fmtctx);  // which include avformat_free_context
+
+libavformat/avformat.h
+libavformat/utils.c
+
+/**
+ * Close an opened input AVFormatContext. Free it and all its contents
+ * and set *s to NULL.
+ */
+void avformat_close_input(AVFormatContext **s);
+
+源码：
+
+void avformat_close_input(AVFormatContext **ps)
+{
+    AVFormatContext *s = *ps;
+    AVIOContext *pb    = s->pb;
+
+    if ((s->iformat && s->iformat->flags & AVFMT_NOFILE) ||
+        (s->flags & AVFMT_FLAG_CUSTOM_IO))
+        pb = NULL;
+
+    flush_packet_queue(s);
+
+    if (s->iformat)
+        if (s->iformat->read_close)
+            s->iformat->read_close(s);
+
+    avformat_free_context(s);
+
+    *ps = NULL;
+
+    avio_close(pb);
+}
+
+/* XXX: suppress the packet queue */
+static void flush_packet_queue(AVFormatContext *s)
+{
+    free_packet_buffer(&s->parse_queue,       &s->parse_queue_end);
+    free_packet_buffer(&s->packet_buffer,     &s->packet_buffer_end);
+    free_packet_buffer(&s->raw_packet_buffer, &s->raw_packet_buffer_end);
+
+    s->raw_packet_buffer_remaining_size = RAW_PACKET_BUFFER_SIZE;
+}

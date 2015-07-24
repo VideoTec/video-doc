@@ -1,0 +1,18 @@
+源文件位置
+libavcodec/avcodec.h
+E:\libav\libavcodec\avpicture.c
+
+/**
+ * Free a picture previously allocated by avpicture_alloc().
+ * The data buffer used by the AVPicture is freed, but the AVPicture structure
+ * itself is not.
+ *
+ * @param picture the AVPicture to be freed
+ */
+void avpicture_free(AVPicture *picture);
+
+
+void avpicture_free(AVPicture *picture)
+{
+    av_free(picture->data[0]);
+}

@@ -1,0 +1,18 @@
+libav 定义的 MOV 格式上下文件
+
+typedef struct MOVContext {
+    AVFormatContext *fc;
+    int time_scale;
+    int64_t duration;     ///< duration of the longest track
+    int found_moov;       ///< 'moov' atom has been found
+    int found_mdat;       ///< 'mdat' atom has been found
+    DVDemuxContext *dv_demux;
+    AVFormatContext *dv_fctx;
+    int isom;             ///< 1 if file is ISO Media (mp4/3gp)
+    MOVFragment fragment; ///< current fragment in moof atom
+    MOVTrackExt *trex_data;
+    unsigned trex_count;
+    int itunes_metadata;  ///< metadata are itunes style
+    int chapter_track;
+    int64_t next_root_atom; ///< offset of the next root atom
+} MOVContext;

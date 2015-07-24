@@ -1,0 +1,18 @@
+AVOutputFormat priv_data_size 示例
+
+AVOutputFormat ff_mp4_muxer = {
+    .name              = "mp4",
+    .long_name         = NULL_IF_CONFIG_SMALL("MP4 (MPEG-4 Part 14)"),
+    .mime_type         = "application/mp4",
+    .extensions        = "mp4",
+    .priv_data_size    = sizeof(MOVMuxContext),
+    .audio_codec       = AV_CODEC_ID_AAC,
+    .video_codec       = CONFIG_LIBX264_ENCODER ?
+                         AV_CODEC_ID_H264 : AV_CODEC_ID_MPEG4,
+    .write_header      = mov_write_header,
+    .write_packet      = mov_write_packet,
+    .write_trailer     = mov_write_trailer,
+    .flags             = AVFMT_GLOBALHEADER | AVFMT_ALLOW_FLUSH | AVFMT_TS_NEGATIVE,
+    .codec_tag         = (const AVCodecTag* const []){ ff_mp4_obj_type, 0 },
+    .priv_class        = &mp4_muxer_class,
+};

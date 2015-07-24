@@ -1,0 +1,24 @@
+---------------------------------------------
+http://en.wikipedia.org/wiki/MPEG-1 解释
+---------------------------------------------
+MPEG-1 Audio is divided into 3 layers.
+
+MPEG-1 Layer I is nothing more than a simplified version of Layer II.[12] Layer I uses a smaller 384-sample frame size for very low delay, and finer resolution.
+Layer I uses a smaller 384-sample frame size for very low delay, and finer resolution.
+
+MPEG-1 Layer II (MP2—often incorrectly called MUSICAM)[48] is a lossy audio format designed to provide high quality at about 192 kbit/s for stereo sound. Decoding MP2 audio is computationally simple, relative to MP3, AAC, etc
+The size of a Layer II frame is fixed at 1152-samples (coefficients[英][kəʊɪ'fɪʃənts] [美][koʊɪ'fɪʃənts] 系数).
+
+MPEG-1 Layer III (MP3) is a lossy audio format designed to provide acceptable quality at about 64 kbit/s for monaural audio over single-channel (BRI) ISDN links, and 128 kbit/s for stereo sound.
+MP3 works on 1152 samples like Layer II, but needs to take multiple frames for analysis before frequency-domain (MDCT) processing and quantization can be effective.
+
+---------------------------------------------
+http://en.wikipedia.org/wiki/MP3 解释
+---------------------------------------------
+MPEG-1 or MPEG-2 Audio Layer III,[4] more commonly referred to as MP3, is an audio coding format for digital audio which uses a form of lossy data compression.
+
+MPEG Audio Layer III versions[5][6][9][31][32][33]
+Version						International Standard[*]			First edition public release date		Latest edition public release date
+MPEG-1 Audio Layer III		ISO/IEC 11172-3 (MPEG-1 Part 3)		1993
+MPEG-2 Audio Layer III		ISO/IEC 13818-3 (MPEG-2 Part 3)		1995									1998
+MPEG-2.5 Audio Layer III	nonstandard, proprietary

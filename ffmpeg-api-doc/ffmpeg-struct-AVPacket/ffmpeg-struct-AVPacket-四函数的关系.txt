@@ -1,0 +1,59 @@
+av_read_frame / av_interleaved_write_frame
+av_encode_v/a / av_decode_v/a
+
+---------------------------------
+av_read_frame
+---------------------------------
+pkt->buf is NULL,      the packet is valid until the next av_read_frame()
+pkt->buf is not NULL,  长期有效
+
+In both cases the packet must be freed with av_free_packet when it is no longer needed
+根据 avconv.c 处理完 avpkt 后，需要释放
+av_free_packet(&pkt);
+
+根据 avconv.c 读取下一帧时, 不需要初始化 avpkt
+AVPacket pkt;
+ret = av_read_frame(f->ctx, &pkt); pkt->buf 不用初始化吗？
+
+根据 ffplay.c 
+先复制 av_dup_packet(pkt) 再 av_free_packet(pkt);
+
+疑问：
+根据源码，看根本没有判断 pkt->buf 是否为空
+并且 read_frame_internal 第一步就是 av_init_packet(pkt);
+
+---------------------------------
+av_interleaved_write_frame
+---------------------------------
+第一种情况：If the packet is reference-counted
+this function will take ownership of this reference and 
+unreference it later when it sees fit.
+av_interleaved_write_frame 最终会调用 av_packet_unref 释放为 avpkt 分配的内存
+
+第二种情况：If the packet is not reference-counted
+libavformat will make a copy.
+
+另：
+3. 传递空值用于：flush the interleaving queues
+4. AVPacket.stream_index 必须设置
+5. AVPacket.pts 必须设置
+
+---------------------------------
+av_decode_v/a
+---------------------------------
+解码用 avpacket 来源
+ 1. av_read_frame
+ 2. av_init_packet() and by then setting data and size
+ 
+---------------------------------
+av_encode_v/a
+---------------------------------
+指定内存，用于接收压缩数据
+The user can supply an output buffer 
+by setting avpkt->data and avpkt->size prior to calling the function, 
+but if the size of the user-provided data is notlarge enough, encoding will fail. 
+All other AVPacket fields will be reset by the encoder using av_init_packet(). 
+
+由编码器分配内存，保存压缩数据
+If avpkt->data is NULL, the encoder will allocate it. 
+The encoder will set avpkt->size to the size of the output packet.

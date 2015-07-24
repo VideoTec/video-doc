@@ -1,0 +1,31 @@
+文档：
+/**
+ * Find a registered decoder with a matching codec ID.
+ *
+ * @param id AVCodecID of the requested decoder
+ * @return A decoder if one was found, NULL otherwise.
+ */
+AVCodec *avcodec_find_decoder(enum AVCodecID id);
+
+源码
+AVCodec *avcodec_find_decoder(enum AVCodecID id)
+{
+    return find_encdec(id, 0);
+}
+
+static AVCodec *find_encdec(enum AVCodecID id, int encoder)
+{
+    AVCodec *p, *experimental = NULL;
+    p = first_avcodec;
+    while (p) {
+        if ((encoder ? av_codec_is_encoder(p) : av_codec_is_decoder(p)) &&
+            p->id == id) {
+            if (p->capabilities & CODEC_CAP_EXPERIMENTAL && !experimental) {
+                experimental = p;
+            } else
+                return p;
+        }
+        p = p->next;
+    }
+    return experimental;
+}

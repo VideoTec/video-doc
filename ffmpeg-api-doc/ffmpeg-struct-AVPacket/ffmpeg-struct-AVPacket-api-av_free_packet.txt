@@ -1,0 +1,34 @@
+头文件
+libavcodec/avcodec.h
+E:\libav\libavcodec\avpacket.c
+
+av_free_packet
+只释放两种 pkt 的数据缓存：
+1. 引用计数的 pkt     av_buffer_unref(&pkt->buf);
+2. 有析构函数的 pkt   pkt->destruct
+
+/**
+ * Free a packet.
+ *
+ * @param pkt packet to free
+ */
+void av_free_packet(AVPacket *pkt);
+
+void av_free_packet(AVPacket *pkt)
+{
+    if (pkt) {
+FF_DISABLE_DEPRECATION_WARNINGS
+        if (pkt->buf)
+            av_buffer_unref(&pkt->buf);
+#if FF_API_DESTRUCT_PACKET
+        else if (pkt->destruct)
+            pkt->destruct(pkt);
+        pkt->destruct = NULL;
+#endif
+FF_ENABLE_DEPRECATION_WARNINGS
+        pkt->data            = NULL;
+        pkt->size            = 0;
+
+        av_packet_free_side_data(pkt);
+    }
+}

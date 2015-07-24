@@ -1,0 +1,50 @@
+libavutil/buffer.h
+libavutil/buffer.c
+
+There are two functions provided for creating a new AVBuffer with a single reference – 
+av_buffer_alloc() to just allocate a new buffer, and 
+av_buffer_create() to wrap an existing array in an AVBuffer.
+
+/**
+ * Allocate an AVBuffer of the given size using av_malloc().
+ *
+ * @return an AVBufferRef of given size or NULL when out of memory
+ */
+AVBufferRef *av_buffer_alloc(int size);
+
+/**
+ * Same as av_buffer_alloc(), except the returned buffer will be initialized
+ * to zero.
+ */
+AVBufferRef *av_buffer_allocz(int size);
+
+
+-----------------------------------------------
+源码
+-----------------------------------------------
+
+AVBufferRef *av_buffer_alloc(int size)
+{
+    AVBufferRef *ret = NULL;
+    uint8_t    *data = NULL;
+
+    data = av_malloc(size);
+    if (!data)
+        return NULL;
+
+    ret = av_buffer_create(data, size, av_buffer_default_free, NULL, 0);
+    if (!ret)
+        av_freep(&data);
+
+    return ret;
+}
+
+AVBufferRef *av_buffer_allocz(int size)
+{
+    AVBufferRef *ret = av_buffer_alloc(size);
+    if (!ret)
+        return NULL;
+
+    memset(ret->data, 0, size);
+    return ret;
+}

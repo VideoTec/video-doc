@@ -1,0 +1,22 @@
+头文件 libavutil/dict.h
+源文件 libavutil/dict.c
+
+/**
+ * Free all the memory allocated for an AVDictionary struct
+ * and all keys and values.
+ */
+void av_dict_free(AVDictionary **m);
+
+void av_dict_free(AVDictionary **pm)
+{
+    AVDictionary *m = *pm;
+
+    if (m) {
+        while (m->count--) {
+            av_free(m->elems[m->count].key);
+            av_free(m->elems[m->count].value);
+        }
+        av_free(m->elems);
+    }
+    av_freep(pm);
+}

@@ -1,0 +1,89 @@
+头文件：libavformat/avformat.h
+源文件：libavformat/utils.c
+
+int audio_stream_index = av_find_best_stream(input_context, AVMEDIA_TYPE_AUDIO, -1, -1, NULL, 0);
+int video_stream_index = av_find_best_stream(input_context, AVMEDIA_TYPE_VIDEO, -1, -1, NULL, 0);
+
+/**
+ * Find the "best" stream in the file.
+ * The best stream is determined according to various heuristics as the most
+ * likely to be what the user expects.
+ * If the decoder parameter is non-NULL, av_find_best_stream will find the
+ * default decoder for the stream's codec; streams for which no decoder can
+ * be found are ignored.
+ *
+ * @param ic                media file handle
+ * @param type              stream type: video, audio, subtitles, etc.
+ * @param wanted_stream_nb  user-requested stream number,
+ *                          or -1 for automatic selection
+ * @param related_stream    try to find a stream related (eg. in the same
+ *                          program) to this one, or -1 if none
+ * @param decoder_ret       if non-NULL, returns the decoder for the
+ *                          selected stream
+ * @param flags             flags; none are currently defined
+ * @return  the non-negative stream number in case of success,
+ *          AVERROR_STREAM_NOT_FOUND if no stream with the requested type
+ *          could be found,
+ *          AVERROR_DECODER_NOT_FOUND if streams were found but no decoder
+ * @note  If av_find_best_stream returns successfully and decoder_ret is not
+ *        NULL, then *decoder_ret is guaranteed to be set to a valid AVCodec.
+ */
+int av_find_best_stream(AVFormatContext *ic,
+                        enum AVMediaType type,
+                        int wanted_stream_nb,
+                        int related_stream,
+                        AVCodec **decoder_ret,
+                        int flags);
+						
+						
+int av_find_best_stream(AVFormatContext *ic, enum AVMediaType type,
+                        int wanted_stream_nb, int related_stream,
+                        AVCodec **decoder_ret, int flags)
+{
+    int i, nb_streams = ic->nb_streams;
+    int ret = AVERROR_STREAM_NOT_FOUND, best_count = -1;
+    unsigned *program = NULL;
+    AVCodec *decoder = NULL, *best_decoder = NULL;
+
+    if (related_stream >= 0 && wanted_stream_nb < 0) {
+        AVProgram *p = find_program_from_stream(ic, related_stream);
+        if (p) {
+            program    = p->stream_index;
+            nb_streams = p->nb_stream_indexes;
+        }
+    }
+    for (i = 0; i < nb_streams; i++) {
+        int real_stream_index = program ? program[i] : i;
+        AVStream *st          = ic->streams[real_stream_index];
+        AVCodecContext *avctx = st->codec;
+        if (avctx->codec_type != type)
+            continue;
+        if (wanted_stream_nb >= 0 && real_stream_index != wanted_stream_nb)
+            continue;
+        if (st->disposition & (AV_DISPOSITION_HEARING_IMPAIRED |
+                               AV_DISPOSITION_VISUAL_IMPAIRED))
+            continue;
+        if (decoder_ret) {
+            decoder = avcodec_find_decoder(st->codec->codec_id);
+            if (!decoder) {
+                if (ret < 0)
+                    ret = AVERROR_DECODER_NOT_FOUND;
+                continue;
+            }
+        }
+        if (best_count >= st->codec_info_nb_frames)
+            continue;
+        best_count   = st->codec_info_nb_frames;
+        ret          = real_stream_index;
+        best_decoder = decoder;
+        if (program && i == nb_streams - 1 && ret < 0) {
+            program    = NULL;
+            nb_streams = ic->nb_streams;
+            /* no related stream found, try again with everything */
+            i = 0;
+        }
+    }
+    if (decoder_ret)
+        *decoder_ret = best_decoder;
+    return ret;
+}

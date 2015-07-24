@@ -1,0 +1,79 @@
+两种 AAC 标准
+传统的MPEG-2 AAC
+MPEG-4 AAC
+
+--------------------------------
+AAC编码优势
+--------------------------------
+AAC可以支持多达48个音轨，15个低频（LFE）音轨，5.1多声道支持
+更高的采样率（最高可达96kHz，音頻CD为44.1kHz）
+更高的采样精度（支持8bit、16bit、24bit、32bit，音頻CD为16bit）
+更高的解码效率，一般来说，AAC可以在对比MP3文件缩小30%的前提下提供更好的音质
+多种语言的兼容能力
+
+比特率：AAC - 最高512kbps（双声道时）/ MP3 - 32~320kbps
+采样率：AAC - 最高96kHz              / MP3 - 最高48kHz
+声道数：AAC - （5.1）六声道          / MP3 - 两声道
+采样精度：AAC - 最高32bit            / MP3 - 最高16bit
+
+--------------------------------
+aac编码器：
+--------------------------------
+FhG：Fraunhofer IIS研发的权威编码器，
+Nero AAC：同时支持LC-AAC / HE-AAC规格，由Nero公司免费发布的Nero AAC编码器
+QuickTime / iTunes：Apple公司的两款软件都提供了AAC编码功能，其编码技术来自"Dolby Laboratories"（简写为Dolby Labs，杜比实验室）
+FAAC（Freeware Advanced Audio Coder）：也是一种很好的命令行编码器，支持LC/Main/LTP规格，而这个软件是免费的。FAAC是属于自由软件。
+DivX AAC：2009年DivX开发出来的新AAC编码器，支持LC/HE/HEv2规格。目前正在测试中。
+
+--------------------------------
+aac编码，常用容器：
+--------------------------------
+1. .aac MPEG-2 Audio Transport Stream（ADTS，参见MPEG-2）容器
+   Audio Data Transport Stream (ADTS) is a format, used by MPEG TS or Shoutcast to stream audio, usually AAC
+   ADTS全称是(Audio Data Transport Stream)，是AAC的一种十分常见的传输格式
+   ADTS 头中相对有用的信息 采样率、声道数、帧长度
+   ADTS_HEADER FRAME1 ADTS_HEADER FRAME2 ADTS_HEADER FRAME3...
+   FAAC默认的封装，但FAAC亦可输出MPEG-4
+   This file and streaming-based format are defined in MPEG-2 Part 7
+
+2. .mp4 MPEG-4 Part 14（第14部分）的简化版即3GPP Media Release 6 Basic
+   Nero AAC编码器仅能输出MPEG-4封装的AAC
+   In an MPEG-4 file, the AAC data is broken up into a series of variable length frames
+
+3. .m4a M4A的本质和音頻MP4相同，故音頻MP4文件亦可直接更改扩展名为M4A
+
+4. Audio Data Interchange Format (ADIF) 音频数据交换格式
+   ADIF_HEADER FRAME1 FRAME2 FRAME3....
+
+5. LATM 的全称为“Low-overhead MPEG-4 Audio TransportMultiplex”（低开销音频传输复用）
+   LATM帧: 由AudioSpecificConfig（音频特定配置单元）与音频负载组成
+   带内传，就是指每一个LATM 帧，都含有一个AudioSpecificConfig 信息
+   带外传，则每一个LATM帧都不含有AudioSpecificConfig 信息，
+           而通过其他方式把AudioSpecificConfig信息发送到解码端，
+           由于AudioSpecificConfig 信息一般是不变的，所以只需发送一次即可
+   MPEG-4 Part 3 also defines its own self-synchronizing format called a Low Overhead Audio Stream (LOAS) 
+   Low Overhead Audio Transport Multiplex (LATM), which just an interleaved multiple stream version of a LOAS
+
+-----------------------------------
+aac 标准分级 - AAC的规格（Profile）
+-----------------------------------
+LC-AAC
+MPEG-4 AAC LC（Low Complexity）是最常用的规格，我们叫“低复杂度规格”，我们简称“LC-AAC”
+
+HE-AAC
+High Efficiency AAC（高效AAC，简写为HE-AAC或AAC-HE）又称为"aacPlus v1"或"AAC+"
+
+HE-AAC v2，
+又称为"aacPlus v2" - 结合了参数化立体声（Parametric Stereo，PS）和HE-AAC中的SBR技术
+
+
+所有规格列表
+MPEG-2 AAC LC低复杂度规格（Low Complexity）
+MPEG-2 AAC Main主规格
+MPEG-2 AAC SSR可变采样率规格（Scaleable Sample Rate）
+MPEG-4 AAC LC低复杂度规格（Low Complexity），现在的手机比较常见的MP4文件中的音频部份就包括了该规格音频文件
+MPEG-4 AAC Main主规格
+MPEG-4 AAC SSR可变采样率规格（Scaleable Sample Rate）
+MPEG-4 AAC LTP长时期预测规格（Long Term Predicition）
+MPEG-4 AAC LD低延迟规格（Low Delay）
+MPEG-4 AAC HE高效率规格（High Efficiency）

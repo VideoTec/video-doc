@@ -1,0 +1,88 @@
+头文件 libavutil/dict.h
+源文件 libavutil/dict.c
+
+设置举例：
+在 avcodec_open 时，设置。
+
+    AVDictionary *dict = NULL;
+    av_dict_set(&dict, "preset", "veryfast", 0);
+    av_dict_set(&dict, "g", "4", 0);    
+    av_dict_set(&dict, "bf", "3", 0);    
+    av_dict_set(&dict, "crf", "18", 0);    
+    av_dict_set(&dict, "level", "41", 0);    
+    av_dict_set(&dict, "preset", "veryfast", 0);    
+    av_dict_set(&dict, "profile", "main", 0);
+    ret = avcodec_open2(avctx, codec, &dict);
+    av_dict_free(&dict);
+
+/**
+ * Set the given entry in *pm, overwriting an existing entry.
+ *
+ * @param pm pointer to a pointer to a dictionary struct. If *pm is NULL
+ * a dictionary struct is allocated and put in *pm.
+ * @param key entry key to add to *pm (will be av_strduped depending on flags)
+ * @param value entry value to add to *pm (will be av_strduped depending on flags).
+ *        Passing a NULL value will cause an existing entry to be deleted.
+ * @return >= 0 on success otherwise an error code <0
+ */
+int av_dict_set(AVDictionary **pm, const char *key, const char *value, int flags);
+
+int av_dict_set(AVDictionary **pm, const char *key, const char *value,
+                int flags)
+{
+    AVDictionary *m = *pm;
+    AVDictionaryEntry *tag = av_dict_get(m, key, NULL, flags);
+    char *oldval = NULL;
+    int allocated = !!m;
+
+    if (!m)
+        m = *pm = av_mallocz(sizeof(*m));
+    if (!m)
+        return AVERROR(ENOMEM);
+
+    if (tag) {
+        if (flags & AV_DICT_DONT_OVERWRITE) {
+            if (flags & AV_DICT_DONT_STRDUP_KEY) av_free(key);
+            if (flags & AV_DICT_DONT_STRDUP_VAL) av_free(value);
+            return 0;
+        }
+        if (flags & AV_DICT_APPEND)
+            oldval = tag->value;
+        else
+            av_free(tag->value);
+        av_free(tag->key);
+        *tag = m->elems[--m->count];
+    } else {
+        int ret = av_reallocp_array(&m->elems,
+                                    m->count + 1, sizeof(*m->elems));
+        if (ret < 0) {
+            if (allocated)
+                av_freep(pm);
+
+            return ret;
+        }
+    }
+    if (value) {
+        if (flags & AV_DICT_DONT_STRDUP_KEY)
+            m->elems[m->count].key = key;
+        else
+            m->elems[m->count].key = av_strdup(key);
+        if (flags & AV_DICT_DONT_STRDUP_VAL) {
+            m->elems[m->count].value = value;
+        } else if (oldval && flags & AV_DICT_APPEND) {
+            int len = strlen(oldval) + strlen(value) + 1;
+            if (!(oldval = av_realloc(oldval, len)))
+                return AVERROR(ENOMEM);
+            av_strlcat(oldval, value, len);
+            m->elems[m->count].value = oldval;
+        } else
+            m->elems[m->count].value = av_strdup(value);
+        m->count++;
+    }
+    if (!m->count) {
+        av_free(m->elems);
+        av_freep(pm);
+    }
+
+    return 0;
+}

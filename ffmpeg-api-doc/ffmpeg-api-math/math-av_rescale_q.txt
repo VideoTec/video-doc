@@ -1,0 +1,32 @@
+libavutil/mathematics.h
+
+/**
+ * Rescale a 64-bit integer by 2 rational numbers.
+   把时间戳从一个时基(bq) 变为 另外一个时基(cq) 时候用的函数。它基本的动作是计算a*b/c
+   直接计算会有溢出的情况发生
+   AV_TIME_BASE * time_in_seconds = avcodec_timestamp
+   AV_TIME_BASE_Q * avcodec_timestamp = time_in_seconds
+ */
+/**
+ * Rescale a 64-bit integer by 2 rational numbers.
+ */
+int64_t av_rescale_q(int64_t a, AVRational bq, AVRational cq) av_const;
+
+int64_t av_rescale_q_rnd(int64_t a, AVRational bq, AVRational cq,
+                         enum AVRounding rnd)
+{
+    int64_t b = bq.num * (int64_t)cq.den;
+    int64_t c = cq.num * (int64_t)bq.den;
+    return av_rescale_rnd(a, b, c, rnd);
+}
+
+---------------------------------------
+11:39 2015/7/10
+---------------------------------------
+  int video_frame_duration = av_rescale_q(40, (AVRational){1, 1000}, (AVRational){1, 600});
+  printf("duration: %d\n", video_frame_duration);
+  为什么输出 -1431655699
+  最后查找原因是:
+  没有添加头文件： #include <libavutil/mathematics.h>
+  编译时有警告：
+  warning C4013: “av_rescale_q”未定义；假设外部返回 int

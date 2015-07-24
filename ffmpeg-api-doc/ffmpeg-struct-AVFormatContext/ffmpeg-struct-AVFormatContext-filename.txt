@@ -1,0 +1,12 @@
+libavformat/avformat.h
+
+    /**
+     * input or output filename
+     *
+     * - demuxing: set by avformat_open_input()
+     * - muxing: may be set by the caller before avformat_write_header()
+     */
+    char filename[1024];
+
+muxing: may be set by the caller before avformat_write_header()
+在创建 AVFormatContext 实例时，把文件名复制到这个缓存

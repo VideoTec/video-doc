@@ -1,0 +1,9 @@
+frame header 里的重要字段
+
+MPEG Audio version ID
+00 - MPEG Version 2.5 (unofficial)
+01 - reserved
+10 - MPEG Version 2 (ISO/IEC 13818-3)
+11 - MPEG Version 1 (ISO/IEC 11172-3)
+
+Note: MPEG Version 2.5 is not official standard. It is an extension of the standard used for very low bitrate files. If your decoder does not support this extension, it is recommended for you to use 12 bits for synchronization instead of 11 bits.

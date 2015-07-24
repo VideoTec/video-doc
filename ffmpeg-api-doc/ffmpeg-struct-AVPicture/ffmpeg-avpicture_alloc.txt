@@ -1,0 +1,31 @@
+头文件 libavcodec/avcodec.h
+源文件 E:\libav\libavcodec\avpicture.c
+
+特别注意：
+av_image_alloc 的 align 参数传递 1
+
+/**
+ * Allocate memory for a picture.  Call avpicture_free() to free it.
+ *
+ * @see avpicture_fill()
+ *
+ * @param picture the picture to be filled in
+ * @param pix_fmt the format of the picture
+ * @param width the width of the picture
+ * @param height the height of the picture
+ * @return zero if successful, a negative value if not
+ */
+int avpicture_alloc(AVPicture *picture, enum AVPixelFormat pix_fmt, int width, int height);
+
+int avpicture_alloc(AVPicture *picture,
+                    enum AVPixelFormat pix_fmt, int width, int height)
+{
+    int ret = av_image_alloc(picture->data, picture->linesize,
+                             width, height, pix_fmt, 1);
+    if (ret < 0) {
+        memset(picture, 0, sizeof(AVPicture));
+        return ret;
+    }
+
+    return 0;
+}

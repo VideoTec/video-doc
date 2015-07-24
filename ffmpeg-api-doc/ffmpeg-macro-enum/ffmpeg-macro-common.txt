@@ -1,0 +1,4 @@
+头文件
+E:\libav\libavutil\common.h
+
+#define FFALIGN(x, a) (((x)+(a)-1)&~((a)-1))

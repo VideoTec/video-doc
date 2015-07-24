@@ -1,0 +1,90 @@
+源文件
+libavformat/avio.h
+
+typedef struct AVIOContext {
+    const AVClass *av_class;
+    unsigned char *buffer;  /**< Start of the buffer. */
+    int buffer_size;        /**< Maximum buffer size */
+    unsigned char *buf_ptr; /**< Current position in the buffer */
+    unsigned char *buf_end; 
+    void *opaque;           /**< A private pointer, passed to the read/write/seek/ functions. */
+    int (*read_packet)(void *opaque, uint8_t *buf, int buf_size);
+    int (*write_packet)(void *opaque, uint8_t *buf, int buf_size);
+    int64_t (*seek)(void *opaque, int64_t offset, int whence);
+    int64_t pos;            /**< position in the file of the current buffer */
+    int must_flush;         /**< true if the next seek should flush */
+    int eof_reached;        /**< true if eof reached */
+    int write_flag;         /**< true if open for writing */
+    int max_packet_size;
+    unsigned long checksum;
+    unsigned char *checksum_ptr;
+    unsigned long (*update_checksum)(unsigned long checksum, const uint8_t *buf, unsigned int size);
+    int error;              /**< contains the error code or 0 if no error happened */
+    int (*read_pause)(void *opaque, int pause);
+    int64_t (*read_seek)(void *opaque, int stream_index, int64_t timestamp, int flags);
+    int seekable;
+} AVIOContext;
+
+/**
+ * Bytestream IO Context.
+ * New fields can be added to the end with minor version bumps.
+ * Removal, reordering and changes to existing fields require a major
+ * version bump.
+ * sizeof(AVIOContext) must not be used outside libav*.
+ *
+ * @note None of the function pointers in AVIOContext should be called
+ *       directly, they should only be set by the client application
+ *       when implementing custom I/O. Normally these are set to the
+ *       function pointers specified in avio_alloc_context()
+ */
+typedef struct AVIOContext {
+    /**
+     * A class for private options.
+     *
+     * If this AVIOContext is created by avio_open2(), av_class is set and
+     * passes the options down to protocols.
+     *
+     * If this AVIOContext is manually allocated, then av_class may be set by
+     * the caller.
+     *
+     * warning -- this field can be NULL, be sure to not pass this AVIOContext
+     * to any av_opt_* functions in that case.
+     */
+    const AVClass *av_class;
+    unsigned char *buffer;  /**< Start of the buffer. */
+    int buffer_size;        /**< Maximum buffer size */
+    unsigned char *buf_ptr; /**< Current position in the buffer */
+    unsigned char *buf_end; /**< End of the data, may be less than
+                                 buffer+buffer_size if the read function returned
+                                 less data than requested, e.g. for streams where
+                                 no more data has been received yet. */
+    void *opaque;           /**< A private pointer, passed to the read/write/seek/...
+                                 functions. */
+    int (*read_packet)(void *opaque, uint8_t *buf, int buf_size);
+    int (*write_packet)(void *opaque, uint8_t *buf, int buf_size);
+    int64_t (*seek)(void *opaque, int64_t offset, int whence);
+    int64_t pos;            /**< position in the file of the current buffer */
+    int must_flush;         /**< true if the next seek should flush */
+    int eof_reached;        /**< true if eof reached */
+    int write_flag;         /**< true if open for writing */
+    int max_packet_size;
+    unsigned long checksum;
+    unsigned char *checksum_ptr;
+    unsigned long (*update_checksum)(unsigned long checksum, const uint8_t *buf, unsigned int size);
+    int error;              /**< contains the error code or 0 if no error happened */
+    /**
+     * Pause or resume playback for network streaming protocols - e.g. MMS.
+     */
+    int (*read_pause)(void *opaque, int pause);
+    /**
+     * Seek to a given timestamp in stream with the specified stream_index.
+     * Needed for some network streaming protocols which don't support seeking
+     * to byte position.
+     */
+    int64_t (*read_seek)(void *opaque, int stream_index,
+                         int64_t timestamp, int flags);
+    /**
+     * A combination of AVIO_SEEKABLE_ flags or 0 when the stream is not seekable.
+     */
+    int seekable;
+} AVIOContext;

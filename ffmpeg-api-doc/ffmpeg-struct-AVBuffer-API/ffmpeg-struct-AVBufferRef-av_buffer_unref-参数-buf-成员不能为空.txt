@@ -1,0 +1,23 @@
+/**
+ * Free a given reference and automatically free the buffer if there are no more
+ * references to it.
+ *
+ * @param buf the reference to be freed. The pointer is set to NULL on return.
+ */
+void av_buffer_unref(AVBufferRef **buf);
+
+源码
+void av_buffer_unref(AVBufferRef **buf)
+{
+    AVBuffer *b;
+
+    if (!buf || !*buf)
+        return;
+    b = (*buf)->buffer;       注意：没有判断其成员是否为空，所以不能传递成员为空的 buffer
+    av_freep(buf);
+
+    if (!avpriv_atomic_int_add_and_fetch(&b->refcount, -1)) {
+        b->free(b->opaque, b->data);
+        av_freep(&b);
+    }
+}

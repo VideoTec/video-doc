@@ -1,0 +1,7 @@
+-1605937854 - error messgae:Bug detected, please report the issue
+
+错误的原因是，参数顺序搞错了
+
+ int ret = avpicture_get_size(target->pix_fmt, target->width, target->height);
+ 写成了 
+ int ret = avpicture_get_size(target->width, target->height, target->pix_fmt);

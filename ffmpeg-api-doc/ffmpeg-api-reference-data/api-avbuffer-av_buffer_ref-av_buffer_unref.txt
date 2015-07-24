@@ -1,0 +1,46 @@
+头文件：avutil/buffer.h
+源文件：avutil/buffer.c
+/**
+ * Create a new reference to an AVBuffer.
+ *
+ * @return a new AVBufferRef referring to the same AVBuffer as buf or NULL on
+ * failure.
+ */
+AVBufferRef *av_buffer_ref(AVBufferRef *buf);
+
+/**
+ * Free a given reference and automatically free the buffer if there are no more
+ * references to it.
+ *
+ * @param buf the reference to be freed. The pointer is set to NULL on return.
+ */
+void av_buffer_unref(AVBufferRef **buf);
+
+AVBufferRef *av_buffer_ref(AVBufferRef *buf)
+{
+    AVBufferRef *ret = av_mallocz(sizeof(*ret));
+
+    if (!ret)
+        return NULL;
+
+    *ret = *buf;
+
+    avpriv_atomic_int_add_and_fetch(&buf->buffer->refcount, 1);
+
+    return ret;
+}
+
+void av_buffer_unref(AVBufferRef **buf)
+{
+    AVBuffer *b;
+
+    if (!buf || !*buf)
+        return;
+    b = (*buf)->buffer;
+    av_freep(buf);
+
+    if (!avpriv_atomic_int_add_and_fetch(&b->refcount, -1)) {
+        b->free(b->opaque, b->data);
+        av_freep(&b);
+    }
+}

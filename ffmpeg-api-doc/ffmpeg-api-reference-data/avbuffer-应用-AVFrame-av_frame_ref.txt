@@ -1,0 +1,98 @@
+头文件：avutil/frame.h
+源文件：avutil/frame.c
+
+/**
+ * Set up a new reference to the data described by the source frame.
+ *
+ * Copy frame properties from src to dst and create a new reference for each
+ * AVBufferRef from src.
+ *
+ * If src is not reference counted, new buffers are allocated and the data is
+ * copied.
+ *
+ * @return 0 on success, a negative AVERROR on error
+ */
+int av_frame_ref(AVFrame *dst, const AVFrame *src);
+
+int av_frame_ref(AVFrame *dst, const AVFrame *src)
+{
+    int i, ret = 0;
+
+    dst->format         = src->format;
+    dst->width          = src->width;
+    dst->height         = src->height;
+    dst->channel_layout = src->channel_layout;
+    dst->nb_samples     = src->nb_samples;
+
+    ret = av_frame_copy_props(dst, src);
+    if (ret < 0)
+        return ret;
+
+    /* duplicate the frame data if it's not refcounted */
+    if (!src->buf[0]) {
+        ret = av_frame_get_buffer(dst, 32);
+        if (ret < 0)
+            return ret;
+
+        ret = av_frame_copy(dst, src);
+        if (ret < 0)
+            av_frame_unref(dst);
+
+        return ret;
+    }
+
+    /* ref the buffers */
+    for (i = 0; i < FF_ARRAY_ELEMS(src->buf) && src->buf[i]; i++) {
+        dst->buf[i] = av_buffer_ref(src->buf[i]);
+        if (!dst->buf[i]) {
+            ret = AVERROR(ENOMEM);
+            goto fail;
+        }
+    }
+
+    if (src->extended_buf) {
+        dst->extended_buf = av_mallocz(sizeof(*dst->extended_buf) *
+                                       src->nb_extended_buf);
+        if (!dst->extended_buf) {
+            ret = AVERROR(ENOMEM);
+            goto fail;
+        }
+        dst->nb_extended_buf = src->nb_extended_buf;
+
+        for (i = 0; i < src->nb_extended_buf; i++) {
+            dst->extended_buf[i] = av_buffer_ref(src->extended_buf[i]);
+            if (!dst->extended_buf[i]) {
+                ret = AVERROR(ENOMEM);
+                goto fail;
+            }
+        }
+    }
+
+    /* duplicate extended data */
+    if (src->extended_data != src->data) {
+        int ch = av_get_channel_layout_nb_channels(src->channel_layout);
+
+        if (!ch) {
+            ret = AVERROR(EINVAL);
+            goto fail;
+        }
+
+        dst->extended_data = av_malloc(sizeof(*dst->extended_data) * ch);
+        if (!dst->extended_data) {
+            ret = AVERROR(ENOMEM);
+            goto fail;
+        }
+        memcpy(dst->extended_data, src->extended_data, sizeof(*src->extended_data) * ch);
+    } else
+        dst->extended_data = dst->data;
+
+    memcpy(dst->data,     src->data,     sizeof(src->data));
+    memcpy(dst->linesize, src->linesize, sizeof(src->linesize));
+
+    return 0;
+
+fail:
+    av_frame_unref(dst);
+    return ret;
+}
+

@@ -1,0 +1,20 @@
+----------------------------------------------------------
+参看 
+int av_frame_get_buffer(AVFrame *frame, int align)
+----------------------------------------------------------
+为每个声道，每个平面 分配单独的 buffer。
+
+----------------------------------------------------------
+直接使用 AVBufferRef->data 来fill需要的frame ?
+----------------------------------------------------------
+
+int avcodec_fill_audio_frame(AVFrame *frame, int nb_channels,
+                             enum AVSampleFormat sample_fmt, const uint8_t *buf,
+                             int buf_size, int align);
+
+没有对应的 avcodec_fill_video_frame
+int avpicture_fill(AVPicture *picture, uint8_t *ptr, enum AVPixelFormat pix_fmt, int width, int height);
+
+需要获得正确的，缓存的大小：
+int avpicture_get_size(enum AVPixelFormat pix_fmt, int width, int height);
+int av_samples_get_buffer_size(int *linesize, int nb_channels, int nb_samples, enum AVSampleFormat sample_fmt, int align);

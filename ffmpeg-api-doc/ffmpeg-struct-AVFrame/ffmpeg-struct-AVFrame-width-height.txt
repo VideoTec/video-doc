@@ -1,0 +1,10 @@
+    /**
+     * width and height of the video frame
+     */
+    int width, height;
+	
+	20:08 2015/4/24 使用 avpicture_fill 不会填充这两个值，需要手动指定
+typedef struct AVPicture {
+    uint8_t *data[AV_NUM_DATA_POINTERS];
+    int linesize[AV_NUM_DATA_POINTERS];     ///< number of bytes per line
+} AVPicture;

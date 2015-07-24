@@ -1,0 +1,5 @@
+aac raw data 句法元素 
+
+7 END marks the end of the frame
+
+An AAC END syntax element has no extra bits. It does not denote the end of the entire stream, only the end of an encoded frame

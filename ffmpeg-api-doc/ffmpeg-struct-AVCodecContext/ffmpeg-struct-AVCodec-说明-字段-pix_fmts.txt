@@ -1,0 +1,42 @@
+编码器支持的 AVPixelFormat 格式
+const enum AVPixelFormat *pix_fmts;     ///< array of supported pixel formats, or NULL if unknown, array is terminated by -1
+
+-------------------------------
+常用编码器的支持列表：
+-------------------------------
+
+MJPEG (Motion JPEG)
+AV_PIX_FMT_YUVJ420P, AV_PIX_FMT_YUVJ422P, AV_PIX_FMT_YUVJ444P
+
+libx264 H.264 / AVC / MPEG-4 AVC / MPEG-4 part 10
+没有指定
+
+libx264 H.264 / AVC / MPEG-4 AVC / MPEG-4 part 10 RGB
+pix_fmts_8bit_rgb
+解释
+static const enum AVPixelFormat pix_fmts_8bit_rgb[] = {
+#ifdef X264_CSP_BGR
+    AV_PIX_FMT_BGR24,
+    AV_PIX_FMT_RGB24,
+#endif
+    AV_PIX_FMT_NONE
+};
+
+PNG (Portable Network Graphics) image
+        AV_PIX_FMT_RGB24, AV_PIX_FMT_RGBA,
+        AV_PIX_FMT_RGB48BE, AV_PIX_FMT_RGBA64BE,
+        AV_PIX_FMT_PAL8,
+        AV_PIX_FMT_GRAY8, AV_PIX_FMT_GRAY8A,
+        AV_PIX_FMT_GRAY16BE,
+        AV_PIX_FMT_MONOBLACK
+
+-------------------------------
+常用解码器的支持列表：
+-------------------------------
+
+H.264 / AVC / MPEG-4 AVC / MPEG-4 part 10
+没有指定
+
+H.264 / AVC / MPEG-4 AVC / MPEG-4 part 10 (VDPAU acceleration)
+AV_PIX_FMT_VDPAU_H264
+

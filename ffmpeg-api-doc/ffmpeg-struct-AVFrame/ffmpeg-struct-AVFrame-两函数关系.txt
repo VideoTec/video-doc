@@ -1,0 +1,29 @@
+---------------------------------------
+解码
+---------------------------------------
+
+
+---------------------------------------
+解码
+---------------------------------------
+int avcodec_encode_audio2(AVCodecContext *avctx, AVPacket *avpkt,
+                          const AVFrame *frame, int *got_packet_ptr);
+ * @param[in] frame AVFrame containing the raw audio data to be encoded.
+ *                  May be NULL when flushing an encoder that has the
+ *                  CODEC_CAP_DELAY capability set.
+ *                  If CODEC_CAP_VARIABLE_FRAME_SIZE is set, then each frame
+ *                  can have any number of samples.
+ *                  If it is not set, frame->nb_samples must be equal to
+ *                  avctx->frame_size for all frames except the last.
+ *                  The final frame may be smaller than avctx->frame_size.
+ 
+ 11:40 2015/5/8
+ 如果 nb_samples 未指定（为零），会出现输出的压缩包的大小一致的情况
+ 如果 指定错误，不符合 avctx->frame_size 程序有可能崩。
+ 
+int avcodec_encode_video2(AVCodecContext *avctx, AVPacket *avpkt,
+                          const AVFrame *frame, int *got_packet_ptr);
+ * @param[in] frame AVFrame containing the raw video data to be encoded.
+ *                  May be NULL when flushing an encoder that has the 
+ 11:49 2015/5/8
+ 必须指定 width,height

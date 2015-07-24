@@ -1,0 +1,16 @@
+debug 相关的选项
+
+Developer options (useful when working on Libav itself):
+
+  --disable-debug          disable debugging symbols
+
+  --enable-debug=LEVEL     set the debug level [$debuglevel]
+sets the debugging level for the compilation command, 
+that is it will add to it the flag: -g LEVEL. 
+
+The meaning of that flag partly depends on the compiler used, for 
+example check the man page for gcc if you're using that. 
+
+Also if you want to debug ffmpeg the tool, it's better to use ffmpeg_g 
+which contains all the debugging symbols which are stripped away from 
+ffmpeg (the same is valid for the other tools as well).

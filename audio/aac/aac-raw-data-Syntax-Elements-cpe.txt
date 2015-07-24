@@ -1,0 +1,8 @@
+AAC RAW DATA ¾ä·¨ÔªËØ
+
+1 CPE channel pair element (codes stereo signal)
+
+A CPE is a channel pair element. 
+This element contains the encoded data for 2 audio channels which probably have data in common. 
+Presently, this description is only concerned with what it takes to decode low complexity (LC) data and processing that affects other features is skipped 
+(except if the data needs to be parsed from the bitstream)

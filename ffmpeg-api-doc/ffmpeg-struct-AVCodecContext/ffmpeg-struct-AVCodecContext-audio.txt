@@ -1,0 +1,46 @@
+libavcodec/avcodec.h
+
+和声音相关的字段
+    /* audio only */
+    int sample_rate; ///< samples per second
+    int channels;    ///< number of audio channels
+    /**
+     * audio sample format
+     * - encoding: Set by user.
+     * - decoding: Set by libavcodec.
+     */
+    enum AVSampleFormat sample_fmt;  ///< sample format
+
+    /* The following data should not be initialized. */
+    /**
+     * Number of samples per channel in an audio frame.
+     *
+     * - encoding: set by libavcodec in avcodec_open2(). Each submitted frame
+     *   except the last must contain exactly frame_size samples per channel.
+     *   May be 0 when the codec has CODEC_CAP_VARIABLE_FRAME_SIZE set, then the
+     *   frame size is not restricted.
+     * - decoding: may be set by some decoders to indicate constant frame size
+     */
+    int frame_size;
+
+    /**
+     * Audio channel layout.
+     * - encoding: set by user.
+     * - decoding: set by user, may be overwritten by libavcodec.
+     */
+    uint64_t channel_layout;
+
+    /**
+     * Request decoder to use this channel layout if it can (0 for default)
+     * - encoding: unused
+     * - decoding: Set by user.
+     */
+    uint64_t request_channel_layout;
+    
+    /**
+     * desired sample format
+     * - encoding: Not used.
+     * - decoding: Set by user.
+     * Decoder will decode to this format if it can.
+     */
+    enum AVSampleFormat request_sample_fmt;

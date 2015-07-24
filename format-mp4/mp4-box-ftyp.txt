@@ -1,0 +1,45 @@
+File Type Box[edit]
+
+In order to identify the specifications to which a file based on ISO base media file format complies,
+遵从，依从，服从( comply的第三人称单数 )
+comply[英][kəmˈplaɪ] [美][kəmˈplaɪ] vi.遵从；依从，顺从；应允，同意
+brands[美][brænd]品牌 are used as identifiers in the file format. 
+
+MP4 文件开始位置必须是一个 ftyp-box
+They are set in a box named File Type Box ('ftyp'), which must be placed in the beginning of the file.
+
+It is somewhat analogous[美][əˈnæləɡəs]相似的 to the so-called fourcc code, 
+used for a similar purpose for media embedded in AVI container format.[46]
+
+A brand might indicate the type of encoding used, 
+how the data of each encoding is stored, 
+constraints[美][kənˈstrent]强制 and extensions that are applied to the file, the compatibility, or the intended usage of the file. 
+
+Brands are a printable four-character codes. 
+
+A File Type Box contains two kinds of brands.
+ 
+One is "major_brand" which identifies the specification of the best use for the file. 
+It is followed by "minor_version", an informative 4 bytes integer for the minor version of the major brand. 
+
+The second kind of brand is "compatible_brands", which identifies multiple specifications to which the file complies. 
+
+All files shall contain a File Type Box, 
+but for compatibility reasons with an earlier version of the specification, 
+files may be conformant to ISO base media file format and not contain a File Type Box. 
+
+In that case they should be read as if they contained an ftyp with major and compatible brand "mp41" (MP4 v1 - ISO 14496-1, Chapter 13).[1] 
+Many in-use brands (ftyps) are not registered and can be found on some webpages.[23]
+
+A multimedia file structured upon ISO base media file format may be compatible with more than one concrete specification, and 
+it is therefore not always possible to speak of a single "type" or "brand" for the file. 
+In this regard, the utility of the Multipurpose Internet Mail Extension type and file name extension is somewhat reduced. 
+In spite of that, when a derived specification is written, a new file extension will be used, a new MIME type and a new Macintosh file type.
+
+----------------------
+代码示例
+----------------------
+00 00 00 1C 66 74 79 70 69 73 6F 6D 00 00 02 00
+            f  t  y  p  i  s  o  m
+69 73 6F 6D 69 73 6F 32 6D 70 34 31
+i  s  o  m  i  s  o  2  m  p  4  1

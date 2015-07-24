@@ -1,0 +1,11 @@
+@warning This function is not thread safe!
+
+int avcodec_open2(AVCodecContext *avctx, const AVCodec *codec, AVDictionary **options);
+
+多个线程调用这个接口造成问题
+
+------------------------------
+飞信视频项目发现的问题
+------------------------------
+原因是：多线程解码，上个线程的关闭 和 当前线程的打开 同时发生。
+解决方法：同步两个线程的操作。

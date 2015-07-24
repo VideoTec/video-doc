@@ -1,0 +1,30 @@
+ffmpeg -v debug
+
+-loglevel [repeat+]loglevel | -v [repeat+]loglevel
+Set the logging level used by the library. Adding "repeat+" indicates that repeated log output should not be compressed to the first line and the "Last message repeated n times" line will be omitted. "repeat" can also be used alone. If "repeat" is used alone, and with no prior loglevel set, the default loglevel will be used. If multiple loglevel parameters are given, using ’repeat’ will not change the loglevel. loglevel is a string or a number containing one of the following values:
+
+‘quiet, -8’
+Show nothing at all; be silent.
+
+‘panic, 0’
+Only show fatal errors which could lead the process to crash, such as and assert failure. This is not currently used for anything.
+
+‘fatal, 8’
+Only show fatal errors. These are errors after which the process absolutely cannot continue after.
+
+‘error, 16’
+Show all errors, including ones which can be recovered from.
+
+‘warning, 24’
+Show all warnings and errors. Any message related to possibly incorrect or unexpected events will be shown.
+
+‘info, 32’
+Show informative messages during processing. This is in addition to warnings and errors. This is the default value.
+
+‘verbose, 40’
+Same as info, except more verbose.
+
+‘debug, 48’
+Show everything, including debugging information.
+
+By default the program logs to stderr, if coloring is supported by the terminal, colors are used to mark errors and warnings. Log coloring can be disabled setting the environment variable AV_LOG_FORCE_NOCOLOR or NO_COLOR, or can be forced setting the environment variable AV_LOG_FORCE_COLOR. The use of the environment variable NO_COLOR is deprecated and will be dropped in a following FFmpeg version.

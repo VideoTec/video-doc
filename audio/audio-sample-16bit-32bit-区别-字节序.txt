@@ -1,0 +1,52 @@
+http://www.zhihu.com/question/21387789
+
+16bit的音源信噪比已经-96dB了，
+16bit->32bit改善的是-96dB到-192dB之间的人耳几乎听不到的地方，
+而AAC之类非可逆编码造成的失真不用说，肯定远远超过-96dB。
+保留那多出来的16bit真的有需要么？
+
+--------------------------
+字节序是怎么指定的？
+--------------------------
+1. 在编码器里？
+2. 在文件格式里？
+
+应该是存储在格式里，有不同的 FOURCC 码来标名。
+
+参考： twos
+static const AVCodecTag ff_codec_aiff_tags[] = {
+     { CODEC_ID_MACE6,        MKTAG('M','A','C','6') },
+     { CODEC_ID_GSM,          MKTAG('G','S','M',' ') },
+     { CODEC_ID_ADPCM_G726,   MKTAG('G','7','2','6') },
++    { CODEC_ID_PCM_S16BE,    MKTAG('t','w','o','s') },
+     { CODEC_ID_PCM_S16LE,    MKTAG('s','o','w','t') },
+     { CODEC_ID_ADPCM_IMA_QT, MKTAG('i','m','a','4') },
+     { CODEC_ID_QDM2,         MKTAG('Q','D','M','2') },
+
+http://wiki.multimedia.cx/?title=PCM#Byte_Order
+
+denote[英][dɪˈnəʊt] [美][dɪˈnoʊt] vt.指代；预示；代表；意思是
+
+Microsoft WAV/AVI/ASF Identifiers
+Microsoft multimedia file formats such as WAV, AVI, and ASF all share the WAVEFORMATEX data structure. The structure defines, among other properties, a 16-bit little endian audio identifier. The following audio identifiers correspond to various PCM formats:
+
+0x0001 denotes linear PCM
+0x0006 denotes A-law logarithmic PCM
+0x0007 denotes mu-law logarithmic PCM
+
+Apple QuickTime Identifiers
+Audio information in QuickTime files is stored along with an stsd atom that contains a FOURCC to indicate the format type. Apple QuickTime accomodates a number of different PCM formats:
+
+'raw ' (need space character, ASCII 0x20, to round out FOURCC) 
+denotes unsigned, linear PCM. 16-bit data is stored in little endian format.
+'twos' denotes signed (i.e. twos-complement) linear PCM. 16-bit data is stored in big endian format.
+'sowt' ('twos' spelled backwards) also denotes signed linear PCM. However, 16-bit data is stored in little endian format.
+'in24' denotes 24-bit, big endian, linear PCM.
+'in32' denotes 32-bit, big endian, linear PCM.
+'fl32' denotes 32-bit floating point PCM. (Presumably IEEE 32-bit; byte order?)
+'fl64' denotes 64-bit floating point PCM. (Presumably IEEE 64-bit; byte order?)
+'alaw' denotes A-law logarithmic PCM.
+'ulaw' denotes mu-law logarithmic PCM.
+
+http://stackoverflow.com/questions/11000933/using-androids-audiotrack-to-combine-bytes-of-sound-samples-produces-noise
+RIFF/WAV format, little-endian, signed PCM-16 bit encoding

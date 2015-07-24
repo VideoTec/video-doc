@@ -1,0 +1,7 @@
+static const AVClass resample_class = {
+    .class_name       = "resample",
+    .item_name        = av_default_item_name,
+    .version          = LIBAVUTIL_VERSION_INT,
+    .child_class_next = resample_child_class_next,
+    .child_next       = resample_child_next,
+};

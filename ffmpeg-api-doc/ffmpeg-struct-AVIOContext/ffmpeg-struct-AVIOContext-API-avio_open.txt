@@ -1,0 +1,31 @@
+源文件
+libavformat/avio.h
+libavformat/aviobuf.c
+
+avio_open 调用 avio_alloc_context
+avio_close 调用 av_free
+
+#define AVIO_FLAG_READ  1                                      /**< read-only */
+#define AVIO_FLAG_WRITE 2                                      /**< write-only */
+#define AVIO_FLAG_READ_WRITE (AVIO_FLAG_READ|AVIO_FLAG_WRITE)  /**< read-write pseudo[美]['su:doʊ]假的 flag */
+
+/**
+ * Create and initialize a AVIOContext for accessing the
+ * resource indicated by url.
+ * @note When the resource indicated by url has been opened in
+ * read+write mode, the AVIOContext can be used only for writing.
+ *
+ * @param s Used to return the pointer to the created AVIOContext.
+ * In case of failure the pointed to value is set to NULL.
+ * @param url resource to access
+ * @param flags flags which control how the resource indicated by url
+ * is to be opened
+ * @return 0 in case of success, a negative value corresponding to an
+ * AVERROR code in case of failure
+ */
+int avio_open(AVIOContext **s, const char *url, int flags);
+
+int avio_open(AVIOContext **s, const char *filename, int flags)
+{
+    return avio_open2(s, filename, flags, NULL, NULL);
+}

@@ -1,0 +1,59 @@
+注意 liav 没有这个字段
+
+{ "moov_size", "maximum moov size so it can be placed at the begin", 0x42, AV_OPT_TYPE_INT, {.i64 = 0}, 0, INT_MAX, AV_OPT_FLAG_ENCODING_PARAM, 0 }
+
+ffmpeg 命令行
+-moov_size bytes
+Reserves space for the moov atom at the beginning of the file instead of placing the moov atom at the end. If the space reserved is insufficient, muxing will fail.
+
+---------------------------------------------
+示例代码
+---------------------------------------------
+AVDictionary *dict = NULL;
+av_dict_set(&dict, "moov_size", "65536", 0);
+avformat_write_header(output_context, &dict);
+av_dict_free(&dict);
+
+---------------------------------------------
+源码，注意 liav 没有这个字段
+E:\ffmpeg-src\libavformat\movenc.h  reserved_moov_size
+---------------------------------------------
+typedef struct MOVMuxContext {
+    const AVClass *av_class;
+    int     mode;
+    int64_t time;
+    int     nb_streams;
+    int     nb_meta_tmcd;  ///< number of new created tmcd track based on metadata (aka not data copy)
+    int     chapter_track; ///< qt chapter track number
+    int64_t mdat_pos;
+    uint64_t mdat_size;
+    MOVTrack *tracks;
+
+    int flags;
+    int rtp_flags;
+    int exact;
+
+    int iods_skip;
+    int iods_video_profile;
+    int iods_audio_profile;
+
+    int fragments;
+    int max_fragment_duration;
+    int min_fragment_duration;
+    int max_fragment_size;
+    int ism_lookahead;
+    AVIOContext *mdat_buf;
+    int first_trun;
+
+    int video_track_timescale;
+
+    int reserved_moov_size; ///< 0 for disabled, -1 for automatic, size otherwise
+    int64_t reserved_moov_pos;
+
+    char *major_brand;
+
+    int per_stream_grouping;
+    AVFormatContext *fc;
+
+    int use_editlist;
+} MOVMuxContext;

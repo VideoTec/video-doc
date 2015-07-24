@@ -1,0 +1,100 @@
+头文件，源文件
+
+libavcodec\avcodec.h
+E:\libav\libavcodec\options.c
+
+什么时候这个注释修改成了下面的样子 avcodec_free_context
+/** 
+ * Allocate an AVCodecContext and set its fields to default values. The
+ * resulting struct should be freed with avcodec_free_context().
+
+/**
+ * Allocate an AVCodecContext and set its fields to default values.  The
+ * resulting struct can be deallocated by calling avcodec_close() on it followed
+ * by av_free().
+ *
+ * @param codec if non-NULL, allocate private data and initialize defaults
+ *              for the given codec. It is illegal[美][ɪˈliɡəl]不合法的 to then call avcodec_open2()
+ *              with a different codec.
+ *              If NULL, then the codec-specific defaults won't be initialized,
+ *              which may result in suboptimal[美]['sʌb'ɒptɪməl]adj.未达最佳标准的 default settings (this is
+ *              important mainly for encoders, e.g. libx264).
+ *
+ * @return An AVCodecContext filled with default values or NULL on failure.
+ * @see avcodec_get_context_defaults
+ */
+AVCodecContext *avcodec_alloc_context3(const AVCodec *codec);
+
+/**
+ * Set the fields of the given AVCodecContext to default values corresponding
+ * to the given codec (defaults may be codec-dependent).
+ *
+ * Do not call this function if a non-NULL codec has been passed
+ * to avcodec_alloc_context3() that allocated this AVCodecContext.
+ * If codec is non-NULL, it is illegal to call avcodec_open2() with a
+ * different codec on this AVCodecContext.
+ */
+int avcodec_get_context_defaults3(AVCodecContext *s, const AVCodec *codec);
+
+------------------------------------------
+源码
+------------------------------------------
+
+AVCodecContext *avcodec_alloc_context3(const AVCodec *codec)
+{
+    AVCodecContext *avctx= av_malloc(sizeof(AVCodecContext));
+
+    if (!avctx)
+        return NULL;
+
+    if(avcodec_get_context_defaults3(avctx, codec) < 0){
+        av_free(avctx);
+        return NULL;
+    }
+
+    return avctx;
+}
+
+int avcodec_get_context_defaults3(AVCodecContext *s, const AVCodec *codec)
+{
+    memset(s, 0, sizeof(AVCodecContext));
+
+    s->av_class = &av_codec_context_class;
+
+    s->codec_type = codec ? codec->type : AVMEDIA_TYPE_UNKNOWN;
+    s->codec      = codec;
+    av_opt_set_defaults(s);
+
+    s->time_base           = (AVRational){0,1};
+    s->get_buffer2         = avcodec_default_get_buffer2;
+    s->get_format          = avcodec_default_get_format;
+    s->execute             = avcodec_default_execute;
+    s->execute2            = avcodec_default_execute2;
+    s->sample_aspect_ratio = (AVRational){0,1};
+    s->pix_fmt             = AV_PIX_FMT_NONE;
+    s->sample_fmt          = AV_SAMPLE_FMT_NONE;
+
+    s->reordered_opaque    = AV_NOPTS_VALUE;
+    if(codec && codec->priv_data_size){
+        if(!s->priv_data){
+            s->priv_data= av_mallocz(codec->priv_data_size);
+            if (!s->priv_data) {
+                return AVERROR(ENOMEM);
+            }
+        }
+        if(codec->priv_class){
+            *(const AVClass**)s->priv_data = codec->priv_class;
+            av_opt_set_defaults(s->priv_data);
+        }
+    }
+    if (codec && codec->defaults) {
+        int ret;
+        const AVCodecDefault *d = codec->defaults;
+        while (d->key) {
+            ret = av_opt_set(s, d->key, d->value, 0);
+            av_assert0(ret >= 0);
+            d++;
+        }
+    }
+    return 0;
+}

@@ -1,0 +1,18 @@
+    /**
+     * Number of elements in AVFormatContext.streams.
+     *
+     * Set by avformat_new_stream(), must not be modified by any other code.
+     */
+    unsigned int nb_streams;
+    /**
+     * A list of all streams in the file. New streams are created with
+     * avformat_new_stream().
+     *
+     * - demuxing: streams are created by libavformat in avformat_open_input().
+     *             If AVFMTCTX_NOHEADER is set in ctx_flags, then new streams may also
+     *             appear in av_read_frame().
+     * - muxing: streams are created by the user before avformat_write_header().
+     *
+     * Freed by libavformat in avformat_free_context().
+     */
+    AVStream **streams;

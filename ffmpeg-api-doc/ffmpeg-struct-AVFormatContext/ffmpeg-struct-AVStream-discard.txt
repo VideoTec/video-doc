@@ -1,0 +1,22 @@
+struct AVStream 是否忽略
+
+enum AVDiscard discard; ///< Selects which packets can be discarded at will and do not need to be demuxed.
+这个字段，会影响 av_read_frame ，被忽略的流，在读取数据包时，被忽略。
+
+enum AVDiscard{
+    /* We leave some space between them for extensions (drop some
+     * keyframes for intra-only or drop just some bidir frames). */
+    AVDISCARD_NONE    =-16, ///< discard nothing
+    AVDISCARD_DEFAULT =  0, ///< discard useless packets like 0 size packets in avi
+    AVDISCARD_NONREF  =  8, ///< discard all non reference
+    AVDISCARD_BIDIR   = 16, ///< discard all bidirectional frames
+    AVDISCARD_NONINTRA= 24, ///< discard all non intra frames
+    AVDISCARD_NONKEY  = 32, ///< discard all frames except keyframes
+    AVDISCARD_ALL     = 48, ///< discard all
+};
+
+问题一：
+初始值是什么？avformat_find_stream_info 之后
+
+问题二：
+不需要的流，设置为 AVDISCARD_ALL 对性能有提升吗？

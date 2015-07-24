@@ -1,0 +1,105 @@
+最重要的几个 AVClass 结构体
+
+---------------------------------------------
+libswresample/options.c
+---------------------------------------------
+static const AVClass av_class = {
+    .class_name                = "SWResampler",
+    .item_name                 = context_to_name,
+    .option                    = options,
+    .version                   = LIBAVUTIL_VERSION_INT,
+    .log_level_offset_offset   = OFFSET(log_level_offset),
+    .parent_log_context_offset = OFFSET(log_ctx),
+    .category                  = AV_CLASS_CATEGORY_SWRESAMPLER,
+};
+static const AVClass audio_data_class = {
+    .class_name = "AudioData",
+    .item_name  = av_default_item_name,
+    .version    = LIBAVUTIL_VERSION_INT,
+};
+
+---------------------------------------------
+libavformat/options.c
+---------------------------------------------
+static const AVClass av_format_context_class = {
+    .class_name     = "AVFormatContext",
+    .item_name      = format_to_name,
+    .option         = avformat_options,
+    .version        = LIBAVUTIL_VERSION_INT,
+    .child_next     = format_child_next,
+    .child_class_next = format_child_class_next,
+    .category       = AV_CLASS_CATEGORY_MUXER,
+    .get_category   = get_category,
+};
+
+---------------------------------------------
+libavcodec/options.c
+---------------------------------------------
+static const AVClass av_codec_context_class = {
+    .class_name              = "AVCodecContext",
+    .item_name               = context_to_name,
+    .option                  = avcodec_options,
+    .version                 = LIBAVUTIL_VERSION_INT,
+    .log_level_offset_offset = offsetof(AVCodecContext, log_level_offset),
+    .child_next              = codec_child_next,
+    .child_class_next        = codec_child_class_next,
+    .category                = AV_CLASS_CATEGORY_ENCODER,
+    .get_category            = get_category,
+};
+static const AVClass av_frame_class = {
+    .class_name              = "AVFrame",
+    .item_name               = NULL,
+    .option                  = frame_options,
+    .version                 = LIBAVUTIL_VERSION_INT,
+};
+static const AVClass av_subtitle_rect_class = {
+    .class_name             = "AVSubtitleRect",
+    .item_name              = NULL,
+    .option                 = subtitle_rect_options,
+    .version                = LIBAVUTIL_VERSION_INT,
+};
+static const AVClass dummy_v1_class = {
+    .class_name = "dummy_v1_class",
+    .item_name  = av_default_item_name,
+    .option     = dummy_options,
+    .version    = LIBAVUTIL_VERSION_INT,
+};
+static const AVClass dummy_v2_class = {
+    .class_name = "dummy_v2_class",
+    .item_name  = av_default_item_name,
+    .option     = dummy_options,
+    .version    = LIBAVUTIL_VERSION_INT,
+};
+
+---------------------------------------------
+libswscale/options.c
+---------------------------------------------
+const AVClass sws_context_class = {
+    .class_name = "SWScaler",
+    .item_name  = sws_context_to_name,
+    .option     = swscale_options,
+    .category   = AV_CLASS_CATEGORY_SWSCALER,
+    .version    = LIBAVUTIL_VERSION_INT,
+};
+
+---------------------------------------------
+libavutil/options.c
+---------------------------------------------
+static const AVClass test_class = {
+    "TestContext",
+    test_get_name,
+    test_options
+};
+
+---------------------------------------------
+libpostproc
+---------------------------------------------
+E:\ffmpeg-src\libpostproc\postprocess.c
+static const AVClass av_codec_context_class = { "Postproc", context_to_name, NULL };
+
+---------------------------------------------
+libavfilter/options.c
+---------------------------------------------
+---------------------------------------------
+libavdevice/options.c
+---------------------------------------------
