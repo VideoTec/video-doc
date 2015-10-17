@@ -1,0 +1,5 @@
+http://wiki.multimedia.cx/index.php?title=AMR-NB
+
+samples: http://samples.mplayerhq.hu/A-codecs/amr/
+specification: http://www.3gpp.org/ftp/Specs/html-info/26-series.htm
+Wikipedia article: http://en.wikipedia.org/wiki/Adaptive_Multi-Rate
