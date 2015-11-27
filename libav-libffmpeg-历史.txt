@@ -1,0 +1,10 @@
+https://lwn.net/Articles/650816/
+
+Why Debian returned to FFmpeg
+
+http://blog.pkh.me/p/13-the-ffmpeg-libav-situation.html
+MPlayer and FFmpeg projects are originally two very close communities; 
+both projects started around the same time (year 2000), 
+and still share a lot of commons things 
+(MPlayer uses FFmpeg API, a lot of developers were working on both projects, 
+they were hosted on the same server, and more)
