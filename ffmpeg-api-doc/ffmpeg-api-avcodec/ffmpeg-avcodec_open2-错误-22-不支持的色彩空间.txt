@@ -1,0 +1,8 @@
+20:48 2015/9/23
+
+  strcpy(target->v_codec_name, "mpeg4");
+  target->width = w;
+  target->height = h;
+  target->nb_vframes = 0;
+  target->pix_fmt = AV_PIX_FMT_NV21;             不支持这个色彩空间，会造成 avcodec_open2 返回 -21
+  target->v_timebase = (AVRational){1, 1000};
