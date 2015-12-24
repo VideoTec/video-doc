@@ -1,0 +1,9 @@
+https://github.com/webrtc/apprtc
+
+Detailed information on devloping in the webrtc github repo can be found in the WebRTC GitHub repo developer's guide.
+
+The development AppRTC server can be accessed by visiting http://localhost:8080.
+
+Running AppRTC locally requires the Google App Engine SDK for Python and Grunt.
+
+Detailed instructions for running on Ubuntu Linux are provided below.

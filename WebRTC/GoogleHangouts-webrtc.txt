@@ -1,0 +1,24 @@
+https://webrtchacks.com/hangout-analysis-philipp-hancke/
+
+http://www.pingwest.com/google-hangouts-moves-to-webrtc/
+VP8是WebRTC的一个组成部分。
+VP8负责WebRTC标准中视频的解码工作，而音频用的则是Vorbis标准。
+要区分开，WebRTC是一个API接口，而不是一个视频解码标准。
+使用WebRTC进行实时视频传输应用的视频解码技术是VP8
+
+通过
+Network Stream API、
+RTCPeerConnection、
+Peer-to-peer Data 
+
+API三类API接口，
+WebRTC可以实现按无插件播放视频，
+因为解码工作都交给了云端进行。
+这对于需要承载多人视频会议的Hangouts来说，
+技能保障高清画质而又无需调用本地视频插件
+
+在转向WebRTC后，进行网页视频将无需插件，
+而Google也会因此终止于第三方视频插件开发商Vidyo的合作。
+2008年Google在Google Talk中推出视频模块时调用的就是Vidyo的视频解码插件。
+
+https://vsee.com/blog/google-hangouts-dropped-vidyo/

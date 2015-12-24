@@ -1,0 +1,31 @@
+http://iswebrtcreadyyet.com/ 查看 浏览器支持情况
+
+https://zh.wikipedia.org/wiki/WebRTC
+
+WebRTC，名称源自网页即时通讯（英语：Web Real-Time Communication）的缩写，
+是一个支持网页浏览器进行实时语音对话或视频对话的API。
+它于2011年6月1日开源并在Google、Mozilla、Opera支持下被纳入万维网联盟的W3C推荐标准
+
+2010年5月，Google以6820万美元收购VoIP软件开发商
+Global IP Solutions的GIPS引擎[4][5][6]，并改为名为“WebRTC”
+
+Global IP Sound，又称Global IP Solutions，简称GIPS，
+是一家位于瑞典斯德哥尔摩的专门从事处理IP语音技术的高科技公司，
+也就是IP语音引擎和相关产品。
+于1999年成立，后改名为 Global IP Solutions。
+许多大公司如，
+北电网络、Skype、QQ、WebEx、AOL、EarthLink 等目前都采用其公司的产品GIPS SoundWare™。
+
+2010年5月, Google 以6820万美元并购 GIPS.[1] 
+2011年6月, Google 释出 WebRTC.[2]
+WebRTC 是在浏览器内进行视频和音频通信的技术
+
+http://baike.baidu.com/view/1345404.htm
+Global IP Sound(GIPS)协议，著名的语音聊天工具skype所使用的协议。
+Global IP Solutions (GIPS) 的前身为
+Global IP Sound (GIPS)，
+专为数据包网络的实时通信应用市场，
+开发行业领先的嵌入式媒体处理解决方案
+
+Skype的CEO和创建者尼古拉斯Niklas Zennstrm，对Global IP Sound的评价是：
+“我们寻找世界上最好的语音引擎来支持我们的软件，感谢Global IP Sound提供给我们。对于我们用于在互联网上打电话的软件，语音质量是非常关键的，而Global IP Sound为我们提供的软件包使得我们能够提供比电话更好的语音质量”

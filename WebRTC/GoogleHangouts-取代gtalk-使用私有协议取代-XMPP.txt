@@ -1,0 +1,24 @@
+http://www.disruptivetelephony.com/2015/02/google-finally-kills-off-googletalk-and-xmpp-jabber-integration.html
+
+By way of a comment to a post I wrote back in May 2013 about Google seeming to kill off XMPP/Jabber support in Google+ Hangouts (spoiler: They did!), I learned from a friend that the GoogleTalk API was officially deprecated as of February 23, 2015. I confirmed this by finding a Google+ post from Google's Mayur Kamat.
+
+Now, this is not a surprise. Google has been clear that Hangouts was the replacement and also that Hangouts does not support XMPP:
+
+On that note, it was really no surprise to see the media reports about Microsoft killing off Google and Facebook chat support in its Outlook.com service. Microsoft made this Google integration available back in May 2013, but today Microsoft really has no choice:
+
+Google has killed off XMPP integration with Hangouts.
+Facebook has killed off XMPP integration with their new v2.0 API.
+And so Microsoft can only offer Outlook.com its own proprietary walled garden... Skype!
+
+Goodbye GoogleTalk and... sadly... goodbye XMPP integration!
+
+http://xmpp.org/2015/03/no-its-not-the-end-of-xmpp-for-google-talk/
+
+Please see the post 
+"No, it’s not the end of XMPP for Google Talk" on the XMPP Standards Foundation site. 
+The XSF notes that XMPP is still used inside of Google and that XMPP federation can still occur with a third-part XMPP client. 
+However, because Google does not support the secure use of XMPP via TLS, 
+many public XMPP servers will not connect to its server. 
+I join the XSF in wishing that Google would embrace secure messaging and better federation. 
+However, given that their product direction is for Hangouts, 
+which does NOT support XMPP, I'm skeptical that we'll ever see any better federation at this point.

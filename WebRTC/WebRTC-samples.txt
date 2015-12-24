@@ -1,0 +1,17 @@
+https://chromium.googlesource.com/external/webrtc-samples/
+
+WebRTC code samples
+
+This is a repository for the WebRTC Javascript code samples.
+
+Some of the samples use new browser features. They may only work in Chrome Canary and/or Firefox Beta, and may require flags to be set.
+
+All of the samples use adapter.js, a shim to insulate apps from spec changes and prefix differences. In fact, the standards and protocols used for WebRTC implementations are highly stable, and there are only a few prefixed names. For full interop information, see webrtc.org/web-apis/interop.
+
+In Chrome and Opera, all samples that use getUserMedia() must be run from a server. Calling getUserMedia() from a file:// URL will work in Firefox, but fail silently in Chrome and Opera.
+
+webrtc.org/testing lists command line flags useful for development and testing with Chrome.
+
+For more information about WebRTC, we maintain a list of WebRTC Resources. If you’ve never worked with WebRTC, we recommend you start with the 2013 Google I/O WebRTC presentation.
+
+Patches and issues welcome! See CONTRIBUTING for instructions. All contributors must sign a contributor license agreement before code can be accepted. Please complete the agreement for an individual or a corporation as appropriate. The Developer’s Guide for this repo has more information about code style, structure and validation.

@@ -1,0 +1,13 @@
+http://no001.blog.51cto.com/1142339/1314711
+
+Libjingle库几乎和jingle的xpmm扩展(XEP-0166)同时诞生，
+libjingle团队使用了自己的协议，
+尽管libjingle库中的协议和jingle协议非常相似，
+但它们是不同的，它们是互不兼容的。
+
+http://baike.baidu.com/view/1342278.htm
+
+Libjingle是Google提供的C++组件集，
+它为Google Talk的点对点通讯与语音呼叫功能提供交互操作性。
+组件包包括了Jingle和Jingle-Audio的google实现的源代码，
+它们是XMPP标准的推荐扩展，目前试验版可用。

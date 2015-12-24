@@ -1,0 +1,13 @@
+http://www.webrtc.org/ 官网
+
+Official web site:          http://www.webrtc.org
+Master source code repo:    https://chromium.googlesource.com/external/webrtc
+Samples and reference apps: https://github.com/webrtc
+Mailing list:               http://groups.google.com/group/discuss-webrtc
+Continuous build:           http://build.chromium.org/p/client.webrtc
+
+源码镜像
+https://github.com/pristineio/webrtc-mirror
+
+mazzila 工程里的代码：
+https://dxr.mozilla.org/mozilla-central/source/media/webrtc

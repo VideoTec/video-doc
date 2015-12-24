@@ -1,0 +1,3 @@
+http://www.cocoachina.com/ios/20151201/14478.html
+
+GIF 的制作工具有很多，但效果好、压缩比高的工具非常少。对于已经制作好的 GIF 来说，用 imagemagick 处理一下可以把文件体积压缩不少。如果需要将视频转为 GIF，Cinemagraph Pro是个不错的傻瓜化工具。这里有一篇文章介绍如何用 ffmpeg 压缩 GIF，虽然参数调节有点麻烦，但效果非常理想

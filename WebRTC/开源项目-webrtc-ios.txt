@@ -1,0 +1,6 @@
+https://github.com/gandg/webrtc-ios
+
+webRTC iOS example app.
+
+Forked from newOcean. Updated to the latest webrtc iOS example code from google. 
+Not sure the trunk directory is needed.

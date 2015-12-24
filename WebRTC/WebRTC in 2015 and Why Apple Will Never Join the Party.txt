@@ -1,0 +1,6 @@
+http://www.programmableweb.com/news/webrtc-2015-and-why-apple-will-never-join-party/analysis/2015/08/13
+WebRTC has gone on to become the open source standard for Google, 
+but there is still no word from Apple about its support, 
+and I am going to be bold here and say it will never happen.
+
+The reason for that is in the latest iOS 8 and OS X updates, Apple took its own approach to voice calling by adding a feature to hand over calls between your Apple devices using FaceTime and iMessage. I don’t believe Apple cares about WebRTC given the time and effort it has put into creating a seamless experience with Apple products in its usual walled garden.

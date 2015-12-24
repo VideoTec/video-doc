@@ -1,0 +1,5 @@
+https://github.com/EricssonResearch/openwebrtc-android-sdk
+
+git@github.com:EricssonResearch/openwebrtc-android-sdk.git
+
+SDK for adding OpenWebRTC to your Android app

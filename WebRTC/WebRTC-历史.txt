@@ -1,0 +1,19 @@
+2005: Google releases libjingle
+ XMPP + media transport library
+ Link your own media lib; gips / mediastreamer (linphone)
+
+2008:
+   Google buys on2, releases VP8 video codec in libvpx
+
+2010:
+ May: Google buys Global IP Solutions (GIPS)
+ October: RTC-WEB kickoff meeting
+
+2011:
+ IETF / W3C working groups formed
+ March: Google releases GIPS engine as webrtc(.org) library
+
+2012:
+ January: webRTC supports lands in Chrome
+ October: webRTC enabled by default in chrome M23
+ November: webRTC support in Firefox Nightly

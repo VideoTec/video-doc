@@ -1,0 +1,17 @@
+http://www.openwebrtc.org/
+
+A mobile-first WebRTC client framework for building native apps
+With OpenWebRTC you can build native WebRTC apps 
+that communicate with browsers that supports the WebRTC standard, 
+such as Chrome, Firefox and Bowser. 
+
+OpenWebRTC is especially focused on mobile platforms, 
+with powerful features such as 
+1）hardware accelerated video coding and 
+2）OpenGL-based video rendering. 
+
+The OpenWebRTC project is free and Open Source with a permissive BSD-2 license. 
+The code is available on GitHub, 
+https://github.com/EricssonResearch/OpenWebRTC
+there is a mailing list and Twitter account for discussions and questions. 
+This site and its blog are maintained by Ericsson Research.

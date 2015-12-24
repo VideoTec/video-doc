@@ -1,0 +1,13 @@
+http://www.oschina.net/translate/high-quality-gif-with-ffmpeg
+
+大约两年前, 我尝试改进FFmpeg对GIF编码的支持，至少要很体面。
+
+尤其是要在GIF编码器中加入透明机制。
+然而你写的代码并不总是能使其达到最优，这种情况非常常见。
+但这仍然只是阻止编码器陷入尴尬的尝试。
+
+不过最近在 Stupeflix，
+我们需要一个方法给 Legend app 生成高质量的 GIF，
+所以我决定在这上面再花些功夫。
+所有在这篇博文 FFmpeg 2.6 中列举的特性都是可用的，
+并且在Legend app的下一版本中将使用这些特性 (大概在3月26号左右)。

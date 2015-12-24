@@ -1,0 +1,24 @@
+http://blog.csdn.net/wangruihit/article/details/45872029
+
+Openwebrtc是爱立信实验室开发的，Ericsson和Google都是webrtc标准的主要制定者，
+两家公司分别实现了一套webrtc ，
+即Ericsson Openwebrtc和我们熟知的Google Webrtc。两者更是一种竞争关系。
+
+Google Webrtc基于GIPS，而Ericsson Openwebrtc基于GStreamer。
+
+经过我的测试，Openwebrtc在iOS上确实比Webrtc有优势，在开销上有大幅降低，在帧率上也有提升。
+如果只做视频，可以考虑直接上手Openwebrtc，编译比webrtc容易很多，代码地址：
+
+不过最终我们也没有用Openwebrtc，
+原因是我们的语音用的是webrtc，如果视频用openwebrtc，
+语音也需要迁移到Openwebrtc上，但是在语音技术上，
+
+GStreamer确实还达不到能替换GIPS的地步，
+GIPS的AEC和Jitter Buffer算法都比GStreamer要好太多。
+
+https://bloggeek.me/ericssons-openwebrtc-project/
+Ericsson’s OpenWebRTC is an alternative to Google’s codebase.
+
+This is a slide I recently added to my collection. I finally understood that people are often unaware that WebRTC is both a standard AND an implementation of it by Google. Now there are two such open source implementations: The Google one and the Ericsson one.
+
+Ericsson’s OpenWebRTC project offers an alternative implementation to Google’s own WebRTC implementation.

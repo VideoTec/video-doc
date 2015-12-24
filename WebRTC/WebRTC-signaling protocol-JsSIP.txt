@@ -1,0 +1,16 @@
+https://en.wikipedia.org/wiki/JsSIP
+
+JsSIP is a simple to use library for the programming language JavaScript which takes advantage of latest developments in SIP and WebRTC to provide a fully featured SIP endpoint in any website. With JsSIP any website can get real-time communication features using audio, video and more with just a few lines of code. Using JsSIP it is possible to build SIP user agents that can send and receive audio and video calls, and text messages.
+
+JsSIP uses the SIP over WebSocket transport for sending an receiving SIP requests and responses, and thus, it requires a SIP proxy/server with WebSocket support. Currently the following SIP servers have been tested and are using JsSIP as the basis for their WebRTC Gateway functionality:
+
+FRAFOS ABC WebRTC Gateway
+OverSIP
+Kamailio
+Asterisk
+reSIProcate and repro
+
+WebRTC web browsers[edit]
+
+At media plane (audio calls), JsSIP version 0.2.0 works with Chrome browser from version 24. 
+At signaling plane (SIP protocol), JsSIP runs in any WebSocket capable browser
