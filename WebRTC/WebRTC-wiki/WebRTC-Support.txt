@@ -1,0 +1,28 @@
+Support
+WebRTC is supported in the following browsers.
+
+Desktop PC
+1）Microsoft Edge 21[17]
+2）Google Chrome 23
+3）Mozilla Firefox 22[18]
+4）Opera 18[19]
+
+Android
+1）Google Chrome 28 (Enabled by default since 29)
+2）Mozilla Firefox 24[20]
+3）Opera Mobile 12
+
+Chrome OS
+Firefox OS
+
+iOS
+1）Bowser[21]
+
+Blackberry 10
+1）Browser
+
+As of September 2015, 
+Internet Explorer and Safari still lack 
+the native support of WebRTC but 
+ORTC was already added to the new Microsoft browser, Edge.[
+Several plugins are available to add the support of WebRTC to these browsers.

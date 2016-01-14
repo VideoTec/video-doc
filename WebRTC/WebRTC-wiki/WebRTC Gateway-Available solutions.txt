@@ -1,0 +1,48 @@
+https://en.wikipedia.org/wiki/WebRTC_Gateway#Available_solutions
+
+There are already a number of 
+open source and 
+commercial solutions available 
+for providing the WebRTC gateway functionality. 
+
+As a lot of required functionality of a WebRTC gateway such as 
+1）media handling, 
+2）signalling mapping 
+is supported by SBC the function of WebRTC gateway 
+is often integrated into SBCs or provided by SBC vendors.
+
+注释：
+Session Border Controller
+会话边界控制器
+http://baike.baidu.com/view/259912.htm
+Session Border Controller，
+即会话边界控制器SBC已经逐渐成为NGN和IMS网络的标准配置产品
+（如同Lanswitch和路由器）。
+也被广泛称为BAC（边界接入控制器），
+定位在IMS网络的ABG (access border gateway) ，
+解决NGN业务部署中遇到的NAT/FW穿越、安全、互通、QoS等问题。
+会话边缘控制器（SBC，或会话控制器）是VoIP呼叫控制产品，
+用于电话完全由VoIP传输而不需要网关的环境。
+它使用全部三种VoIP协议——H.323关守、SIP代理和媒体网关控制协议（MGCP）。
+它会在未来的VoIP服务提供中发挥重要作用，
+允许跨越多个IP网络，即使有防火墙要穿越，也能提供有质量保障的VoIP服务。
+
+Open source WebRTC Gateways
+1）OverSIP
+2）Kamailio
+3）Asterisk
+4）reSIProcate and repro
+5）WebRTC2SIP
+6）Janus
+7）FreeSWITCH
+8）SylkServer
+
+Commercial Solutions
+1）AudioCodes WebRTC enabled SBC, WebRTC GW
+2）WIT Software
+3）FRAFOS ABC WebRTC Gateway
+4）Oracle
+5）Sonus
+6）Genband
+7）AhoyRTC
+8）Pexip Infinity Platform

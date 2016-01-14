@@ -1,0 +1,18 @@
+https://en.wikipedia.org/wiki/WebRTC#History
+
+In May 2011, Google released an open source project for browser-based real-time communication known as WebRTC.[2] This has been followed by ongoing work to standardise the relevant protocols in the IETF[3] and browser APIs in the W3C.[4]
+
+The W3C draft of WebRTC is a work in progress 
+with advanced implementations in the Chrome and Firefox browsers. 
+The API is based on preliminary work done in the WHATWG.
+
+It was referred to as the ConnectionPeer API, 
+and a pre-standards concept implementation was created at Ericsson Labs.
+The Web Real-Time Communications Working Group 
+expects this specification to evolve significantly based on:
+
+1）Outcomes of ongoing exchanges in the companion RTCWEB group at IETF[8] to define the set of protocols that, together with this document, define real-time communications in Web browsers. While no one signalling protocol is mandated, SIP over Websockets (RFC 7118) is often used partially due to the applicability of SIP to most of the envisaged communication scenarios as well as the availability of open source software such as JsSIP.
+2）Privacy issues that arise when exposing local capabilities and local streams
+3）Technical discussions within the group, on implementing data channels in particular[9]
+4）Experience gained through early experimentation
+5）Feedback from other groups and individuals

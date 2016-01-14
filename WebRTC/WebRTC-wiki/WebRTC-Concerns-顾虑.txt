@@ -1,0 +1,19 @@
+concern[英][kənˈsɜ:n] [美][kənˈsɜ:rn]
+n.关心；关系，有关；顾虑；公司或企业
+
+https://en.wikipedia.org/wiki/WebRTC#Concerns
+
+In January 2015, TorrentFreak reported that 
+browsers supporting WebRTC suffer from a serious security flaw 
+that compromises the security of VPN-tunnels, 
+by allowing the true IP address of the user to be read.[26] 
+The IP address read requests 
+are not visible in the browser's developer console, and 
+they are not blocked by common ad blocking/privacy plugins 
+(enabling online tracking by advertisers and other entities despite precautions).[27]
+
+WebRTC can be enabled and disabled in Firefox 
+by toggling the value of "media.peerconnection.enabled" in about:config, and 
+WebRTC settings can be changed in about:webrtc. 
+WebRTC cannot be disabled in the desktop version of Google Chrome, 
+although there is a plug-in available for blocking it

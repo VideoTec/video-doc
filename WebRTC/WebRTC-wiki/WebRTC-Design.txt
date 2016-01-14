@@ -1,0 +1,33 @@
+https://en.wikipedia.org/wiki/WebRTC#Design
+
+Major components of WebRTC include:
+
+1）getUserMedia, which allows a web browser to 
+access the camera and microphone and to capture media
+2）RTCPeerConnection, which sets up audio/video calls
+3）RTCDataChannel, which allow browsers to share data via peer-to-peer
+
+The WebRTC API also includes a statistics function:
+
+4）getStats, which allows the web application to 
+retrieve a set of statistics about WebRTC sessions. 
+These statistics data are being described in a separate W3C document.
+
+As of November 2015, 
+the IETF WebRTC Audio Codec and Processing Requirements draft 
+requires implementations to 
+
+1）provide PCMA/PCMU (RFC 3551), 
+RTP Profile for Audio and Video Conferences with Minimal Control
+PCMA(G.711A)  PCMU(G.711U)
+
+2）Telephone Event as DTMF (RFC 4733), and 
+双音多频信号（Dual-Tone Multi-Frequency, DTMF），
+电话系统中电话机与交换机之间的一种用户信令，通常用于发送被叫号码
+
+3）Opus (RFC 6716) audio codecs as minimum capabilities. 
+The PeerConnection, data channel and media capture browser APIs 
+are detailed in the W3C.
+
+W3C is developing ORTC (Object Real-time Communications) for WebRTC.
+This is commonly referred to as WebRTC 1.1.

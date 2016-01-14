@@ -1,0 +1,9 @@
+https://en.wikipedia.org/wiki/WebRTC
+
+WebRTC (Web Real-Time Communication) is an API definition 
+drafted by the World Wide Web Consortium (W3C) 
+that supports browser-to-browser applications for 
+1）voice calling, 
+2）video chat, and 
+3）P2P file sharing 
+without the need of either internal or external plugins.

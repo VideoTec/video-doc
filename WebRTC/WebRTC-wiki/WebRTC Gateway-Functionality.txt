@@ -1,0 +1,95 @@
+callee[英][kɔ:'li:] [美][kɔ:ld]
+n.被召者；受话人
+
+negotiation[英][nɪˌgəʊʃiˈeɪʃn] [美][nɪˌgoʊʃiˈeɪʃn]
+n.协商，谈判；转让；通过
+
+mandatory[英][ˈmændətəri] [美][ˈmændətɔ:ri]
+adj.强制的；命令的；受委托的
+
+https://en.wikipedia.org/wiki/WebRTC_Gateway#Functionality
+
+The usual process with WebRTC is that 
+a user download a WebRTC Javascript application. 
+This application is then used to communicate with another user. 
+A WebRTC gateway would usually contain 
+the server from where a user would download the WebRTC Javascript application. 
+When receiving a call from the user, 
+the WebRTC gateway needs to decide whether the callee is reachable over WebRTC. 
+If not, then the call will have to be translated into SIP for example. 
+To translate a call into SIP, the gateway will have to map different layers:
+
+1）Signalling: 
+There is no standardised signalling protocol for WebRTC applications. 
+However, SIP over Websockets (RFC 7118) 
+is often used partially due to the applicability of SIP 
+to most of the envisaged communication scenarios 
+as well as the availability of open source software such as JsSIP. 
+In such a case, the gateway would only need to repackage the SIP packets 
+from the Websocket layer into UDP, TCP or TLS.
+
+2）Media transport: 
+The WebRTC specifications indicate that 
+for security reasons WebRTC applications 
+must use SRTP for transporting media content. 
+While some VoIP applications support SRTP as well, 
+this is optional and hence not always the case. 
+If the callee does not support SRTP then 
+the WebRTC gateway will have to map between SRTP and RTP.
+
+3）Media content: 
+The WebRTC specifications indicate that 
+WebRTC applications must use for audio communication 
+either G.711 or OPUS as the Audio codec. 
+Applications using SIP for establishing audio session 
+are fedd to choose any type of codec. 
+If the callee does not support OPUS or G.711 
+then the WebRTC gateway will have to transcode 
+between the WebRTC and SIP sides of the communication.
+
+4）Media address negotiation: 
+In order to be able to traverse all kinds of NAT, 
+theWebRTC specifications indicate that 
+WebRTC applications must use STUN and ICE 
+in order to detect the addresses 
+under which two end points can exchange media packets. 
+While these technologies are also implemented be some SIP user agents, 
+this is not mandatory. 
+如果出现下面的情况：
+    1）If the callee does not support ICE or 
+    2）in case media transport layer needs mapping or 
+    3）media transcoding is required 
+WebRTC 网关需要充当 ICE end point，路由媒体数据
+then the WebRTC gateway will have to 
+act as an ICE end point an route the media packets 
+between the caller and callee.
+
+--------------------------------------
+注释
+--------------------------------------
+ICE
+互动式连接建立（Interactive Connectivity Establishment），
+一种综合性的NAT穿越的技术
+
+互动式连接建立是由IETF的MMUSIC工作组开发出来的一种framework，
+可整合各种NAT穿透技术，如
+1）STUN、
+2）TURN（Traversal Using Relay NAT，中继NAT实现的穿透）、
+3）RSIP（Realm Specific IP，特定域IP）等。
+该framework可以让SIP的客户端利用各种NAT穿透方式打穿远程的防火墙。
+
+STUN
+（Session Traversal Utilities for NAT，NAT会话传输应用程序）
+是一种网络协议，
+它允许位于NAT（或多重NAT）后的客户端找出自己的公网地址，
+查出自己位于哪种类型的NAT之后以及NAT为某一个本地端口所绑定的Internet端端口。
+这些信息被用来在两个同时处于NAT 路由器之后的主机之间建立UDP通信。
+该协议由RFC 5389定义
+
+NAT
+（Network Address Translation，网络地址转换）
+是1994年提出的。
+当在专用网内部的一些主机本来已经分配到了本地IP地址
+（即仅在本专用网内使用的专用地址），
+但现在又想和因特网上的主机通信（并不需要加密）时，
+可使用NAT方法

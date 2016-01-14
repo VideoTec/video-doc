@@ -1,0 +1,62 @@
+benefit[英][ˈbenɪfɪt] [美][ˈbɛnəfɪt]
+n.利益，好处；救济金，津贴；义演，义卖；恩惠，恩泽
+
+https://en.wikipedia.org/wiki/WebRTC#Benefits
+
+WebRTC enables all kinds of real time communication 
+such as audio, video and text between users 
+by utilising the browsers. 
+Using WebRTC bears different benefits for different market segments. 
+
+For end users it has two major advantages:
+
+1）Ease of use: Real-time communication is supported 
+without the need for additional applications or plug-ins.
+
+2）Security: WebRTC enforces the usage of encryption 
+for both the media and the signalling. 
+Thereby, WebRTC provides a higher security level 
+than most currently available commercial telephony systems.
+
+For enterprises WebRTC can provide even more benefits：
+toll-free[英][təul fri:] [美][tol fri]
+adj.<美>（打电话）由接电话的机构付费的，受付
+
+1）Cost savings: Save on the costs 
+of toll-free telephone number for call centres
+
+2）Rich communication: 
+Enhance the communication to users and between employers 
+with video and messaging 
+without the need for special applications and servers.
+
+3）Un-interrupted communication: 
+Keep the customers on the web page and 
+at the same time start a voice and video call with customer.
+
+4）Security: Secure the communication 
+with the customers 
+as well as employees in the home office and remote branches 
+using state of the art encryption standards.
+
+For operators, WebRTC can additionally provide new opportunities:
+
+1）Mobile Telephony: 
+By relying on WebRTC technology, 
+service providers can enable users to access their VoIP service 
+while on the go without specialised applications.
+
+2）Hosted Services: 
+By deploying a WebRTC gateway end users 
+would be able to access the SIP based hosted PBX and call centers 
+without the need to change these services.
+
+3）WebRTC as a Service: 
+Similar to hosted PBX services, 
+service providers can host WebRTC Gateways on behalf of enterprises. 
+WebRTC calls destined to the enterprise 
+are handled by a WebRTC Gateway of the service provider. 
+Incoming WebRTC calls would 
+be translated into SIP calls and routed to the enterprise. 
+The enterprise would not have to change anything in its infrastructure,
+as it will still be only handling SIP calls
