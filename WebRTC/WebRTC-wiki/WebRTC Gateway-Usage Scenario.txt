@@ -1,0 +1,5 @@
+https://en.wikipedia.org/wiki/WebRTC_Gateway#Usage_Scenario
+
+To enable browsers using different application providers to communicate with each other (e.g. a user logged in to application providers X wants to call someone that is logged in to application provider Y) a so-called WebRTC trapezoid can be used. In this case the two providers use a widely used VoIP signalling protocol such as SIP to federate between them. However, each of their respective browser-based clients signals to its server using proprietary application protocols built on top of HTTP and Websockets.
+
+This component that mediates between WebRTC and SIP is referred to as a WebRTC Gateway. Beside connecting different WebRTC applications, a WebRTC gateway also enables the communication between a WebRTC phone and a VoIP or even a PSTN phone. Thereby, a WebRTC gateway extends the scope of a WebRTC applications and enables much wider reach and usage scenarios
