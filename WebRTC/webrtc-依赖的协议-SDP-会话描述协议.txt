@@ -1,0 +1,10 @@
+https://developer.mozilla.org/zh-CN/docs/Web/API/WebRTC_API/Protocols
+
+SDP
+会话描述协议Session Description Protocol (SDP) 
+是一个描述多媒体连接内容的协议，
+
+例如分辨率，格式，编码，加密算法等。
+
+所以在数据传输时两端都能够理解彼此的数据。
+本质上，这些描述内容的元数据并不是媒体流本身。

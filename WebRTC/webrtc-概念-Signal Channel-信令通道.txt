@@ -1,0 +1,35 @@
+https://developer.mozilla.org/zh-CN/docs/Web/API/WebRTC_API/WebRTC_basics
+
+Signal Channel
+
+现在我们有了ICE候选，
+然后需要将它发送到我们的另一端，以让它知道如何跟我们建立连接。
+
+然而，现在有一个先有鸡还是先有蛋的问题。
+我们想要PeerConnection发送数据到另一端，
+但是在那之前我们需要先把元数据发送过去……
+
+现在就是用到信令通道（Signal Channel）的时候了。
+它的任何一个数据传输方法都允许两个端点之间交换信息。
+在本文中，我们将使用FireBase。
+因为它设置起来灰常简单，并且不需要任何主机或者服务器端的代码编写。
+
+现在我们想象只有两个两个方法：
+send()， 它将使用一个键，然后将数据赋值给它；
+recv() ，当一个键有值的时候会调用一个处理函数。
+
+数据库的结构就像下面这样：
+
+{
+    "": {
+        "candidate:": …
+        "offer": …
+        "answer": … 
+    }
+}
+
+连接会被roomId分割，然后会保存四条信息：
+1）发起者(oferer)的ICE候选、
+2）应答者(answerer)的ICE候选、
+3）offer SDP 和 
+4）answer SDP.

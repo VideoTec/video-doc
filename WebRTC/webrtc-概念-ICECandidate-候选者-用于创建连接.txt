@@ -1,0 +1,10 @@
+candidate[英][ˈkændɪdət] [美][ˈkændɪˌdet, -dɪt]
+n.报考者；申请求职者；攻读学位者；最后命运或结局如何已显然可见者
+
+https://developer.mozilla.org/zh-CN/docs/Web/API/WebRTC_API/WebRTC_basics
+
+ICECandidate
+
+创建好PeerConnection并传入可用的STUN和TURN之后，
+当ICE框架找到可以使用Peer创建连接的“候选者”，
+会立即触发一个事件（onicecandidate）。

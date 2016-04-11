@@ -1,0 +1,45 @@
+https://developer.mozilla.org/zh-CN/docs/Web/API/WebRTC_API/WebRTC_basics
+
+Offer
+
+Offer SDP
+是用来向另一端描述期望格式（视频, 格式, 解编码, 加密, 解析度, 尺寸 等等）的元数据。
+
+一次信息的交换需要从一端拿到offer，
+然后另外一端接受这个offer
+然后返回一个answer。
+
+pc.createOffer(function (offer) {
+    pc.setLocalDescription(offer, function() {
+        send("offer", JSON.stringify(pc.localDescription);
+    }, errorHandler);
+}, errorHandler, options);
+
+-----------------------------------
+errorHandler
+-----------------------------------
+
+创建offer的过程如果出现问题，
+就会执行这个函数，并且将错误的详细信息作为第一个参数。
+
+var errorHandler = function (err) {
+    console.error(err);
+};
+
+-----------------------------------
+options
+-----------------------------------
+
+Offer SDP 的选项.
+
+var options = {
+    offerToReceiveAudio: true,
+    offerToReceiveVideo: true
+};
+
+offerToReceiveAudio/Video 告诉另一端，你想接收视频还是音频。
+对于DataChannel来说，这些是不需要的。
+
+offer创建好之后，我们必须将本地SDP设置进去，
+然后通过信令通道将它发送到另一端，
+之后就静静地等待另一端的Answer SDP吧.

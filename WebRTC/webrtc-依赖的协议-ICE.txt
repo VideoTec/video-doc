@@ -1,0 +1,18 @@
+https://developer.mozilla.org/zh-CN/docs/Web/API/WebRTC_API/Protocols
+
+交互式连接建立
+Interactive Connectivity Establishment (ICE) 
+是一个允许你的浏览器和对端浏览器建立连接的协议框架。
+
+在实际的网络当中，
+有很多原因能导致简单的从A端到B端直连不能如愿完成。
+这需要绕过阻止建立连接的防火墙，
+给你的设备分配一个唯一可见的地址（通常情况下我们的大部分设备没有一个公网地址），
+如果路由器不允许主机直连，
+还得通过一台服务器转发数据。
+
+ICE通过使用以下几种技术完成上述工作：
+
+STUN
+NAT
+TURN

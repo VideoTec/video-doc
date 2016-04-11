@@ -1,0 +1,9 @@
+http://tools.ietf.org/id/draft-nandakumar-rtcweb-sdp-01.html
+
+SDP for the WebRTC
+
+The Web Real-Time Communication (WebRTC) [WEBRTC] working group is charged to provide protocol support for direct interactive rich communication using audio, video and data between two peers' web browsers. With in the WebRTC framework, Session Description protocol (SDP) [RFC4566] is used for negotiating session capabilities between the peers. Such a negotiataion happens based on the SDP Offer/Answer exchange mechanism described in the RFC 3264 [RFC3264].
+
+This document serves a introductory purpose in describing the role of SDP for the most common WebRTC use-cases.
+
+The IETF has been notified of intellectual property rights claimed in regard to some or all of the specification contained in this document. For more information consult the online list of claimed rights.

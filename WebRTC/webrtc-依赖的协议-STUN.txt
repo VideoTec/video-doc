@@ -1,0 +1,23 @@
+stun[英][stʌn] [美][stʌn]
+vt.击晕，使昏厥；使震聋；使目瞪口呆；使大吃一惊
+n.打击，刺激
+
+traversal[英][træ'vɜ:sl] [美]['trævɜsəl]
+n.横越，横断物，（横向）往返移动
+
+utility[英][ju:ˈtɪləti] [美][juˈtɪləti]
+n.功用，效用；有用的物体或器械；公用事业公司；公用事业
+adj.有多种用途的；各种工作都会做的；能在数个位置作替补的；为获得经济价值而饲养
+
+https://developer.mozilla.org/zh-CN/docs/Web/API/WebRTC_API/Protocols
+
+STUN
+NAT的会话穿越功能
+Session Traversal Utilities for NAT (STUN) 
+(缩略语的最后一个字母是NAT的首字母)
+
+是一个允许位于NAT后的客户端找出自己的公网地址，
+判断出路由器阻止直连的限制方法的协议。
+
+客户端通过给公网的STUN服务器发送请求获得自己的公网地址信息，
+以及是否能够被（穿过路由器）访问。

@@ -1,0 +1,17 @@
+https://developer.mozilla.org/zh-CN/docs/Web/API/WebRTC_API/WebRTC_basics
+
+Answer
+
+Answer SDP跟offer是差不多的，只不过它是作为相应的。
+有点像接电话一样。我们只能在接收到offer的时候创建一次Answer.
+
+recv("offer", function (offer) {
+    offer = new SessionDescription(JSON.parse(offer))
+    pc.setRemoteDescription(offer);
+
+    pc.createAnswer(function (answer) {
+        pc.setLocalDescription(answer, function() {
+            send("answer", JSON.stringify(pc.localDescription));
+        }, errorHandler);
+    }, errorHandler);
+});

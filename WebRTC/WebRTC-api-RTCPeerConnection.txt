@@ -1,0 +1,26 @@
+https://developer.mozilla.org/zh-CN/docs/Web/API/WebRTC_API/WebRTC_basics
+
+RTCPeerConnection
+
+这是使用peer创建连接的起始点。它接收一个配置选项，
+其中配置了用来创建连接的ICE服务器信息
+
+var pc = new RTCPeerConnection(configuration);
+
+RTCConfiguration
+
+RTCConfiguration 对象包含了一些信息，
+这些信息是关于用来做ICE的TURN和/或STUN服务器的。
+这是用来确保大多数用户可以避免因NAT和防火墙导致的无法建立连接
+
+var configuration = {
+    iceServers: [
+        {urls: "stun:23.21.150.121"},
+        {urls: "stun:stun.l.google.com:19302"},
+        {urls: "turn:numb.viagenie.ca", credential: "webrtcdemo", username: "louis%40mozilla.com"}
+    ]
+}
+
+Google运行了一个我们可以使用的公共STUN服务器。
+我也在http://numb.viagenie.ca/ 创建了一个免费的可以访问TURN服务器的账户。
+可能你也想这么做，你只要替换到你自己的许可证书就可以了。
