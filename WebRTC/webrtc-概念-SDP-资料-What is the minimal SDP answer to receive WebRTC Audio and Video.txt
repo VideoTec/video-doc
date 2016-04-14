@@ -1,0 +1,1 @@
+http://stackoverflow.com/questions/27584498/what-is-the-minimal-sdp-answer-to-receive-webrtc-audio-and-video
