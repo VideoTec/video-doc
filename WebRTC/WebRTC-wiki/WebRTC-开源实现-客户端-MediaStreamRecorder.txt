@@ -1,0 +1,15 @@
+https://github.com/streamproc/MediaStreamRecorder
+
+Cross browser audio/video/screen recording. 
+It supports Chrome, Firefox, Opera and Microsoft Edge. 
+It even works on Android browsers. 
+It follows latest MediaRecorder API standards and provides similar APIs
+
+A cross-browser implementation to record audio/video streams:
+
+MediaStreamRecorder can record both audio and video in single WebM file on Firefox.
+MediaStreamRecorder can record audio as WAV and video as either WebM or animated gif on Chrome.
+
+MediaStreamRecorder is useful in scenarios 
+where you're planning to submit/upload recorded blobs in realtime to the server! 
+You can get blobs after specific time-intervals.

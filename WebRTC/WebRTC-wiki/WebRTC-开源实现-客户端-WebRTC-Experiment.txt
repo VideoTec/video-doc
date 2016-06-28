@@ -1,0 +1,10 @@
+https://github.com/muaz-khan/WebRTC-Experiment
+
+WebRTC, WebRTC and WebRTC. Everything here is all about WebRTC!! 
+
+Realtime/Working WebRTC Experiments
+
+It is a repository of uniquely experimented WebRTC demos; written by Muaz Khan!
+No special requirement! Just WebRTC compatible web-browser (e.g. chrome/firefox/opera on desktop/android)
+These demos/experiments are entirely client-side; i.e. no server installation needed!
+You can use all these demos in PHP/Python/Ruby/ASP.NET/etc. everywhere!

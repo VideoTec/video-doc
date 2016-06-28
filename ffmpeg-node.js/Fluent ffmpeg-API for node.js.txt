@@ -1,0 +1,13 @@
+fluent[英][ˈflu:ənt] [美]['fluːənt]
+adj.流畅的；流利的；液态的
+
+http://www.infoq.com/cn/articles/webrtc-implementation-ideas
+于是，我决定采用一个连接，使用Web摄像头进行无停止的录制。
+稍后，我要将记录进行分割并将其发送到Amazon S3上，
+这个过程中，我决定使用node-fluent-ffmpeg库。
+
+实现起来比较困难，这不仅涉及到资源还涉及到时间。
+我必须要搭建Kurento Media Server、coturn以及Node.js，
+其中Node.js会用来将视频转换为另外一种格式，将其拆分为多个部分，并将其发送到S3中
+
+https://github.com/fluent-ffmpeg/node-fluent-ffmpeg

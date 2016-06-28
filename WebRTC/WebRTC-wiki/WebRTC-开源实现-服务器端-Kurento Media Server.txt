@@ -1,0 +1,25 @@
+https://www.kurento.org/
+
+Kurento is an Open Source Software WebRTC media server
+
+https://github.com/Kurento/kurento-media-server
+
+Kurento Media Server is the Kurento's core element. 
+It is responsible for media transmission, processing, loading and recording. 
+It is implemented in low level technologies based on GStreamer to optimize the resource consumption. 
+It provides the following features:
+
+Networked streaming protocols, 
+including HTTP, RTP and WebRTC.
+
+Group communications (MCUs and SFUs functionality) 
+supporting both media mixing and media routing/dispatching.
+
+Generic support for computational vision and augmented reality filters.
+
+Media storage supporting writing operations for WebM and MP4 and 
+playing in all formats supported by GStreamer.
+
+Automatic media transcodification between any of the codecs 
+supported by GStreamer 
+including VP8, H.264, H.263, AMR, OPUS, Speex, G.711, etc.

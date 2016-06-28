@@ -1,0 +1,14 @@
+https://github.com/Kurento/kurento-utils-js
+
+The Kurento Utils project contains a set of reusable components 
+that have been found useful during the development of the WebRTC applications with Kurento.
+
+http://www.infoq.com/cn/articles/webrtc-implementation-ideas
+
+我需要一个服务器来接收来自客户端的视频流并对其进行记录。
+对我来讲，一个较为合适的方案是使用Kurento Media Server，
+我在Amazon EC2上使用STUN/TURN服务器进行了搭建。
+我使用Kurento 库实现了前端（不需要使用中间服务器）。
+Kurento（英语中“stream”这个词的世界语名称）是一个开源的框架，
+它提供了一个媒体服务器，
+这个服务器基于标准提供了任意媒体的处理功能。
