@@ -1,0 +1,3 @@
+https://trac.ffmpeg.org/wiki/Encode/H.264
+
+ffmpeg -i input -c:v libx264 -preset slow -crf 22 -c:a copy output.mkv
