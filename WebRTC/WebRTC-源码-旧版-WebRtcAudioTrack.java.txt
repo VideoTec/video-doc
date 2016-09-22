@@ -1,0 +1,4 @@
+https://chromium.googlesource.com/external/webrtc/stable/webrtc/+/15a8a6e7edb2c8df7f5b21e759ace213a4ab7292/modules/audio_device/android/java/src/org/webrtc/voiceengine/WebRtcAudioRecord.java
+
+这个方法会把铃声，也截获了，并在指定的设备上播放。
+private int RecordAudio(int lengthInBytes) 
