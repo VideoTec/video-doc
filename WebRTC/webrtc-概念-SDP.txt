@@ -1,0 +1,58 @@
+https://tools.ietf.org/html/rfc4566
+
+SDP: Session Description Protocol
+
+This memo defines the Session Description Protocol (SDP).  
+SDP is intended for describing multimedia sessions 
+for the purposes of session announcement, 
+session invitation, 
+and other forms of multimedia session initiation.
+
+https://zh.wikipedia.org/wiki/%E4%BC%9A%E8%AF%9D%E6%8F%8F%E8%BF%B0%E5%8D%8F%E8%AE%AE
+
+会话描述协议（Session Description Protocol或简写SDP）描述的是流媒体的初始化参数。
+此协议由IETF发表为 RFC 2327。
+SDP最初的时候是会话发布协议（Session Announcement Protocol或简写SAP）的一个部件，
+1998年4月推出第一版[1]，
+但是之后被广泛用于和RTSP以及SIP协同工作，也可被单独用来描述多播会话。
+
+https://en.wikipedia.org/wiki/Session_Description_Protocol
+
+A session is described by a series of fields, one per line.
+The form of each field is as follows.
+
+<character>=<value>
+
+Where 
+<character> is a single case-significant character and 
+<value> is structured text whose format depends upon attribute type. 
+Values are typically a UTF-8 encoding.
+Whitespace is not allowed immediately to either side of the =
+
+Session description
+    v=  (protocol version number, currently only 0)
+    o=  (originator and session identifier : username, id, version number, network address)
+    s=  (session name : mandatory with at least one UTF-8-encoded character)
+    i=* (session title or short information)
+    u=* (URI of description)
+    e=* (zero or more email address with optional name of contacts)
+    p=* (zero or more phone number with optional name of contacts)
+    c=* (connection information—not required if included in all media)
+    b=* (zero or more bandwidth information lines)
+    One or more Time descriptions ("t=" and "r=" lines; see below)
+    z=* (time zone adjustments)
+    k=* (encryption key)
+    a=* (zero or more session attribute lines)
+    Zero or more Media descriptions (each one starting by an "m=" line; see below)
+	
+Time description (mandatory)
+    t=  (time the session is active)
+    r=* (zero or more repeat times)
+	
+Media description (if present)
+    m=  (media name and transport address)
+    i=* (media title or information field)
+    c=* (connection information — optional if included at session level)
+    b=* (zero or more bandwidth information lines)
+    k=* (encryption key)
+    a=* (zero or more media attribute lines — overriding the Session attribute lines)

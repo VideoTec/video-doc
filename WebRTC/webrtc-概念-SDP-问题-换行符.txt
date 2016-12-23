@@ -1,0 +1,23 @@
+https://en.wikipedia.org/wiki/Session_Description_Protocol
+
+A session is described by a series of fields, one per line
+
+Each line is separated from the next by a carriage return/line feed sequence. 
+Implementations are allowed to relax this to omit the carriage return and supply only the line feed.
+
+解释：
+carriage return 	是 \r 	简写 CR
+line feed 			是 \n	简写 LF
+
+carriage	英[ˈkærɪdʒ]
+美[ˈkærɪdʒ]
+n.	运费; 运输，输送; （旧时载客的） 四轮马车; 〈英〉火车客车车厢;
+
+feed	英[fi:d]
+美[fid]
+vt.	喂养; 满足（欲望等）; 向…提供; 供…作食物;
+vi.	吃，以…为食; 流入，注入，进入（如油流入机器）; [电子学] 馈入;
+n.	饲料（尤指粗饲料），施肥; 喂送; 草料; （尤指向地方性电视台） 馈送电视节目;
+
+回车 carriage return
+换行 line feed

@@ -1,0 +1,8 @@
+"v=0 \r\n"
+
+D:/osrc/jsdp-1.1/src/src/main/java/net/sourceforge/jsdp/Version.java
+
+int version = Integer.parseInt(field.substring(2));
+
+异常：
+NumberFormatException parseException

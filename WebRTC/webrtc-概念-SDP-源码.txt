@@ -1,0 +1,45 @@
+----------------------------------------------------
+https://github.com/ibauersachs/sdes4j
+----------------------------------------------------
+Implementation of RFC4568: 
+Session Description Protocol (SDP) Security Descriptions for Media Streams for Java.
+
+----------------------------------------------------
+http://jsdp.sourceforge.net/index.html
+https://sourceforge.net/projects/jsdp/
+----------------------------------------------------
+
+jSDP: a Java implementation of SDP protocol
+
+The IETF protocol SDP provides a standard representation 
+for information that describe multi-media sessions. 
+
+This information are included within other protocol messages as payload so, 
+typically, a SDP message is contained as an element of a message in the following protocols:
+
+Session Announcement Protocol, SAP
+Session Initiation Protocol, SIP
+Real Time Streaming Protocol, RTSP
+SMTP , using the MIME extensions
+Hypertext Transfer Protocol, HTTP
+
+SDP protocol was specified by RFC 4566: 
+jSDP is a Java library that enable users to manipulate SDP messages.
+
+https://jcp.org/en/jsr/detail?id=141
+
+Description:
+
+The IETF protocol SDP specifies messages 
+that describe multi-media sessions and are included within other protocol messages as payload. 
+The API will enable users to manipulate SDP messages. 
+
+Java Specification Requests (JSRs) 
+are the actual descriptions of proposed and 
+final specifications for the Java platform. 
+
+解释：
+
+Java Specification Request (JSR)
+JCP（Java Community Process) 
+是一个开放的国际组织，主要由Java开发者以及被授权者组成，职能是发展和更新
